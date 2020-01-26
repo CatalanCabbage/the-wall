@@ -1,0 +1,11 @@
+{
+  "name": "thewall",
+  "version": "1.0.0",
+  "description": "We’re going to build a wall, folks. We’re going to build a wall. We’re going to build it. Don’t worry. We’re going to build a wall. That wall will go up so fast your head will spin.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "CatalanCabbage",
+  "license": "ISC"
+}
