@@ -2,10 +2,22 @@
   "name": "thewall",
   "version": "1.0.0",
   "description": "We’re going to build a wall, folks. We’re going to build a wall. We’re going to build it. Don’t worry. We’re going to build a wall. That wall will go up so fast your head will spin.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "author": "CatalanCabbage",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "electron-rebuild": "^1.10.0",
+    "mocha": "^7.0.1"
+  },
+  "dependencies": {
+    "electron": "^7.1.11",
+    "electron-reload": "^1.5.0",
+    "sequelize": "^5.21.3",
+    "sqlite3": "^4.1.1"
+  }
 }
