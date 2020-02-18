@@ -128,6 +128,23 @@ dataAccess.getTag = function getTag(tagId) {
         })
 };
 
+/**
+ * Gets all entries from Tags table
+ * @return Promise
+ */
+dataAccess.getTags = function getTags() {
+    return Tag.findAll(
+        {
+            attributes: ["id", "name", "desc"]
+        })
+        .then(tags => {
+            return tags;
+        })
+        .catch(err => {
+            console.error(err);
+            return false;
+        })
+};
 
 /**
  * Deletes entry from Tags table
@@ -200,6 +217,23 @@ dataAccess.getSection = function getSection(sectionId) {
         })
 };
 
+/**
+ * Gets all entries from Sections table
+ * @return Promise
+ */
+dataAccess.getSections = function getSections() {
+    return Section.findAll(
+        {
+            attributes: ["id", "name", "parent_section_id"]
+        })
+        .then(sections => {
+            return sections;
+        })
+        .catch(err => {
+            console.error(err);
+            return false;
+        })
+};
 
 /**
  * Deletes entry from Sections table
@@ -236,7 +270,7 @@ dataAccess.addTask = function addTask(taskDetails) {
     return Task.create(
         {name: taskDetails.name, desc: taskDetails.desc, status: taskDetails.status, weightage: taskDetails.weightage,
             entry_time: taskDetails.entryTime, finish_time: taskDetails.finishTime, parent_section_id: taskDetails.parentSectionId},
-        {fields: ["name", "desc", "status", "weightage", "entryTime", "finishTime", "parentSectionId"]} //Allows insertion of only these fields
+        {fields: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]} //Allows insertion of only these fields
     )
         .then(() => {
             return true;
@@ -263,8 +297,8 @@ dataAccess.getTask = function getTask(taskId) {
             attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
             where: {task_id: taskId}
         })
-        .then(section => {
-            return section;
+        .then(task => {
+            return task;
         })
         .catch(err => {
             console.error(err);
@@ -272,6 +306,44 @@ dataAccess.getTask = function getTask(taskId) {
         })
 };
 
+/**
+ * Gets all entries from Task table
+ * @return Promise
+ * @param taskId
+ */
+dataAccess.getTasks = function getTasks() {
+    return TaskTagRel.findAll(
+        {
+            attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]
+        })
+        .then(tasks => {
+            return tasks;
+        })
+        .catch(err => {
+            console.error(err);
+            return false;
+        })
+};
+
+/**
+ * Gets entries from Task table corresponding to that parent_section_id
+ * @return Promise
+ * @param parentSectionId
+ */
+dataAccess.getTasksBySectionId = function getTasksBySectionId(parentSectionId) {
+    return TaskTagRel.findAll(
+        {
+            attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
+            where: {parent_section_id: parentSectionId}
+        })
+        .then(tasks => {
+            return tasks;
+        })
+        .catch(err => {
+            console.error(err);
+            return false;
+        })
+};
 
 /**
  * Deletes entry from Tasks table
@@ -346,6 +418,25 @@ dataAccess.getTaskTagRel = function getTaskTagRel(taskId) {
         })
 };
 
+/**
+ * Gets entry from TaskTagRels
+ * @return Promise
+ * @param taskId
+ */
+dataAccess.getTaskTagRels = function getTaskTagRels() {
+    return TaskTagRel.findAll(
+        {
+            attributes: ["id", "task_id", "tag_id"],
+            where: {task_id: taskId}
+        })
+        .then(taskTagRels => {
+            return taskTagRels;
+        })
+        .catch(err => {
+            console.error(err);
+            return false;
+        })
+};
 
 /**
  * Deletes entry from TaskTagRel table
@@ -367,21 +458,24 @@ dataAccess.deleteTaskTagRel = function deleteTaskTagRel(TaskTagRelId) {
 //DataAccess for TaskTagRel ends----------------------------------------------------------------------------------------
 
 
-/**
+/*
  Example snippets:
  Tags:
+     Add:
     tagDetails = {name: "testName", desc: "testDescription"};
     dataAccess.addTag(tagDetails).then((result) => {
         console.log(result);
     })
 
  Sections:
+    Add:
     sectionDetails = {name: "testName", parentSectionId: 1};
     dataAccess.addSection(sectionDetails).then((result) => {
         console.log(result);
     })
 
  Tasks:
+     Add:
      taskDetails = {name: "testName", desc:"testDesc", status: "Completed", weightage: 10,
         entryTime:"2007-01-01 10:00:00", finishTime:"2007-01-01 10:10:00", parentSectionId: 1};
      dataAccess.addTask(taskDetails).then((result) => {
@@ -389,13 +483,14 @@ dataAccess.deleteTaskTagRel = function deleteTaskTagRel(TaskTagRelId) {
     })
 
  TaskTagRel:
+     Add:
      taskTagRelDetails = {taskId: 1, tagId: 1};
      dataAccess.addTaskTagRel(taskTagRelDetails).then((result) => {
         console.log(result);
     })
 
 
- **/
+ */
 console.log("Db file ends");
 
 module.exports = dataAccess;
