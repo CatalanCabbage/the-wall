@@ -40,6 +40,9 @@ const Section = sequelize.define('section', {
     id: {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
     parent_section_id: Sequelize.INTEGER,
     name: {type: Sequelize.STRING, allowNull: false}
+}, {
+    updatedAt: 'updated_at',
+    createdAt: 'created_at'
 });
 
 //Tasks
@@ -56,6 +59,9 @@ const Task = sequelize.define('task', {
         allowNull: false,
         references: {model: Section, key: 'id'}
     }
+}, {
+    updatedAt: 'updated_at',
+    createdAt: 'created_at'
 });
 
 //Tag
@@ -63,12 +69,18 @@ const Tag = sequelize.define('tag', {
     id: {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
     name: {type: Sequelize.STRING, allowNull: false, unique: true},
     desc: {type: Sequelize.STRING, allowNull: false},
+}, {
+    updatedAt: 'updated_at',
+    createdAt: 'created_at'
 });
 
 //Task to Tag relational mapping
 const TaskTagRel = sequelize.define('task_tag_rel', {
     task_id: {type: Sequelize.INTEGER, allowNull: false, references: {model: Task, key: 'id'}},
     tag_id: {type: Sequelize.INTEGER, allowNull: false, references: {model: Tag, key: 'id'}},
+}, {
+    updatedAt: 'updated_at',
+    createdAt: 'created_at'
 });
 
 
@@ -242,8 +254,8 @@ dataAccess.getSections = function getSections() {
  */
 dataAccess.deleteSection = function deleteSection(sectionId) {
     return Section.destroy({
-            where: {id: sectionId}
-        })
+        where: {id: sectionId}
+    })
         .then(() => {
             return true;
         })
@@ -268,8 +280,15 @@ dataAccess.addTask = function addTask(taskDetails) {
     }
 
     return Task.create(
-        {name: taskDetails.name, desc: taskDetails.desc, status: taskDetails.status, weightage: taskDetails.weightage,
-            entry_time: taskDetails.entryTime, finish_time: taskDetails.finishTime, parent_section_id: taskDetails.parentSectionId},
+        {
+            name: taskDetails.name,
+            desc: taskDetails.desc,
+            status: taskDetails.status,
+            weightage: taskDetails.weightage,
+            entry_time: taskDetails.entryTime,
+            finish_time: taskDetails.finishTime,
+            parent_section_id: taskDetails.parentSectionId
+        },
         {fields: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]} //Allows insertion of only these fields
     )
         .then(() => {

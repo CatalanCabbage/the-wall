@@ -1,0 +1,64 @@
+body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    background: #29B6F6;
+    overflow: hidden;
+}
+#title-bar {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    position: fixed;
+    height: 40px;
+    width: 100%;
+    left: 0px;
+    top: 0px;
+    background: #254053;
+    -webkit-app-region: drag;
+}
+#title-bar__controls {
+    display: grid;
+    grid-template-columns: repeat(2, 46px); 
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    -webkit-app-region: no-drag;
+}
+.title-bar__button {
+    grid-row: 1 / span 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: #387994;
+}
+#minimize-button {
+    grid-column: 1;
+}
+#close-button {
+    grid-column: 2;
+}
+#title-bar__title {
+    display: flex;
+    grid-column: 2;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    white-space: nowrap;
+    background: #387994;
+    align-items: center;
+    justify-content: center;
+}
+main {
+    display: grid;
+    padding-top: 40px;
+}
+.panel {
+    height: 100%;
+    width: 10%;
+}

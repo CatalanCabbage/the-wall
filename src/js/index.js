@@ -1,7 +1,28 @@
-var s = 10
-var asd = s + 2
+const remote = require('electron').remote;
 
-const h1 = document.getElementById('h1-hello')
-h1.addEventListener('click', function(){
-    s = s + 1
-})
+const win = remote.getCurrentWindow();
+
+// When document has loaded, initialise
+document.onreadystatechange = (event) => {
+    if (document.readyState == "complete") {
+        handleWindowControls();
+    }
+};
+
+window.onbeforeunload = (event) => {
+    /* If window is reloaded, remove win event listeners
+    (DOM element listeners get auto garbage collected but not
+    Electron win listeners as the win is not dereferenced unless closed) */
+    win.removeAllListeners();
+}
+
+function handleWindowControls() {
+    // Make minimise/maximise/restore/close buttons work when they are clicked
+    document.getElementById('minimize-button').addEventListener("click", event => {
+        win.minimize();
+    });
+
+    document.getElementById('close-button').addEventListener("click", event => {
+        win.close();
+    });
+}

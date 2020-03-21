@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-  </head>
-  <body>
-    <h1 id="h1-hello">Hello World!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-  </body>
-  <script src="../js/index.js"></script>
-  <script src="../js/dataAccess.js"></script>
+    <head>
+        <meta charset="UTF-8">
+        <title>The Wall</title>
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+        <link rel="stylesheet" type="text/css" href="../../node_modules/metro4/build/css/metro.css">
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
+    </head>
+    <body>
+    <header id="title-bar">
+        <div id="title-bar__title">
+            The Wall
+        </div>
+        <div id="title-bar__controls">
+            <div class="title-bar__button" id="minimize-button">-</div>
+            <div class="title-bar__button" id="close-button">x</div>
+        </div>
+    </header>
+    <main>
+        <div data-role="panel" class="panel">
+            ...
+        </div>
+    </main>
+    </body>
+    <script src="../../node_modules/metro4/build/js/metro.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/dataAccess.js"></script>
 </html>
