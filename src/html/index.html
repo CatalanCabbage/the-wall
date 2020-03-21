@@ -5,7 +5,7 @@
         <title>The Wall</title>
         <link rel="stylesheet" type="text/css" href="../css/style.css">
         <link rel="stylesheet" type="text/css" href="../../node_modules/metro4/build/css/metro.css">
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';"/>
     </head>
     <body>
     <header id="title-bar">
@@ -18,12 +18,26 @@
         </div>
     </header>
     <main>
-        <div data-role="panel" class="panel">
-            ...
+        <div id="main-panels">
+            <div data-role="panel" data-title-caption="testTitle" class="panel">
+                ...
+            </div>
+            <div data-role="panel" data-title-caption="testTitle" class="panel">
+                ...
+            </div>
+            <div data-role="panel" data-title-caption="testTitle" class="panel">
+                ...
+            </div>
+            <div data-role="panel" data-title-caption="testTitle" class="panel">
+                ...
+            </div>
+            <div data-role="panel" data-title-caption="testTitle" class="panel">
+                ...
+            </div>
         </div>
     </main>
     </body>
-    <script src="../../node_modules/metro4/build/js/metro.js"></script>
-    <script src="../js/index.js"></script>
+    <script src="../../node_modules/metro4/build/js/metro.js" ></script>
     <script src="../js/dataAccess.js"></script>
+    <script src="../js/index.js"></script>
 </html>

@@ -6,6 +6,8 @@ body {
     top: 0px;
     background: #29B6F6;
     overflow: hidden;
+    margin:0;
+    padding:0;
 }
 #title-bar {
     display: grid;
@@ -55,10 +57,17 @@ body {
     justify-content: center;
 }
 main {
-    display: grid;
     padding-top: 40px;
-}
-.panel {
     height: 100%;
-    width: 10%;
+    width: 100%;
+}
+#main-panels {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(3, auto);
+    grid-gap: 5px;
+    justify-items: stretch;
+    align-items: stretch;
+    height: 100%;
+    width: 100%;
 }

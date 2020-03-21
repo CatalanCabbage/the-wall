@@ -233,8 +233,9 @@ dataAccess.getSection = function getSection(sectionId) {
  * Gets all entries from Sections table
  * @return Promise
  */
-dataAccess.getSections = function getSections() {
-    return Section.findAll(
+ //TODO: Change all to async-await
+dataAccess.getSections = async function getSections() {
+    return await Section.findAll(
         {
             attributes: ["id", "name", "parent_section_id"]
         })
