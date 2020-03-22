@@ -93,13 +93,13 @@ sequelize.sync();
  * @param tagDetails Object containing params
  * Params: name, desc
  */
-dataAccess.addTag = function addTag(tagDetails) {
+dataAccess.addTag = async function addTag(tagDetails) {
     if (typeof tagDetails != "object" || tagDetails == null) {
         console.error("Sections: Param passed is invalid");
         return false;
     }
 
-    return Tag.create(
+    return await Tag.create(
         {name: tagDetails.name, desc: tagDetails.desc},
         {fields: ["name", "desc"]} //Allows insertion of only these fields
     )
@@ -125,8 +125,8 @@ dataAccess.addTag = function addTag(tagDetails) {
  * @return Promise
  * @param tagId
  */
-dataAccess.getTag = function getTag(tagId) {
-    return Tag.findOne(
+dataAccess.getTag = async function getTag(tagId) {
+    return await Tag.findOne(
         {
             attributes: ["id", "name", "desc"],
             where: {id: tagId}
@@ -144,8 +144,8 @@ dataAccess.getTag = function getTag(tagId) {
  * Gets all entries from Tags table
  * @return Promise
  */
-dataAccess.getTags = function getTags() {
-    return Tag.findAll(
+dataAccess.getTags = async function getTags() {
+    return await Tag.findAll(
         {
             attributes: ["id", "name", "desc"]
         })
@@ -163,8 +163,8 @@ dataAccess.getTags = function getTags() {
  * @return Promise
  * @param tagId
  */
-dataAccess.deleteTag = function deleteTag(tagId) {
-    return Tag
+dataAccess.deleteTag = async function deleteTag(tagId) {
+    return await Tag
         .destroy({
             where: {id: tagId}
         })
@@ -185,13 +185,13 @@ dataAccess.deleteTag = function deleteTag(tagId) {
  * @param sectionDetails Object containing params
  * Params: name, parentSectionId
  */
-dataAccess.addSection = function addSection(sectionDetails) {
+dataAccess.addSection = async function addSection(sectionDetails) {
     if (typeof sectionDetails != "object" || sectionDetails == null) {
         console.error("Sections: Param passed is invalid");
         return false;
     }
 
-    return Section.create(
+    return await Section.create(
         {name: sectionDetails.name, parent_section_id: sectionDetails.parentSectionId},
         {fields: ["name", "parent_section_id"]} //Allows insertion of only these fields
     )
@@ -214,8 +214,8 @@ dataAccess.addSection = function addSection(sectionDetails) {
  * @return Promise
  * @param sectionId
  */
-dataAccess.getSection = function getSection(sectionId) {
-    return Section.findOne(
+dataAccess.getSection = async function getSection(sectionId) {
+    return await Section.findOne(
         {
             attributes: ["id", "name", "parent_section_id"],
             where: {id: sectionId}
@@ -233,7 +233,6 @@ dataAccess.getSection = function getSection(sectionId) {
  * Gets all entries from Sections table
  * @return Promise
  */
- //TODO: Change all to async-await
 dataAccess.getSections = async function getSections() {
     return await Section.findAll(
         {
@@ -253,8 +252,8 @@ dataAccess.getSections = async function getSections() {
  * @return Promise
  * @param sectionId
  */
-dataAccess.deleteSection = function deleteSection(sectionId) {
-    return Section.destroy({
+dataAccess.deleteSection = async function deleteSection(sectionId) {
+    return await Section.destroy({
         where: {id: sectionId}
     })
         .then(() => {
@@ -274,13 +273,13 @@ dataAccess.deleteSection = function deleteSection(sectionId) {
  * @param taskDetails Object containing params
  * Params: name, desc, status, weightage, entryTime, finishTime, parentSectionId
  */
-dataAccess.addTask = function addTask(taskDetails) {
+dataAccess.addTask = async function addTask(taskDetails) {
     if (typeof taskDetails != "object" || taskDetails == null) {
         console.error("Task: Param passed is invalid");
         return false;
     }
 
-    return Task.create(
+    return await Task.create(
         {
             name: taskDetails.name,
             desc: taskDetails.desc,
@@ -311,8 +310,8 @@ dataAccess.addTask = function addTask(taskDetails) {
  * @return Promise
  * @param taskId
  */
-dataAccess.getTask = function getTask(taskId) {
-    return TaskTagRel.findOne(
+dataAccess.getTask = async function getTask(taskId) {
+    return await TaskTagRel.findOne(
         {
             attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
             where: {task_id: taskId}
@@ -331,8 +330,8 @@ dataAccess.getTask = function getTask(taskId) {
  * @return Promise
  * @param taskId
  */
-dataAccess.getTasks = function getTasks() {
-    return TaskTagRel.findAll(
+dataAccess.getTasks = async function getTasks() {
+    return await TaskTagRel.findAll(
         {
             attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]
         })
@@ -350,8 +349,8 @@ dataAccess.getTasks = function getTasks() {
  * @return Promise
  * @param parentSectionId
  */
-dataAccess.getTasksBySectionId = function getTasksBySectionId(parentSectionId) {
-    return TaskTagRel.findAll(
+dataAccess.getTasksBySectionId = async function getTasksBySectionId(parentSectionId) {
+    return await TaskTagRel.findAll(
         {
             attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
             where: {parent_section_id: parentSectionId}
@@ -370,8 +369,8 @@ dataAccess.getTasksBySectionId = function getTasksBySectionId(parentSectionId) {
  * @return Promise
  * @param taskId
  */
-dataAccess.deleteTask = function deleteTask(taskId) {
-    return Task.destroy({
+dataAccess.deleteTask = async function deleteTask(taskId) {
+    return await Task.destroy({
         where: {id: taskId}
     })
         .then(() => {
@@ -391,13 +390,13 @@ dataAccess.deleteTask = function deleteTask(taskId) {
  * @param taskTagRelDetails Object containing params
  * Params: taskId, tagId
  */
-dataAccess.addTaskTagRel = function addTaskTagRel(taskTagRelDetails) {
+dataAccess.addTaskTagRel = async function addTaskTagRel(taskTagRelDetails) {
     if (typeof taskTagRelDetails != "object" || taskTagRelDetails == null) {
         console.error("TaskTagRels: Param passed is invalid");
         return false;
     }
 
-    return TaskTagRel.create(
+    return await TaskTagRel.create(
         {task_id: taskTagRelDetails.taskId, tag_id: taskTagRelDetails.tagId},
         {fields: ["task_id", "tag_id"]} //Allows insertion of only these fields
     )
@@ -423,8 +422,8 @@ dataAccess.addTaskTagRel = function addTaskTagRel(taskTagRelDetails) {
  * @return Promise
  * @param taskId
  */
-dataAccess.getTaskTagRel = function getTaskTagRel(taskId) {
-    return TaskTagRel.findOne(
+dataAccess.getTaskTagRel = async function getTaskTagRel(taskId) {
+    return await TaskTagRel.findOne(
         {
             attributes: ["id", "task_id", "tag_id"],
             where: {task_id: taskId}
@@ -443,8 +442,8 @@ dataAccess.getTaskTagRel = function getTaskTagRel(taskId) {
  * @return Promise
  * @param taskId
  */
-dataAccess.getTaskTagRels = function getTaskTagRels() {
-    return TaskTagRel.findAll(
+dataAccess.getTaskTagRels = async function getTaskTagRels() {
+    return await TaskTagRel.findAll(
         {
             attributes: ["id", "task_id", "tag_id"],
             where: {task_id: taskId}
@@ -463,8 +462,8 @@ dataAccess.getTaskTagRels = function getTaskTagRels() {
  * @return Promise
  * @param TaskTagRelId
  */
-dataAccess.deleteTaskTagRel = function deleteTaskTagRel(TaskTagRelId) {
-    return TaskTagRel.destroy({
+dataAccess.deleteTaskTagRel = async function deleteTaskTagRel(TaskTagRelId) {
+    return await TaskTagRel.destroy({
         where: {id: TaskTagRelId}
     })
         .then(() => {
