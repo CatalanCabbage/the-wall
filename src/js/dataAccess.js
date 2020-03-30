@@ -1,5 +1,5 @@
 let dataAccess = {};
-
+const { QueryTypes } = require('sequelize');
 console.log('Connected to DB yet?');
 
 // Create database connection
@@ -248,6 +248,30 @@ dataAccess.getSections = async function getSections() {
 };
 
 /**
+ * Gets all entries from Sections table
+ * @return Promise
+ */
+dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
+    var totalWeightage = await sequelize.query("select distinct sections.id as id, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id",
+        { type: QueryTypes.SELECT }
+    );
+    var completedWeightage = await sequelize.query("select distinct sections.id as id, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is 'Completed' group by sections.id",
+            { type: QueryTypes.SELECT }
+        );
+    var weightage = {};
+    totalWeightage.forEach(function(totalWeightageObj){
+        weightage[totalWeightageObj.id] = {"total" : totalWeightageObj.total, "completed" : 0};
+    })
+    completedWeightage.forEach(function(completedWeightageObj){
+        var tempObj = weightage[completedWeightageObj.id];
+        tempObj["completed"] = completedWeightageObj.completed;
+        weightage[completedWeightageObj.id] = tempObj;
+    })
+    console.log("weightage : " + JSON.stringify(weightage));
+    return totalWeightage;
+};
+
+/**
  * Deletes entry from Sections table
  * @return Promise
  * @param sectionId
@@ -271,25 +295,59 @@ dataAccess.deleteSection = async function deleteSection(sectionId) {
  * Adds entry in Task table
  * @return Promise
  * @param taskDetails Object containing params
- * Params: name, desc, status, weightage, entryTime, finishTime, parentSectionId
+ * Params: name, desc, status, weightage, parentSectionId
  */
 dataAccess.addTask = async function addTask(taskDetails) {
     if (typeof taskDetails != "object" || taskDetails == null) {
         console.error("Task: Param passed is invalid");
         return false;
     }
-
+    var currentTime = new Date();
     return await Task.create(
         {
             name: taskDetails.name,
             desc: taskDetails.desc,
             status: taskDetails.status,
             weightage: taskDetails.weightage,
-            entry_time: taskDetails.entryTime,
-            finish_time: taskDetails.finishTime,
+            entry_time: currentTime,
+            finish_time: currentTime,
             parent_section_id: taskDetails.parentSectionId
         },
         {fields: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]} //Allows insertion of only these fields
+    )
+        .then(() => {
+            return true;
+        })
+        .catch(err => {
+            if (err.toString().includes("cannot be null")) {
+                console.error("Task: Param missing", err);
+                return false;
+            } else {
+                console.error(err);
+                return false;
+            }
+        });
+};
+
+/**
+ * Updates Task status in Task table; also updates finish_time with current time
+ * @return Promise
+ * @param taskDetails Object containing params
+ * Params: id, status
+ */
+dataAccess.updateTaskStatus = async function updateTaskStatus(taskDetails) {
+    if (typeof taskDetails != "object" || taskDetails == null) {
+        console.error("Task: Param passed is invalid");
+        return false;
+    }
+    var currentTime = new Date();
+    return await Task.update(
+        {
+            status: taskDetails.status,
+            finish_time: currentTime
+        },
+        {fields: ["status","finish_time"]}, //Allows insertion of only these fields
+        {where: {id: taskDetails.id}}
     )
         .then(() => {
             return true;
@@ -331,7 +389,7 @@ dataAccess.getTask = async function getTask(taskId) {
  * @param taskId
  */
 dataAccess.getTasks = async function getTasks() {
-    return await TaskTagRel.findAll(
+    return await Task.findAll(
         {
             attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]
         })
@@ -350,7 +408,7 @@ dataAccess.getTasks = async function getTasks() {
  * @param parentSectionId
  */
 dataAccess.getTasksBySectionId = async function getTasksBySectionId(parentSectionId) {
-    return await TaskTagRel.findAll(
+    return await Task.findAll(
         {
             attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
             where: {parent_section_id: parentSectionId}
@@ -495,11 +553,16 @@ dataAccess.deleteTaskTagRel = async function deleteTaskTagRel(TaskTagRelId) {
 
  Tasks:
      Add:
-     taskDetails = {name: "testName", desc:"testDesc", status: "Completed", weightage: 10,
-        entryTime:"2007-01-01 10:00:00", finishTime:"2007-01-01 10:10:00", parentSectionId: 1};
+     taskDetails = {name: "testName", desc:"testDesc", status: "Completed", weightage: 10, parentSectionId: 1};
      dataAccess.addTask(taskDetails).then((result) => {
         console.log(result);
     })
+    Update:
+         taskDetails = {status: "Completed", id:1};
+         async function updateStatus(){
+             var data = await dataAccess.updateTaskStatus(taskDetails)
+             console.log(data);
+         }
 
  TaskTagRel:
      Add:

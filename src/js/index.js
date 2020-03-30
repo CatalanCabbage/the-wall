@@ -33,11 +33,20 @@ async function addMainPanels() {
     sections.forEach(function(section) {
         id = section.dataValues.id;
         name = section.dataValues.name;
-        var panelTemplate = '<div data-role="panel" data-title-caption="testTitle" class="panel" id="panel' + id + '">'
-                + name
+        var panelTemplate = '<div data-role="panel" data-title-caption="'+ name +'" class="panel main-panel" data-width="280" data-height="250" id="section' + id + '">'
+                + '<div id="donut3" data-role="donut" data-value="35" data-hole=".6" data-stroke="#f5f5f5" data-fill="#9C27B0" data-animate="10" data-size="80"></div>'
                 + '</div>';
         panelElements = panelElements + panelTemplate;
     });
     mainPanelsElem.html(panelElements);
+    setMainPanelsEvents();
 }
 addMainPanels();
+
+function setMainPanelsEvents() {
+    console.log("setMainPanelsEvents");
+    console.log("setMainPanelsEvents", $(".main-panel"));
+    $(".main-panel").on("click", function() {
+       console.log("ad");
+    });
+}
