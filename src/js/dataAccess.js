@@ -241,7 +241,7 @@ dataAccess.getSections = async function getSections() {
             attributes: ["id", "name", "parent_section_id"]
         })
         .then(sections => {
-            return sections;
+            return sections.dataValues;
         })
         .catch(err => {
             console.error(err);
@@ -254,23 +254,24 @@ dataAccess.getSections = async function getSections() {
  * @return Promise
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
-    var totalWeightage = await sequelize.query("select distinct sections.id as id, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id",
+    var totalWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id",
         { type: QueryTypes.SELECT }
     );
-    var completedWeightage = await sequelize.query("select distinct sections.id as id, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is 'Completed' group by sections.id",
+    var completedWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is 'completed' group by sections.id",
             { type: QueryTypes.SELECT }
         );
     var weightage = {};
     totalWeightage.forEach(function(totalWeightageObj){
-        weightage[totalWeightageObj.id] = {"total" : totalWeightageObj.total, "completed" : 0};
+        weightage[totalWeightageObj.id] = {"name" : totalWeightageObj.name, "total" : totalWeightageObj.total, "completed" : 0};
     })
     completedWeightage.forEach(function(completedWeightageObj){
         var tempObj = weightage[completedWeightageObj.id];
         tempObj["completed"] = completedWeightageObj.completed;
         weightage[completedWeightageObj.id] = tempObj;
     })
-    console.log("weightage : " + JSON.stringify(weightage));
-    return totalWeightage;
+    console.log(weightage);
+    console.log(totalWeightage)
+    return weightage;
 };
 
 /**

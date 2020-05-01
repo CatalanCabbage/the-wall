@@ -26,21 +26,25 @@ function handleWindowControls() {
         win.close();
     });
 }
+addMainPanels();
 async function addMainPanels() {
     var mainPanelsElem = $("#main-panels");
     var panelElements = "", name, id;
 
-    var sections = await dataAccess.getSections();
-    sections.forEach(function(section) {
-        id = section.dataValues.id;
-        name = section.dataValues.name;
-        var panelTemplate = '<div data-role="panel" data-title-caption="'+ name +'" class="panel main-panel" data-width="280" data-height="250" id="section' + id + '">'
-                + '<div id="donut3" data-role="donut" data-value="35" data-hole=".6" data-stroke="#f5f5f5" data-fill="#9C27B0" data-animate="10" data-size="80"></div>'
+    var sections = await dataAccess.getWeightageOfSections();
+    for (var key in sections) {
+        var section = sections[key];
+        id = key;
+        name = section.name;
+        total = section.total;
+        completed = section.completed;
+        var panelTemplate = '<div class="card" id="section' + id + '">'
+                + '<div class="ui statistic"><div class="value">' + completed + '</div><div class="label">' + total + '</div></div>'
+                + '<div class="content">' + name + '</div>'
                 + '</div>';
         panelElements = panelElements + panelTemplate;
-    });
+    };
     mainPanelsElem.html(panelElements);
-    setMainPanelsEvents();
 }
 function initListeners() {
     document.getElementById('task-submit-btn').addEventListener('click', event => {
@@ -69,7 +73,7 @@ async function addTask() {
     taskObj = await dataAccess.addTask(taskInpObj);
     overallWeightage = await dataAccess.getOverallWeightage();
     console.log(overallWeightage);
-    pointsPanel.innerHTML = overallWeightage.completed;
+    //pointsPanel.innerHTML = overallWeightage.completed;
     taskNameInp.value = '';
     sectionNameInp.value = '';
     pointsInp.value = '';
