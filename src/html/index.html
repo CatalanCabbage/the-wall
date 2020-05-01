@@ -4,8 +4,9 @@
         <meta charset="UTF-8">
         <title>The Wall</title>
         <link rel="stylesheet" type="text/css" href="../css/style.css">
-        <link rel="stylesheet" type="text/css" href="../../node_modules/metro4/build/css/metro.css">
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';"/>
+        <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../node_modules/fomantic-ui/dist/semantic.min.css">
+        <script src="../../node_modules/fomantic-ui/dist/semantic.min.js"></script>
     </head>
     <body>
     <header id="title-bar">
@@ -18,26 +19,18 @@
         </div>
     </header>
     <main>
-        <div id="main-panels">
-            <div data-role="panel" data-title-caption="testTitle" class="panel">
-                ...
-            </div>
-            <div data-role="panel" data-title-caption="testTitle" class="panel">
-                ...
-            </div>
-            <div data-role="panel" data-title-caption="testTitle" class="panel">
-                ...
-            </div>
-            <div data-role="panel" data-title-caption="testTitle" class="panel">
-                ...
-            </div>
-            <div data-role="panel" data-title-caption="testTitle" class="panel">
-                ...
-            </div>
+        <form id="input-bar" class="ui input">
+            <input class="task-input" id= "task-input__section" type="text" placeholder="section">
+            <input class="task-input" id= "task-input__name" type="text" placeholder="name">
+            <input class="task-input" id= "task-input__points" type="number" placeholder="points">
+            <button id="task-submit-btn" type="button" onclick="addTask()">b</button>
+        </div>
+    </form>
+        <div id="points-panel">
+            89
         </div>
     </main>
     </body>
-    <script src="../../node_modules/metro4/build/js/metro.js" ></script>
     <script src="../js/dataAccess.js"></script>
     <script src="../js/index.js"></script>
 </html>

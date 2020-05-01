@@ -6,6 +6,7 @@ const win = remote.getCurrentWindow();
 document.onreadystatechange = (event) => {
     if (document.readyState == "complete") {
         handleWindowControls();
+        initListeners();
     }
 };
 
@@ -41,12 +42,35 @@ async function addMainPanels() {
     mainPanelsElem.html(panelElements);
     setMainPanelsEvents();
 }
-addMainPanels();
-
-function setMainPanelsEvents() {
-    console.log("setMainPanelsEvents");
-    console.log("setMainPanelsEvents", $(".main-panel"));
-    $(".main-panel").on("click", function() {
-       console.log("ad");
-    });
+function initListeners() {
+    document.getElementById('task-submit-btn').addEventListener('click', event => {
+        console.log();
+    })
+}
+async function addTask() {
+    let taskNameInp = document.getElementById('task-input__name');
+    let sectionNameInp = document.getElementById('task-input__section');
+    let pointsInp = document.getElementById('task-input__points');
+    let pointsPanel = document.getElementById('points-panel');
+    console.log(sectionNameInp.value.toString().toLowerCase());
+    let sectionObj = await dataAccess.getSection(sectionNameInp.value.toString().toLowerCase());
+    if(sectionObj == null) {
+        //If null, add the Section
+        sectionObj = await dataAccess.addSection({name: sectionNameInp.value, parentSectionId: 0});
+    }
+    let sectionId = sectionObj.id;
+    let taskInpObj = {
+        name: taskNameInp.value,
+        desc: "--", 
+        status: "completed", 
+        weightage: pointsInp.value, 
+        parentSectionId: sectionId
+    }
+    taskObj = await dataAccess.addTask(taskInpObj);
+    overallWeightage = await dataAccess.getOverallWeightage();
+    console.log(overallWeightage);
+    pointsPanel.innerHTML = overallWeightage.completed;
+    taskNameInp.value = '';
+    sectionNameInp.value = '';
+    pointsInp.value = '';
 }

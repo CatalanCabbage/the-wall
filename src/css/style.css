@@ -22,7 +22,7 @@ body {
 }
 #title-bar__controls {
     display: grid;
-    grid-template-columns: repeat(2, 46px); 
+    grid-template-columns: repeat(2, 46px);
     position: absolute;
     top: 0;
     right: 0;
@@ -58,21 +58,99 @@ body {
 }
 main {
     padding-top: 40px;
+    display: grid;
+    grid-template-rows: 1fr 9fr;
+    background: #aaaaaa;
     height: 100%;
     width: 100%;
 }
-#main-panels {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-rows: repeat(3, auto);
-    grid-gap: 5px;
-    justify-items: stretch;
-    align-items: stretch;
-    height: 100%;
-    width: 100%;
+#input-bar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 20px;
 }
-.main-panel {
-    display: grid;
-    height: 100%;
+#points-panel{
+    font-size: 8rem;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    animation-name: shaker;
+    animation-duration: 600ms;
+    animation-timing-function: ease-in-out;
+    animation-delay: 1s;
+}
+@keyframes shaker {
+ 0% {
+  transform: translate(0px, 0px) rotate(0deg);
+  opacity: 0.8;
+ }
+ 10% {
+  transform: translate(10px, 7px) rotate(-9deg);
+  opacity: 0.6;
+ }
+ 20% {
+  transform: translate(13px, -19px) rotate(-3deg);
+  opacity: 0.3;
+ }
+ 30% {
+  transform: translate(-6px, -6px) rotate(2deg);
+  opacity: 0.4;
+ }
+ 40% {
+  transform: translate(-9px, -18px) rotate(-5deg);
+  opacity: 0.4;
+ }
+ 50% {
+  transform: translate(10px, -8px) rotate(5deg);
+  opacity: 0.7;
+ }
+ 60% {
+  transform: translate(-10px, 14px) rotate(-6deg);
+  opacity: 1;
+ }
+ 70% {
+  transform: translate(10px, 3px) rotate(6deg);
+  opacity: 0.1;
+ }
+ 80% {
+  transform: translate(-2px, 20px) rotate(-6deg);
+  opacity: 1;
+ }
+ 90% {
+  transform: translate(-7px, -19px) rotate(2deg);
+  opacity: 0.5;
+ }
+}
+
+#task-input {
+    height: 36px;
+    line-height: 36px;
     width: 100%;
+    position: relative;
+    border: 1px #d9d9d9 solid;
+    background: #ffffff none;
+    display:block;
+    border-radius: 36px;
+    padding-left: 20px;
+    margin: 10px 10px;
+    box-sizing: border-box;
+    border: 1px #123123 solid;
+}
+
+.task-input:focus {
+    border: 4px #123123 solid;
+}
+
+#task-input__points {
+    width: 50%;
+}
+
+#task-submit-btn{
+    margin: 10px 10px;
+}
+*:focus {
+    outline: none;
 }

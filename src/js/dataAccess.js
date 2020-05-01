@@ -39,7 +39,7 @@ dataAccess.isConnected = isConnected();
 const Section = sequelize.define('section', {
     id: {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
     parent_section_id: Sequelize.INTEGER,
-    name: {type: Sequelize.STRING, allowNull: false}
+    name: {type: Sequelize.STRING, allowNull: false, unique: true}
 }, {
     updatedAt: 'updated_at',
     createdAt: 'created_at'
@@ -195,8 +195,8 @@ dataAccess.addSection = async function addSection(sectionDetails) {
         {name: sectionDetails.name, parent_section_id: sectionDetails.parentSectionId},
         {fields: ["name", "parent_section_id"]} //Allows insertion of only these fields
     )
-        .then(() => {
-            return true;
+        .then((res) => {
+            return res.dataValues;
         })
         .catch(err => {
             if (err.toString().includes("cannot be null")) {
@@ -212,16 +212,18 @@ dataAccess.addSection = async function addSection(sectionDetails) {
 /**
  * Gets entry from Sections table
  * @return Promise
- * @param sectionId
+ * @param sectionName
  */
-dataAccess.getSection = async function getSection(sectionId) {
+dataAccess.getSection = async function getSection(sectionName) {
     return await Section.findOne(
         {
             attributes: ["id", "name", "parent_section_id"],
-            where: {id: sectionId}
+            where: {name: sectionName}
         })
         .then(section => {
-            return section;
+            if(section != null) {
+                return section.dataValues;
+            }
         })
         .catch(err => {
             console.error(err);
@@ -248,7 +250,7 @@ dataAccess.getSections = async function getSections() {
 };
 
 /**
- * Gets all entries from Sections table
+ * Gets total and completed weights for each Section
  * @return Promise
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
@@ -269,6 +271,23 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
     })
     console.log("weightage : " + JSON.stringify(weightage));
     return totalWeightage;
+};
+
+/**
+ * Gets total and completed weights for each Section
+ * @return Promise
+ */
+dataAccess.getOverallWeightage = async function getOverallWeightage() {
+    var totalWeightage = await sequelize.query("select sum(tasks.weightage) as total from tasks",
+        { type: QueryTypes.SELECT }
+    );
+    var completedWeightage = await sequelize.query("select sum(tasks.weightage) as completed from tasks where tasks.status is 'completed'",
+        { type: QueryTypes.SELECT }
+    );
+    if(totalWeightage == null || completedWeightage == null) {
+        return null;
+    }
+    return {'total': totalWeightage['0']['total'], 'completed': completedWeightage['0']['completed']};
 };
 
 /**
@@ -315,8 +334,8 @@ dataAccess.addTask = async function addTask(taskDetails) {
         },
         {fields: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]} //Allows insertion of only these fields
     )
-        .then(() => {
-            return true;
+        .then((res) => {
+            return res.dataValues;
         })
         .catch(err => {
             if (err.toString().includes("cannot be null")) {
