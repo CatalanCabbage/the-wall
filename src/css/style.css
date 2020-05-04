@@ -57,7 +57,7 @@ body {
     justify-content: center;
 }
 main {
-    padding-top: 40px;
+    padding: 40px 40px;
     display: grid;
     grid-template-rows: 1fr 9fr;
     background: #aaaaaa;
@@ -69,7 +69,7 @@ main {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin: 10px 20px;
+    margin: 10px 40px;
 }
 #points-panel{
     font-size: 8rem;
@@ -125,27 +125,16 @@ main {
  }
 }
 
-#task-input {
-    height: 36px;
-    line-height: 36px;
-    width: 100%;
-    position: relative;
-    border: 1px #d9d9d9 solid;
-    background: #ffffff none;
-    display:block;
-    border-radius: 36px;
-    padding-left: 20px;
-    margin: 10px 10px;
-    box-sizing: border-box;
-    border: 1px #123123 solid;
-}
 
 .task-input:focus {
     border: 4px #123123 solid;
 }
 
-#task-input__points {
-    width: 50%;
+#task-input__points-container {
+    width: 10%;
+}
+.task-input.ui.input {
+    width: 10%;
 }
 
 #task-submit-btn{
@@ -153,4 +142,8 @@ main {
 }
 *:focus {
     outline: none;
+}
+
+#main-panels {
+    overflow-y: auto;
 }

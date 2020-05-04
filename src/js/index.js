@@ -6,7 +6,7 @@ const win = remote.getCurrentWindow();
 document.onreadystatechange = (event) => {
     if (document.readyState == "complete") {
         handleWindowControls();
-        initListeners();
+        initEvents();
     }
 };
 
@@ -26,7 +26,6 @@ function handleWindowControls() {
         win.close();
     });
 }
-addMainPanels();
 async function addMainPanels() {
     var mainPanelsElem = $("#main-panels");
     var panelElements = "", name, id;
@@ -46,35 +45,138 @@ async function addMainPanels() {
     };
     mainPanelsElem.html(panelElements);
 }
-function initListeners() {
+function initEvents() {
+    //Handling for 'Submit'
     document.getElementById('task-submit-btn').addEventListener('click', event => {
-        console.log();
-    })
+        addTask();
+    });
+    addMainPanels();
+    populateInputsDropdown();
 }
 async function addTask() {
-    let taskNameInp = document.getElementById('task-input__name');
+    let taskNameInp = document.getElementById('task-input__task');
     let sectionNameInp = document.getElementById('task-input__section');
     let pointsInp = document.getElementById('task-input__points');
-    let pointsPanel = document.getElementById('points-panel');
+    if (!isValidInput()) {
+        return;
+    }
+    let points = parseInt(pointsInp.value);
     console.log(sectionNameInp.value.toString().toLowerCase());
     let sectionObj = await dataAccess.getSection(sectionNameInp.value.toString().toLowerCase());
     if(sectionObj == null) {
         //If null, add the Section
-        sectionObj = await dataAccess.addSection({name: sectionNameInp.value, parentSectionId: 0});
+        sectionObj = await dataAccess.addSection({name: sectionNameInp.value.toString().toLowerCase(), parentSectionId: 0});
     }
+    console.log(sectionObj);
     let sectionId = sectionObj.id;
     let taskInpObj = {
         name: taskNameInp.value,
         desc: "--", 
         status: "completed", 
-        weightage: pointsInp.value, 
+        weightage: points, 
         parentSectionId: sectionId
     }
     taskObj = await dataAccess.addTask(taskInpObj);
+    console.log(taskObj);
     overallWeightage = await dataAccess.getOverallWeightage();
     console.log(overallWeightage);
-    //pointsPanel.innerHTML = overallWeightage.completed;
-    taskNameInp.value = '';
-    sectionNameInp.value = '';
+    //Clear inputs
+    $('.ui.dropdown').dropdown('restore defaults');
     pointsInp.value = '';
+    
+    addMainPanels(); //Needs to update main panels on adding new entry
+    populateInputsDropdown(); // Needs to update dropdown
+    //Added toast
+    $('main')
+      .toast({
+        message: 'Task ' + taskNameInp.value + ' added with ' + points + ' points!',
+        position: 'bottom right',
+        displayTime: 3000,
+        class : 'green'
+      })
+    ;
+}
+
+function isValidInput() {
+    var valid = true;
+    let taskNameInp = document.getElementById('task-input__task');
+    let sectionNameInp = document.getElementById('task-input__section');
+    let pointsInp = document.getElementById('task-input__points');
+    //Check empty
+    if (taskNameInp.value.trim() == '') {
+        console.log('Task is empty');
+        valid = false;
+    }
+    if (sectionNameInp.value.trim() == '') {
+        console.log('Section is empty');
+        valid = false;
+    }
+    if (pointsInp.value.trim() == '') {
+        console.log('Points is empty');
+        valid = false;
+    }
+    if (!valid) {
+        $('main')
+        .toast({
+          message: 'Fill in all the fields',
+          position: 'bottom right',
+          displayTime: 3000,
+          class : 'red'
+        });
+        return false;
+    }
+
+    //Validate points
+    var parsedPoints = parseInt(pointsInp.value);
+    if (isNaN(parsedPoints)) {
+        $('main')
+        .toast({
+            message: 'Points should be a number',
+            position: 'bottom right',
+            displayTime: 3000,
+            class : 'red'
+        });
+        return false;
+    }
+    if (parsedPoints < 1) {
+        $('main')
+        .toast({
+            message: 'Give yourself at least 1 point!',
+            position: 'bottom right',
+            displayTime: 2000,
+            class : 'red'
+        });
+        return false;
+    }
+
+    return true;
+}
+
+//For dropdown in inputs, refer to Fomantic-UI
+$('.ui.dropdown')
+  .dropdown({
+    allowAdditions: true
+  });
+
+//Populate dropdown entries for inputs, such as Section and Tasks
+async function populateInputsDropdown() {
+    //Get Sections
+    let sectionNames = await dataAccess.getSectionNames();
+    var sectionsTemplate = '<option value="">Section</option>';
+    sectionNames.forEach(name => {
+        sectionsTemplate = sectionsTemplate.concat('<option value="' + name + '">' + name + '</option>');
+    });
+    //Populate Sections Dropdown
+    let sectionNameInp = $('#task-input__section');
+    sectionNameInp.html(sectionsTemplate);
+
+    //Get Tasks
+    let taskNames = await dataAccess.getTaskNames();
+    var tasksTemplate = '<option value="">Task</option>';
+    taskNames.forEach(name => {
+        tasksTemplate = tasksTemplate.concat('<option value="' + name + '">' + name + '</option>');
+    });
+    //Populate Tasks Dropdown
+    let taskNameInp = $('#task-input__task');
+    taskNameInp.html(tasksTemplate);
 }

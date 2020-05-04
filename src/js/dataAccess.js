@@ -249,15 +249,30 @@ dataAccess.getSections = async function getSections() {
         })
 };
 
+
+/**
+ * Returns all distinct Section names as an array
+ */
+dataAccess.getSectionNames = async function getSectionNames() {
+    var namesResult = await sequelize.query("select distinct name from sections",
+        { type: QueryTypes.SELECT }
+    );
+    var names = [];
+    namesResult.forEach(function(name){
+        names.push(name.name);
+    })
+    return names;
+}
+
 /**
  * Gets total and completed weights for each Section
  * @return Promise
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
-    var totalWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id",
+    var totalWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id order by total",
         { type: QueryTypes.SELECT }
     );
-    var completedWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is 'completed' group by sections.id",
+    var completedWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is 'completed' group by sections.id order by completed",
             { type: QueryTypes.SELECT }
         );
     var weightage = {};
@@ -269,13 +284,11 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
         tempObj["completed"] = completedWeightageObj.completed;
         weightage[completedWeightageObj.id] = tempObj;
     })
-    console.log(weightage);
-    console.log(totalWeightage)
     return weightage;
 };
 
 /**
- * Gets total and completed weights for each Section
+ * Gets total and completed weights
  * @return Promise
  */
 dataAccess.getOverallWeightage = async function getOverallWeightage() {
@@ -322,13 +335,18 @@ dataAccess.addTask = async function addTask(taskDetails) {
         console.error("Task: Param passed is invalid");
         return false;
     }
+    var parsedWeightage = parseInt(taskDetails.weightage);
+    if (isNaN(parsedWeightage)) {
+        console.error("Task: Weightage passed is NaN : " +  taskDetails.weightage);
+        return false;
+    }
     var currentTime = new Date();
     return await Task.create(
         {
             name: taskDetails.name,
             desc: taskDetails.desc,
             status: taskDetails.status,
-            weightage: taskDetails.weightage,
+            weightage: parsedWeightage,
             entry_time: currentTime,
             finish_time: currentTime,
             parent_section_id: taskDetails.parentSectionId
@@ -421,6 +439,20 @@ dataAccess.getTasks = async function getTasks() {
             return false;
         })
 };
+
+/**
+ * Returns all distinct Task names as an array
+ */
+dataAccess.getTaskNames = async function getTaskNames() {
+    var namesResult = await sequelize.query("select distinct name from tasks",
+        { type: QueryTypes.SELECT }
+    );
+    var names = [];
+    namesResult.forEach(function(name){
+        names.push(name.name);
+    })
+    return names;
+}
 
 /**
  * Gets entries from Task table corresponding to that parent_section_id

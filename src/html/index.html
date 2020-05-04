@@ -3,13 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <title>The Wall</title>
-        <link rel="stylesheet" type="text/css" href="../css/style.css">
         <script>
             const jQuery = require('jquery')
             const $ = jQuery
             require('../../node_modules/fomantic-ui/dist/semantic.min.js')
           </script>
         <link rel="stylesheet" type="text/css" href="../../node_modules/fomantic-ui/dist/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
     </head>
     <body>
     <header id="title-bar">
@@ -21,25 +21,23 @@
             <div class="title-bar__button" id="close-button">x</div>
         </div>
     </header>
+    
     <main>
-        <form id="input-bar" class="ui input">
-            <input class="task-input" id= "task-input__section" type="text" placeholder="section">
-            <input class="task-input" id= "task-input__name" type="text" placeholder="name">
-            <input class="task-input" id= "task-input__points" type="number" placeholder="points">
-            <button id="task-submit-btn" class="ui button" type="button" onclick="addTask()">b</button>
-        </div>
-    </form>
-        <div id="main-panels" class="ui four cards">
-            
-        </div>
-        <!-- <div class="ui card">
-            <div class="content" id="points-panel">
-                89
+        <form id="input-bar">
+            <select name="section" class="task-input ui search dropdown" id="task-input__section">
+                <option value="">Section</option>
+            </select>
+            <select name="task" class="task-input ui search dropdown" id="task-input__task">
+                <option value="">Task</option>
+            </select>
+            <div class="task-input ui input" id="task-input__points-container">
+                <input id="task-input__points" type="text" placeholder="points">
             </div>
-            <div class="extra content">
-                points
-            </div>
-        </div> -->
+            <button id="task-submit-btn" class="ui button" type="button" autofocus>Submit</button>
+        </form>
+        <div id="main-panels" class="ui three cards">
+
+        </div>
     </main>
     </body>
     <script src="../js/dataAccess.js"></script>
