@@ -29,9 +29,10 @@ function handleWindowControls() {
 async function addMainPanels() {
     var mainPanelsElem = $("#main-panels");
     var panelElements = "", name, id;
-
+    var numberOfSections = 0;
     var sections = await dataAccess.getWeightageOfSections();
     for (var key in sections) {
+        numberOfSections++;
         var section = sections[key];
         id = key;
         name = section.name;
@@ -43,6 +44,16 @@ async function addMainPanels() {
                 + '</div>';
         panelElements = panelElements + panelTemplate;
     };
+    //Set number of columns depending on number of sections
+    if (numberOfSections == 0) {
+        //Show splash screen, getting started
+    } else if (numberOfSections == 1) {
+        mainPanelsElem.toggleClass('one');
+    } else if (numberOfSections >= 2 && numberOfSections <= 4) {
+        mainPanelsElem.toggleClass('two');
+    } else {
+        mainPanelsElem.toggleClass('three');
+    }
     mainPanelsElem.html(panelElements);
 }
 function initEvents() {

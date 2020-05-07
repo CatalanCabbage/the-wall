@@ -16,7 +16,8 @@ const sequelize = new Sequelize('database', 'username', 'password', {
         idle: 10000
     },
     logging: 0,
-    storage: './database.sqlite'
+    storage: './database.sqlite',
+    fileMustExist: true
 });
 
 // Test connection
