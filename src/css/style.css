@@ -147,3 +147,12 @@ main {
 #main-panels {
     overflow-y: auto;
 }
+
+.panel.card{
+    color: black !important;
+    background-color: white !important;
+}
+
+.panel.card.card--small {
+    height: 135px;
+}

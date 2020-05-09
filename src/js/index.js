@@ -29,18 +29,25 @@ function handleWindowControls() {
 async function addMainPanels() {
     var mainPanelsElem = $("#main-panels");
     var panelElements = "", name, id;
-    var numberOfSections = 0;
-    var sections = await dataAccess.getWeightageOfSections();
+    var sectionsResponse = await dataAccess.getWeightageOfSections();
+    var sections = sectionsResponse[0];
+    var numberOfSections = sectionsResponse[1];
+    //When very few Cards are present, they expand in height to take up the full container
+    //Need to limit heights manually when very few are present 
+    var limitCardHeight = '';
+    if (numberOfSections <= 4) {
+        limitCardHeight = 'card--small';
+    }
+    
     for (var key in sections) {
-        numberOfSections++;
         var section = sections[key];
         id = key;
         name = section.name;
         total = section.total;
         completed = section.completed;
-        var panelTemplate = '<div class="card" id="section' + id + '">'
-                + '<div class="ui statistic"><div class="value">' + completed + '</div><div class="label">' + total + '</div></div>'
-                + '<div class="content">' + name + '</div>'
+        var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + id + '">'
+                + '<div class="panel black ui statistic"><div class="value">' + completed + '</div><div class="label">' + total + '</div></div>'
+                + '<div class="panel content">' + name + '</div>'
                 + '</div>';
         panelElements = panelElements + panelTemplate;
     };
@@ -48,11 +55,13 @@ async function addMainPanels() {
     if (numberOfSections == 0) {
         //Show splash screen, getting started
     } else if (numberOfSections == 1) {
-        mainPanelsElem.toggleClass('one');
+        mainPanelsElem.addClass('one');
     } else if (numberOfSections >= 2 && numberOfSections <= 4) {
-        mainPanelsElem.toggleClass('two');
+        mainPanelsElem.removeClass('one');
+        mainPanelsElem.addClass('two');
     } else {
-        mainPanelsElem.toggleClass('three');
+        mainPanelsElem.removeClass('two');
+        mainPanelsElem.addClass('three');
     }
     mainPanelsElem.html(panelElements);
 }
@@ -98,14 +107,7 @@ async function addTask() {
     addMainPanels(); //Needs to update main panels on adding new entry
     populateInputsDropdown(); // Needs to update dropdown
     //Added toast
-    $('main')
-      .toast({
-        message: 'Task ' + taskNameInp.value + ' added with ' + points + ' points!',
-        position: 'bottom right',
-        displayTime: 3000,
-        class : 'green'
-      })
-    ;
+    showToast('Task ' + taskNameInp.value + ' added with ' + points + ' points!', 'green');
 }
 
 function isValidInput() {
@@ -115,52 +117,41 @@ function isValidInput() {
     let pointsInp = document.getElementById('task-input__points');
     //Check empty
     if (taskNameInp.value.trim() == '') {
-        console.log('Task is empty');
         valid = false;
     }
     if (sectionNameInp.value.trim() == '') {
-        console.log('Section is empty');
         valid = false;
     }
     if (pointsInp.value.trim() == '') {
-        console.log('Points is empty');
         valid = false;
     }
     if (!valid) {
-        $('main')
-        .toast({
-          message: 'Fill in all the fields',
-          position: 'bottom right',
-          displayTime: 3000,
-          class : 'red'
-        });
+        showToast('Fill in all fields', 'red');
         return false;
     }
 
     //Validate points
     var parsedPoints = parseInt(pointsInp.value);
     if (isNaN(parsedPoints)) {
-        $('main')
-        .toast({
-            message: 'Points should be a number',
-            position: 'bottom right',
-            displayTime: 3000,
-            class : 'red'
-        });
+        showToast('Got to add up Points; make it a number!', 'red');
         return false;
     }
     if (parsedPoints < 1) {
-        $('main')
-        .toast({
-            message: 'Give yourself at least 1 point!',
-            position: 'bottom right',
-            displayTime: 2000,
-            class : 'red'
-        });
+        showToast('Give yourself at least 1 point!', 'red');
         return false;
     }
 
     return true;
+}
+
+function showToast(message, color) {
+    $('main')
+        .toast({
+            message: message,
+            position: 'bottom right',
+            displayTime: 30000,
+            class: color
+        });
 }
 
 //For dropdown in inputs, refer to Fomantic-UI
