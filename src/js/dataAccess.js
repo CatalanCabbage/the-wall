@@ -266,8 +266,10 @@ dataAccess.getSectionNames = async function getSectionNames() {
 }
 
 /**
- * Gets total and completed weights for each Section
- * @return Promise
+ * @returns Array of Obj of (name, total and completed weights for each Section id) AND total Sections.
+ * Return format: [{SectionDetails}, int numberOfSections]
+ * Where SectionDetails is in the format:
+ * {id : {name : xyz, total : 123, completed : 12}}, id2 : {...} ...}
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
     var totalWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id order by total",
@@ -277,7 +279,9 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
             { type: QueryTypes.SELECT }
         );
     var weightage = {};
+    var totalSections = 0;
     totalWeightage.forEach(function(totalWeightageObj){
+        totalSections++;
         weightage[totalWeightageObj.id] = {"name" : totalWeightageObj.name, "total" : totalWeightageObj.total, "completed" : 0};
     })
     completedWeightage.forEach(function(completedWeightageObj){
@@ -285,7 +289,7 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
         tempObj["completed"] = completedWeightageObj.completed;
         weightage[completedWeightageObj.id] = tempObj;
     })
-    return weightage;
+    return [weightage, totalSections];
 };
 
 /**
