@@ -3,16 +3,26 @@
   "version": "0.1.1",
   "description": "We’re going to build a wall, folks. We’re going to build a wall. We’re going to build it. Don’t worry. We’re going to build a wall. That wall will go up so fast your head will spin.",
   "main": "main.js",
+  "repository": {
+    "type" : "git",
+    "url" : "https://gitlab.com/cataxcab/the-wall"
+  },
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder build --win --publish never",
+    "deploy": "electron-builder build --win --publish always"
   },
   "build": {
     "appId": "cataxcab.thewall",
     "productName": "The Wall",
+    "publish": [{
+      "provider": "generic",
+      "url": "https://gitlab.com/cataxcab/the-wall"
+    }],
     "win": {
       "target": "nsis"
     }
