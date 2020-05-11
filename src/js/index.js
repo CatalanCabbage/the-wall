@@ -144,13 +144,13 @@ function isValidInput() {
 
     return true;
 }
-
+showToast('v1.1!', 'yellow');
 function showToast(message, color) {
     $('main')
         .toast({
             message: message,
             position: 'bottom right',
-            displayTime: 30000,
+            displayTime: 3000,
             class: color
         });
 }
