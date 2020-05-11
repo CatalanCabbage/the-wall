@@ -1,6 +1,6 @@
 {
   "name": "thewall",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "We’re going to build a wall, folks. We’re going to build a wall. We’re going to build it. Don’t worry. We’re going to build a wall. That wall will go up so fast your head will spin.",
   "main": "main.js",
   "scripts": {
@@ -31,6 +31,7 @@
     "electron": "^7.1.11",
     "electron-builder": "^22.6.0",
     "electron-rebuild": "^1.10.0",
+    "electron-updater": "^4.3.1",
     "mocha": "^7.0.1"
   },
   "dependencies": {

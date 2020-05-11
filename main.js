@@ -1,11 +1,11 @@
 const { app, BrowserWindow } = require('electron')
+require('electron-reload')('./src/js');
+const {autoUpdater} = require('electron-updater'); 
+const {ipcMain} = require('electron');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-
-require('electron-reload')('./src/js');
-
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
@@ -14,15 +14,11 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-      frame: false
+      frame: false,
+      show: false
   })
-
   // and load the index.html of the app.
   win.loadFile('./src/html/index.html')
-
-  // Open the DevTools.
-  win.webContents.openDevTools()
-  
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -53,3 +49,48 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+//Handle updates
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = false;
+//To be handled: check for updates with release notes as response, update
+ipcMain.on('updater-action', (event, arg) => {
+  if (arg == 'checkForUpdates') {
+    autoUpdater.checkForUpdates();
+  }
+  //Indicate that there's an update
+  autoUpdater.on('update-downloaded', (info) => {
+    event.sender.send('updater-action-response', ['updateDownloaded', info]);
+  })
+
+  autoUpdater.on('error', (err) => {
+    console.log('Error in auto-updater. ' + err);
+    event.sender.send('updater-action-response', ['error', err]);
+  })
+  
+  //Will always update while quitting
+  if (arg == 'alwaysUpdate') {
+    autoUpdater.autoInstallOnAppQuit = true;    
+  }
+
+  //Update and force quit
+  if (arg = 'updateAndQuit') {
+    autoUpdater.quitAndInstall();
+  }
+  
+  
+
+
+  //For debugging---------------
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available.');
+  })
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available.');
+  })
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update');
+  })
+  //For debuging----------------
+})
+

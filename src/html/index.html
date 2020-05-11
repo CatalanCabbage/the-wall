@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <title>The Wall</title>
-        <script src="../js/dataAccess.js"></script>
         <script>
             const jQuery = require('jquery')
             const $ = jQuery
@@ -24,6 +23,32 @@
     </header>
     
     <main>
+        <!--Used for updates-->
+        <div class="ui tiny update modal">
+            <div class="header" style="text-align: center;">
+              Update available
+            </div>
+            <div class="content">
+                <div id="release-notes">
+                    
+                </div>
+                <p>Do you want to update the app now?</p>
+            </div>
+            <div class="actions">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="update-checkbox" name="update-checkbox"/>
+                        <label>Always update automatically</label>
+                  </div>
+                <div class="ui red deny button">
+                    No
+                </div>
+                <div class="ui green approve button">
+                    Yes
+                </div>
+            </div>
+          </div>
+
+
         <form id="input-bar">
             <select name="section" class="task-input ui search dropdown" id="task-input__section">
                 <option value="">Section</option>

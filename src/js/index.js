@@ -1,6 +1,7 @@
 const remote = require('electron').remote;
-
+const dataAccess = require('./../js/dataAccess'); //Without the ../ it looks inside node_modules
 const win = remote.getCurrentWindow();
+const {ipcRenderer} = require('electron');
 
 // When document has loaded, initialise
 document.onreadystatechange = (event) => {
@@ -38,7 +39,7 @@ async function addMainPanels() {
     if (numberOfSections <= 4) {
         limitCardHeight = 'card--small';
     }
-    
+
     for (var key in sections) {
         var section = sections[key];
         id = key;
@@ -181,4 +182,65 @@ async function populateInputsDropdown() {
     //Populate Tasks Dropdown
     let taskNameInp = $('#task-input__task');
     taskNameInp.html(tasksTemplate);
+}
+
+//Handle updates
+updatePopup(); //Testing
+//Update available popup
+function updatePopup(info) {
+    if (info != null) {
+        $('#release-notes').html('<p>Release notes</p>' + info + '<br><div class="ui divider"></div>');
+    }
+    $('.ui.update.modal')
+        .modal({
+            onApprove : function() {
+                if ($('#update-checkbox')[0].checked) {
+                    console.log('checked');
+                    alwaysUpdate();
+                }
+                console.log('approved');
+                updateAndQuit();
+            }
+        })
+        .modal('show')
+    ;
+}
+
+//Trigger check for update
+//If update is present, ask if you want to update along with release notes 
+//If yes, trigger update
+//If no, do nothing
+//arg format: 
+var errorMessageCount = 0;
+function checkForUpdates() {
+    ipcRenderer.send('updater-action', 'checkForUpdates');
+    errorMessageCount = 0;
+}
+checkForUpdates();
+//Ask if you want to update with release notes when a new update is downloaded
+ipcRenderer.on('updater-action-response', (event, arg) => {
+    if (arg[0] == 'updateDownloaded') {
+        var info = arg[1];
+        console.log('received info');
+        console.log(info);
+        updatePopup(info);
+        //Ask if you want to update, with release notes
+    }
+    //Display if there's an error; is displayed only 2 times, unless checkForUpdates is clicked again
+    if (arg[0] == 'error') {
+        if(errorMessageCount < 3) {
+            //Display error message
+            console.log(arg[1]);
+        }
+    }
+})
+
+//To update when user quits the application
+function alwaysUpdate() {
+    ipcRenderer.send('updater-action', 'alwaysUpdate');
+}
+
+//To update and quit immediately
+function updateAndQuit() {
+    ipcRenderer.send('updater-action', 'updateAndQuit');
 }
