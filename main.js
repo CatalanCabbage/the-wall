@@ -28,10 +28,29 @@ function createWindow () {
   })
 }
 
+//Introduce splash-screen to reduce jarring page load delay of main window
+var splashScreen
+function createSplashWindow () {
+  splashScreen = new BrowserWindow({
+    width: 850,
+    height: 550,
+    frame: false
+  })
+  splashScreen.loadFile('./src/html/test.html');
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () =>{
+  createSplashWindow();
+  createWindow();
+  win.once('ready-to-show', () => {
+    win.show();
+    splashScreen.destroy();
+  });
+  win.webContents.openDevTools();
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
