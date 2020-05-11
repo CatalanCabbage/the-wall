@@ -185,7 +185,6 @@ async function populateInputsDropdown() {
 }
 
 //Handle updates
-updatePopup(); //Testing
 //Update available popup
 function updatePopup(info) {
     if (info != null) {
@@ -214,6 +213,7 @@ function updatePopup(info) {
 var errorMessageCount = 0;
 function checkForUpdates() {
     ipcRenderer.send('updater-action', 'checkForUpdates');
+    console.log('Started check for updates');
     errorMessageCount = 0;
 }
 checkForUpdates();
@@ -237,10 +237,12 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
 
 //To update when user quits the application
 function alwaysUpdate() {
+    console.log('sending alwaysUpdate');
     ipcRenderer.send('updater-action', 'alwaysUpdate');
 }
 
 //To update and quit immediately
 function updateAndQuit() {
+    console.log('sending updateAndQuit');
     ipcRenderer.send('updater-action', 'updateAndQuit');
 }
