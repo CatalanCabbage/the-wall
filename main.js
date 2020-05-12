@@ -36,7 +36,7 @@ function createSplashWindow () {
     height: 550,
     frame: false
   })
-  splashScreen.loadFile('./src/html/test.html');
+  splashScreen.loadFile('./src/html/splashScreen.html');
 }
 
 // This method will be called when Electron has finished
