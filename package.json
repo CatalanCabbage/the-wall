@@ -4,8 +4,8 @@
   "description": "We’re going to build a wall, folks. We’re going to build a wall. We’re going to build it. Don’t worry. We’re going to build a wall. That wall will go up so fast your head will spin.",
   "main": "main.js",
   "repository": {
-    "type" : "git",
-    "url" : "https://gitlab.com/cataxcab/the-wall"
+    "type": "git",
+    "url": "https://gitlab.com/cataxcab/the-wall"
   },
   "scripts": {
     "start": "electron .",
@@ -19,10 +19,12 @@
   "build": {
     "appId": "cataxcab.thewall",
     "productName": "The Wall",
-    "publish": [{
-      "provider": "generic",
-      "url": "https://gitlab.com/cataxcab/the-wall"
-    }],
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://gitlab.com/cataxcab/the-wall"
+      }
+    ],
     "win": {
       "target": "nsis"
     }
@@ -44,10 +46,10 @@
   },
   "dependencies": {
     "electron-reload": "^1.5.0",
+    "electron-updater": "^4.3.1",
     "fomantic-ui": "^2.8.4",
     "jquery": "^3.3.1",
     "sequelize": "^5.21.3",
-    "sqlite3": "^4.1.1",
-    "electron-updater": "^4.3.1"
+    "sqlite3": "^4.1.1"
   }
 }
