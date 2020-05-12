@@ -5,7 +5,7 @@ stages:
   - build
   
 build:
-  image: cataxcab/the-wall
+  image: electronjs/build
   stage: build
   artifacts:
     paths:
