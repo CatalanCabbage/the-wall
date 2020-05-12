@@ -13,4 +13,6 @@ build:
   script:
     - sed "s/0.0.0/${VERSION_ID}/g" package.json > _package.json && mv _package.json package.json
     - npm install gulp
+    - rm -rf node_modules/gulp-autoprefixer
+    - npm install gulp-autoprefixer@2.3.1
     - npm install && npm run build
