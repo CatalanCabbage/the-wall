@@ -5,7 +5,7 @@ stages:
   - build
   
 build:
-  image: cataxcab/thewall
+  image: cataxcab/the-wall
   stage: build
   artifacts:
     paths:
