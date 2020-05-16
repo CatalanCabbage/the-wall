@@ -5,7 +5,7 @@ const path = require('path');
 var fs = require('fs');
 
 //Check if folder exists to store db file
-var dbPath = path.join(app.getPath('appData'), 'the-wall', 'Storage');
+var dbPath = path.join(app.getPath('appData'), 'the-wall', 'Local Storage');
 if (!fs.existsSync(dbPath)){
     fs.mkdirSync(dbPath, { recursive: true });
 }
