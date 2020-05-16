@@ -72,6 +72,12 @@ app.on('activate', () => {
 //Handle updates
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = false;
+autoUpdater.requestHeaders = { "PRIVATE-TOKEN": "Fv5UD8ajrw2qyUaDwiJs" };
+autoUpdater.setFeedURL({
+  provider: "generic",
+  channel: "latest",
+  url: "https://gitlab.com/api/v4/projects/16527632/jobs/artifacts/master/raw/dist?job=build"
+});
 //To be handled: check for updates with release notes as response, update
 ipcMain.on('updater-action', (event, arg) => {
   if (arg == 'checkForUpdates') {

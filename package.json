@@ -22,7 +22,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitlab.com/cataxcab/the-wall"
+        "url": "https://gitlab.com"
       }
     ],
     "win": {
