@@ -3,6 +3,10 @@ const dataAccess = require('./../js/dataAccess'); //Without the ../ it looks ins
 const win = remote.getCurrentWindow();
 const {ipcRenderer} = require('electron');
 
+//Add version number to title
+var version = remote.app.getVersion();
+$('app-title').html('The Wall v' + version);
+
 // When document has loaded, initialise
 document.onreadystatechange = (event) => {
     if (document.readyState == "complete") {
