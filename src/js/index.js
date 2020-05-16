@@ -5,7 +5,7 @@ const {ipcRenderer} = require('electron');
 
 //Add version number to title
 var version = remote.app.getVersion();
-$('app-title').html('The Wall v' + version);
+$('title').html('The Wall v' + version);
 
 // When document has loaded, initialise
 document.onreadystatechange = (event) => {
@@ -117,7 +117,6 @@ async function addTask() {
     //Added toast
     showToast('Task ' + taskNameInp.value + ' added with ' + points + ' points!', 'green');
 }
-showToast('Updated to v0.1.3! ', 'yellow');
 
 function isValidInput() {
     var valid = true;
