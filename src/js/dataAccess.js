@@ -10,8 +10,8 @@ if (!fs.existsSync(dbPath)){
     fs.mkdirSync(dbPath, { recursive: true });
 }
 var dbFile;
-dbFile = './database.sqlite'; //Development
-//dbFile = path.join(dbPath, 'database.sqlite'); //Production
+//dbFile = './database.sqlite'; //Development
+dbFile = path.join(dbPath, 'database.sqlite'); //Production
 
 
 console.log('Connected to DB yet?');
