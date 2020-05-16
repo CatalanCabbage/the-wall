@@ -237,17 +237,10 @@ dataAccess.getSection = async function getSection(sectionName) {
  * @return Promise
  */
 dataAccess.getSections = async function getSections() {
-    return await Section.findAll(
-        {
-            attributes: ["id", "name", "parent_section_id"]
-        })
-        .then(sections => {
-            return sections.dataValues;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        })
+    var sectionsResult = await sequelize.query("select * from sections",
+        { type: QueryTypes.SELECT }
+    );
+    return sectionsResult;
 };
 
 
