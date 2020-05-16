@@ -70,52 +70,56 @@ app.on('activate', () => {
 })
 
 //Handle updates
-autoUpdater.autoDownload = true;
-autoUpdater.autoInstallOnAppQuit = false;
-autoUpdater.requestHeaders = { "PRIVATE-TOKEN": "Fv5UD8ajrw2qyUaDwiJs" };
-autoUpdater.setFeedURL({
-  provider: "generic",
-  channel: "latest",
-  url: "https://gitlab.com/api/v4/projects/16527632/jobs/artifacts/master/raw/dist?job=build"
-});
-//To be handled: check for updates with release notes as response, update
-ipcMain.on('updater-action', (event, arg) => {
-  if (arg == 'checkForUpdates') {
-    autoUpdater.checkForUpdates();
-  }
-  //Indicate that there's an update
-  autoUpdater.on('update-downloaded', (info) => {
-    event.sender.send('updater-action-response', ['updateDownloaded', info]);
-  })
+try {
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.requestHeaders = { "PRIVATE-TOKEN": "Fv5UD8ajrw2qyUaDwiJs" };
+  autoUpdater.setFeedURL({
+    provider: "generic",
+    channel: "latest",
+    url: "http://gitlab.com/api/v4/projects/16527632/jobs/artifacts/master/raw/dist?job=build"
+  });
+  //To be handled: check for updates with release notes as response, update
+  ipcMain.on('updater-action', (event, arg) => {
+    if (arg == 'checkForUpdates') {
+      autoUpdater.checkForUpdates();
+    }
+    //Indicate that there's an update
+    autoUpdater.on('update-downloaded', (info) => {
+      event.sender.send('updater-action-response', ['updateDownloaded', info]);
+    })
 
-  autoUpdater.on('error', (err) => {
-    console.log('Error in auto-updater. ' + err);
-    event.sender.send('updater-action-response', ['error', err]);
-  })
-  
-  //Will always update while quitting
-  if (arg == 'alwaysUpdate') {
-    autoUpdater.autoInstallOnAppQuit = true;    
-  }
+    autoUpdater.on('error', (err) => {
+      console.log('Error in auto-updater. ' + err);
+      event.sender.send('updater-action-response', ['error', err]);
+    })
+    
+    //Will always update while quitting
+    if (arg == 'alwaysUpdate') {
+      autoUpdater.autoInstallOnAppQuit = true;    
+    }
 
-  //Update and force quit
-  if (arg = 'updateAndQuit') {
-    autoUpdater.quitAndInstall();
-  }
-  
-  
+    //Update and force quit
+    if (arg = 'updateAndQuit') {
+      autoUpdater.quitAndInstall();
+    }
+    
+    
 
 
-  //For debugging---------------
-  autoUpdater.on('update-available', (info) => {
-    console.log('Update available.');
+    //For debugging---------------
+    autoUpdater.on('update-available', (info) => {
+      console.log('Update available.');
+    })
+    autoUpdater.on('update-not-available', (info) => {
+      console.log('Update not available.');
+    })
+    autoUpdater.on('checking-for-update', () => {
+      console.log('Checking for update');
+    })
+    //For debugging----------------
   })
-  autoUpdater.on('update-not-available', (info) => {
-    console.log('Update not available.');
-  })
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for update');
-  })
-  //For debuging----------------
-})
+} catch (e) {
+  console.log(e)
+}
 

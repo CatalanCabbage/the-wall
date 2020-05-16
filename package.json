@@ -5,7 +5,7 @@
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/cataxcab/the-wall"
+    "url": "http://gitlab.com/cataxcab/the-wall"
   },
   "scripts": {
     "start": "electron .",
@@ -25,7 +25,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitlab.com"
+        "url": "http://gitlab.com"
       }
     ],
     "win": {
