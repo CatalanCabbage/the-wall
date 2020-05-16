@@ -71,7 +71,7 @@ try {
 
   //Handle updates
   autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true; //TempTest should be set back to false
+  autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.setFeedURL({
     provider: "generic",
     channel: "latest",
