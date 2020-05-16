@@ -222,6 +222,12 @@ function updatePopup(info) {
     ;
 }
 
+//For logging from main process
+ipcRenderer.on('logger', (event, arg) => {
+    console.log(arg);
+})
+
+
 //Trigger check for update
 //If update is present, ask if you want to update along with release notes 
 //If yes, trigger update
@@ -245,6 +251,7 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
     }
     //Display if there's an error; is displayed only 2 times, unless checkForUpdates is clicked again
     if (arg[0] == 'error') {
+        //errorMessageCount++;
         if(errorMessageCount < 3) {
             //Todo Display error message
             console.log(arg[1]);
