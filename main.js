@@ -71,7 +71,7 @@ try {
 
   //Handle updates
   autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.autoInstallOnAppQuit = true; //TempTest should be set back to false
   autoUpdater.requestHeaders = { "PRIVATE-TOKEN": "Fv5UD8ajrw2qyUaDwiJs" };
   autoUpdater.setFeedURL({
     provider: "generic",
