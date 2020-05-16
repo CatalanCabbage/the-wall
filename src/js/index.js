@@ -113,6 +113,7 @@ async function addTask() {
     //Added toast
     showToast('Task ' + taskNameInp.value + ' added with ' + points + ' points!', 'green');
 }
+showToast('Updated to v0.1.3! ', 'yellow');
 
 function isValidInput() {
     var valid = true;
