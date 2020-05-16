@@ -34,8 +34,8 @@
   },
   "nsis": {
     "oneclick": "true",
-    "installerIcon": "icon.ico",
-    "installerHeaderIcon": "icon.ico"
+    "installerIcon": "icon.png",
+    "installerHeaderIcon": "icon.png"
   },
   "author": {
     "name": "CatalanCabbage",
