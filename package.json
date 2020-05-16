@@ -19,6 +19,9 @@
   "build": {
     "appId": "cataxcab.thewall",
     "productName": "The Wall",
+    "directories": {
+      "buildResources": "./buildResources"
+    },
     "publish": [
       {
         "provider": "generic",

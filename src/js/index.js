@@ -199,8 +199,8 @@ async function populateInputsDropdown() {
 //Handle updates
 //Update available popup
 function updatePopup(info) {
-    if (info != null) {
-        $('#release-notes').html('<p>Release notes</p>' + info + '<br><div class="ui divider"></div>');
+    if (info.releaseNotes != null) {
+        $('#release-notes').html('<p>Release notes</p>' + info + ', releaseNotes ' + info.releaseNotes + '<br><div class="ui divider"></div>');
     }
     $('.ui.update.modal')
         .modal({
