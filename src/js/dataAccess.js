@@ -1,7 +1,20 @@
 let dataAccess = {};
 const { QueryTypes } = require('sequelize');
-console.log('Connected to DB yet?');
+const app = require('electron').remote.app;
+const path = require('path');
+var fs = require('fs');
 
+//Check if folder exists to store db file
+var dbPath = path.join(app.getPath('appData'), 'the-wall', 'Storage');
+if (!fs.existsSync(dbPath)){
+    fs.mkdirSync(dbPath, { recursive: true });
+}
+var dbFile;
+dbFile = './database.sqlite'; //Development
+//dbFile = path.join(dbPath, 'database.sqlite'); //Production
+
+
+console.log('Connected to DB yet?');
 // Create database connection
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -16,7 +29,7 @@ const sequelize = new Sequelize('database', 'username', 'password', {
         idle: 10000
     },
     logging: 0,
-    storage: './database.sqlite',
+    storage: dbFile,
     fileMustExist: true
 });
 
