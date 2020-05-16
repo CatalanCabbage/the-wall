@@ -71,6 +71,9 @@ function initEvents() {
     document.getElementById('task-submit-btn').addEventListener('click', event => {
         addTask();
     });
+    document.getElementById('task-input__points').addEventListener('focusout', event => {
+        validatePoints();
+    });
     addMainPanels();
     populateInputsDropdown();
 }
@@ -116,6 +119,7 @@ function isValidInput() {
     let taskNameInp = document.getElementById('task-input__task');
     let sectionNameInp = document.getElementById('task-input__section');
     let pointsInp = document.getElementById('task-input__points');
+
     //Check empty
     if (taskNameInp.value.trim() == '') {
         valid = false;
@@ -130,21 +134,29 @@ function isValidInput() {
         showToast('Fill in all fields', 'red');
         return false;
     }
+    valid = validatePoints();
 
-    //Validate points
+    return valid;
+}
+//Does nothing if no value has been entered
+function validatePoints() {
+    let pointsInp = document.getElementById('task-input__points');
+    if (pointsInp.value.trim() == '') {
+        return false;
+    }
     var parsedPoints = parseInt(pointsInp.value);
     if (isNaN(parsedPoints)) {
-        showToast('Got to add up Points; make it a number!', 'red');
+        showToast('Points must be a number!', 'red');
         return false;
     }
     if (parsedPoints < 1) {
         showToast('Give yourself at least 1 point!', 'red');
         return false;
     }
-
     return true;
 }
-showToast('v1.1!', 'yellow');
+
+
 function showToast(message, color) {
     $('main')
         .toast({
@@ -229,7 +241,7 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
     //Display if there's an error; is displayed only 2 times, unless checkForUpdates is clicked again
     if (arg[0] == 'error') {
         if(errorMessageCount < 3) {
-            //Display error message
+            //Todo Display error message
             console.log(arg[1]);
         }
     }
