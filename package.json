@@ -13,7 +13,7 @@
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "build": "electron-builder build --mwl --publish never",
+    "build": "electron-builder build --win --mac --publish never",
     "deploy": "electron-builder build --win --publish always"
   },
   "build": {
