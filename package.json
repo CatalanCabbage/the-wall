@@ -30,6 +30,9 @@
     ],
     "win": {
       "target": "nsis"
+    },
+    "mac": {
+        "target": "tar.gz"
     }
   },
   "nsis": {
