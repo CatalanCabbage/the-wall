@@ -44,7 +44,7 @@
     "name": "CatalanCabbage",
     "email": "catalancabbage@zoho.com"
   },
-  "license": "ISC",
+  "license": "AGPLv3",
   "devDependencies": {
     "electron": "^7.1.11",
     "electron-builder": "^22.6.0",
