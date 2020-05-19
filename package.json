@@ -13,8 +13,8 @@
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "build": "electron-builder build --win --mac --publish never",
-    "deploy": "electron-builder build --win --publish always"
+    "buildWin": "electron-builder build --win --publish never",
+    "buildMac": "electron-builder build --mac --publish never"
   },
   "build": {
     "appId": "cataxcab.thewall",

@@ -13,4 +13,6 @@ build:
   script:
     - sed "s/0.0.0/${VERSION_ID}/g" package.json > _package.json && mv _package.json package.json
     - npm install
-    - npm run build
+    - npm run buildWin
+    - npm cache --force clean
+    - npm run buildMac
