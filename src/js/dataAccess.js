@@ -10,14 +10,13 @@ if (!fs.existsSync(dbPath)){
     fs.mkdirSync(dbPath, { recursive: true });
 }
 var dbFile;
-//dbFile = './database.sqlite'; //Development
-dbFile = path.join(dbPath, 'database.sqlite'); //Production
+dbFile = './database.sqlite'; //Development
+//dbFile = path.join(dbPath, 'database.sqlite'); //Production
 
 
 console.log('Connected to DB yet?');
 // Create database connection
 const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
 const sequelize = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
     dialect: 'sqlite',
@@ -108,24 +107,24 @@ sequelize.sync();
  * Params: name, desc
  */
 dataAccess.addTag = async function addTag(tagDetails) {
-    if (typeof tagDetails != "object" || tagDetails == null) {
-        console.error("Sections: Param passed is invalid");
+    if (typeof tagDetails != 'object' || tagDetails == null) {
+        console.error('Sections: Param passed is invalid');
         return false;
     }
 
     return await Tag.create(
         {name: tagDetails.name, desc: tagDetails.desc},
-        {fields: ["name", "desc"]} //Allows insertion of only these fields
+        {fields: ['name', 'desc']} //Allows insertion of only these fields
     )
         .then(() => {
             return true;
         })
         .catch(err => {
-            if (err.toString().includes("SequelizeUniqueConstraintError")) { //Tag name has been set as unique
-                console.error("Tags: Given tag name is not unique", err);
+            if (err.toString().includes('SequelizeUniqueConstraintError')) { //Tag name has been set as unique
+                console.error('Tags: Given tag name is not unique', err);
                 return false;
-            } else if (err.toString().includes("cannot be null")) {
-                console.error("Tags: Param missing", err);
+            } else if (err.toString().includes('cannot be null')) {
+                console.error('Tags: Param missing', err);
                 return false;
             } else {
                 console.error(err);
@@ -142,7 +141,7 @@ dataAccess.addTag = async function addTag(tagDetails) {
 dataAccess.getTag = async function getTag(tagId) {
     return await Tag.findOne(
         {
-            attributes: ["id", "name", "desc"],
+            attributes: ['id', 'name', 'desc'],
             where: {id: tagId}
         })
         .then(tag => {
@@ -151,7 +150,7 @@ dataAccess.getTag = async function getTag(tagId) {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -161,7 +160,7 @@ dataAccess.getTag = async function getTag(tagId) {
 dataAccess.getTags = async function getTags() {
     return await Tag.findAll(
         {
-            attributes: ["id", "name", "desc"]
+            attributes: ['id', 'name', 'desc']
         })
         .then(tags => {
             return tags;
@@ -169,7 +168,7 @@ dataAccess.getTags = async function getTags() {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -200,21 +199,21 @@ dataAccess.deleteTag = async function deleteTag(tagId) {
  * Params: name, parentSectionId
  */
 dataAccess.addSection = async function addSection(sectionDetails) {
-    if (typeof sectionDetails != "object" || sectionDetails == null) {
-        console.error("Sections: Param passed is invalid");
+    if (typeof sectionDetails != 'object' || sectionDetails == null) {
+        console.error('Sections: Param passed is invalid');
         return false;
     }
 
     return await Section.create(
         {name: sectionDetails.name, parent_section_id: sectionDetails.parentSectionId},
-        {fields: ["name", "parent_section_id"]} //Allows insertion of only these fields
+        {fields: ['name', 'parent_section_id']} //Allows insertion of only these fields
     )
         .then((res) => {
             return res.dataValues;
         })
         .catch(err => {
-            if (err.toString().includes("cannot be null")) {
-                console.error("Sections: Param missing", err);
+            if (err.toString().includes('cannot be null')) {
+                console.error('Sections: Param missing', err);
                 return false;
             } else {
                 console.error(err);
@@ -231,7 +230,7 @@ dataAccess.addSection = async function addSection(sectionDetails) {
 dataAccess.getSection = async function getSection(sectionName) {
     return await Section.findOne(
         {
-            attributes: ["id", "name", "parent_section_id"],
+            attributes: ['id', 'name', 'parent_section_id'],
             where: {name: sectionName}
         })
         .then(section => {
@@ -242,7 +241,7 @@ dataAccess.getSection = async function getSection(sectionName) {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -250,7 +249,7 @@ dataAccess.getSection = async function getSection(sectionName) {
  * @return Promise
  */
 dataAccess.getSections = async function getSections() {
-    var sectionsResult = await sequelize.query("select * from sections",
+    var sectionsResult = await sequelize.query('select * from sections',
         { type: QueryTypes.SELECT }
     );
     return sectionsResult;
@@ -261,15 +260,15 @@ dataAccess.getSections = async function getSections() {
  * Returns all distinct Section names as an array
  */
 dataAccess.getSectionNames = async function getSectionNames() {
-    var namesResult = await sequelize.query("select distinct name from sections",
+    var namesResult = await sequelize.query('select distinct name from sections',
         { type: QueryTypes.SELECT }
     );
     var names = [];
     namesResult.forEach(function(name){
         names.push(name.name);
-    })
+    });
     return names;
-}
+};
 
 /**
  * @returns Array of Obj of (name, total and completed weights for each Section id) AND total Sections.
@@ -278,23 +277,23 @@ dataAccess.getSectionNames = async function getSectionNames() {
  * {id : {name : xyz, total : 123, completed : 12}}, id2 : {...} ...}
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
-    var totalWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id order by total",
+    var totalWeightage = await sequelize.query('select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id order by total',
         { type: QueryTypes.SELECT }
     );
-    var completedWeightage = await sequelize.query("select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is 'completed' group by sections.id order by completed",
-            { type: QueryTypes.SELECT }
-        );
+    var completedWeightage = await sequelize.query('select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is \'completed\' group by sections.id order by completed',
+        { type: QueryTypes.SELECT }
+    );
     var weightage = {};
     var totalSections = 0;
     totalWeightage.forEach(function(totalWeightageObj){
         totalSections++;
-        weightage[totalWeightageObj.id] = {"name" : totalWeightageObj.name, "total" : totalWeightageObj.total, "completed" : 0};
-    })
+        weightage[totalWeightageObj.id] = {'name' : totalWeightageObj.name, 'total' : totalWeightageObj.total, 'completed' : 0};
+    });
     completedWeightage.forEach(function(completedWeightageObj){
         var tempObj = weightage[completedWeightageObj.id];
-        tempObj["completed"] = completedWeightageObj.completed;
+        tempObj['completed'] = completedWeightageObj.completed;
         weightage[completedWeightageObj.id] = tempObj;
-    })
+    });
     return [weightage, totalSections];
 };
 
@@ -303,10 +302,10 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
  * @return Promise
  */
 dataAccess.getOverallWeightage = async function getOverallWeightage() {
-    var totalWeightage = await sequelize.query("select sum(tasks.weightage) as total from tasks",
+    var totalWeightage = await sequelize.query('select sum(tasks.weightage) as total from tasks',
         { type: QueryTypes.SELECT }
     );
-    var completedWeightage = await sequelize.query("select sum(tasks.weightage) as completed from tasks where tasks.status is 'completed'",
+    var completedWeightage = await sequelize.query('select sum(tasks.weightage) as completed from tasks where tasks.status is \'completed\'',
         { type: QueryTypes.SELECT }
     );
     if(totalWeightage == null || completedWeightage == null) {
@@ -342,13 +341,13 @@ dataAccess.deleteSection = async function deleteSection(sectionId) {
  * Params: name, desc, status, weightage, parentSectionId
  */
 dataAccess.addTask = async function addTask(taskDetails) {
-    if (typeof taskDetails != "object" || taskDetails == null) {
-        console.error("Task: Param passed is invalid");
+    if (typeof taskDetails != 'object' || taskDetails == null) {
+        console.error('Task: Param passed is invalid');
         return false;
     }
     var parsedWeightage = parseInt(taskDetails.weightage);
     if (isNaN(parsedWeightage)) {
-        console.error("Task: Weightage passed is NaN : " +  taskDetails.weightage);
+        console.error('Task: Weightage passed is NaN : ' +  taskDetails.weightage);
         return false;
     }
     var currentTime = new Date();
@@ -362,14 +361,14 @@ dataAccess.addTask = async function addTask(taskDetails) {
             finish_time: currentTime,
             parent_section_id: taskDetails.parentSectionId
         },
-        {fields: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]} //Allows insertion of only these fields
+        {fields: ['name', 'desc', 'status', 'weightage', 'entry_time', 'finish_time', 'parent_section_id']} //Allows insertion of only these fields
     )
         .then((res) => {
             return res.dataValues;
         })
         .catch(err => {
-            if (err.toString().includes("cannot be null")) {
-                console.error("Task: Param missing", err);
+            if (err.toString().includes('cannot be null')) {
+                console.error('Task: Param missing', err);
                 return false;
             } else {
                 console.error(err);
@@ -385,8 +384,8 @@ dataAccess.addTask = async function addTask(taskDetails) {
  * Params: id, status
  */
 dataAccess.updateTaskStatus = async function updateTaskStatus(taskDetails) {
-    if (typeof taskDetails != "object" || taskDetails == null) {
-        console.error("Task: Param passed is invalid");
+    if (typeof taskDetails != 'object' || taskDetails == null) {
+        console.error('Task: Param passed is invalid');
         return false;
     }
     var currentTime = new Date();
@@ -395,15 +394,15 @@ dataAccess.updateTaskStatus = async function updateTaskStatus(taskDetails) {
             status: taskDetails.status,
             finish_time: currentTime
         },
-        {fields: ["status","finish_time"]}, //Allows insertion of only these fields
+        {fields: ['status','finish_time']}, //Allows insertion of only these fields
         {where: {id: taskDetails.id}}
     )
         .then(() => {
             return true;
         })
         .catch(err => {
-            if (err.toString().includes("cannot be null")) {
-                console.error("Task: Param missing", err);
+            if (err.toString().includes('cannot be null')) {
+                console.error('Task: Param missing', err);
                 return false;
             } else {
                 console.error(err);
@@ -420,7 +419,7 @@ dataAccess.updateTaskStatus = async function updateTaskStatus(taskDetails) {
 dataAccess.getTask = async function getTask(taskId) {
     return await TaskTagRel.findOne(
         {
-            attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
+            attributes: ['name', 'desc', 'status', 'weightage', 'entry_time', 'finish_time', 'parent_section_id'],
             where: {task_id: taskId}
         })
         .then(task => {
@@ -429,7 +428,7 @@ dataAccess.getTask = async function getTask(taskId) {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -440,7 +439,7 @@ dataAccess.getTask = async function getTask(taskId) {
 dataAccess.getTasks = async function getTasks() {
     return await Task.findAll(
         {
-            attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"]
+            attributes: ['name', 'desc', 'status', 'weightage', 'entry_time', 'finish_time', 'parent_section_id']
         })
         .then(tasks => {
             return tasks;
@@ -448,22 +447,22 @@ dataAccess.getTasks = async function getTasks() {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
  * Returns all distinct Task names as an array
  */
 dataAccess.getTaskNames = async function getTaskNames() {
-    var namesResult = await sequelize.query("select distinct name from tasks",
+    var namesResult = await sequelize.query('select distinct name from tasks',
         { type: QueryTypes.SELECT }
     );
     var names = [];
     namesResult.forEach(function(name){
         names.push(name.name);
-    })
+    });
     return names;
-}
+};
 
 /**
  * Gets entries from Task table corresponding to that parent_section_id
@@ -473,7 +472,7 @@ dataAccess.getTaskNames = async function getTaskNames() {
 dataAccess.getTasksBySectionId = async function getTasksBySectionId(parentSectionId) {
     return await Task.findAll(
         {
-            attributes: ["name", "desc", "status", "weightage", "entry_time", "finish_time", "parent_section_id"],
+            attributes: ['name', 'desc', 'status', 'weightage', 'entry_time', 'finish_time', 'parent_section_id'],
             where: {parent_section_id: parentSectionId}
         })
         .then(tasks => {
@@ -482,7 +481,7 @@ dataAccess.getTasksBySectionId = async function getTasksBySectionId(parentSectio
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -512,24 +511,24 @@ dataAccess.deleteTask = async function deleteTask(taskId) {
  * Params: taskId, tagId
  */
 dataAccess.addTaskTagRel = async function addTaskTagRel(taskTagRelDetails) {
-    if (typeof taskTagRelDetails != "object" || taskTagRelDetails == null) {
-        console.error("TaskTagRels: Param passed is invalid");
+    if (typeof taskTagRelDetails != 'object' || taskTagRelDetails == null) {
+        console.error('TaskTagRels: Param passed is invalid');
         return false;
     }
 
     return await TaskTagRel.create(
         {task_id: taskTagRelDetails.taskId, tag_id: taskTagRelDetails.tagId},
-        {fields: ["task_id", "tag_id"]} //Allows insertion of only these fields
+        {fields: ['task_id', 'tag_id']} //Allows insertion of only these fields
     )
         .then(() => {
             return true;
         })
         .catch(err => {
-            if (err.toString().includes("cannot be null")) {
-                console.error("TaskTagRel: Param missing", err);
+            if (err.toString().includes('cannot be null')) {
+                console.error('TaskTagRel: Param missing', err);
                 return false;
-            } else if (err.toString().includes("ForeignKeyConstraintError")) {
-                console.error("TaskTagRel: Foreign Key constraint failed", err);
+            } else if (err.toString().includes('ForeignKeyConstraintError')) {
+                console.error('TaskTagRel: Foreign Key constraint failed', err);
                 return false;
             } else {
                 console.error(err);
@@ -546,7 +545,7 @@ dataAccess.addTaskTagRel = async function addTaskTagRel(taskTagRelDetails) {
 dataAccess.getTaskTagRel = async function getTaskTagRel(taskId) {
     return await TaskTagRel.findOne(
         {
-            attributes: ["id", "task_id", "tag_id"],
+            attributes: ['id', 'task_id', 'tag_id'],
             where: {task_id: taskId}
         })
         .then(section => {
@@ -555,7 +554,7 @@ dataAccess.getTaskTagRel = async function getTaskTagRel(taskId) {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -566,8 +565,7 @@ dataAccess.getTaskTagRel = async function getTaskTagRel(taskId) {
 dataAccess.getTaskTagRels = async function getTaskTagRels() {
     return await TaskTagRel.findAll(
         {
-            attributes: ["id", "task_id", "tag_id"],
-            where: {task_id: taskId}
+            attributes: ['id', 'task_id', 'tag_id']
         })
         .then(taskTagRels => {
             return taskTagRels;
@@ -575,7 +573,7 @@ dataAccess.getTaskTagRels = async function getTaskTagRels() {
         .catch(err => {
             console.error(err);
             return false;
-        })
+        });
 };
 
 /**
@@ -636,6 +634,6 @@ dataAccess.deleteTaskTagRel = async function deleteTaskTagRel(TaskTagRelId) {
 
 
  */
-console.log("Db file ends");
+console.log('Db file ends');
 
 module.exports = dataAccess;

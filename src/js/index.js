@@ -8,32 +8,34 @@ var version = remote.app.getVersion();
 $('title').html('The Wall v' + version);
 
 // When document has loaded, initialise
-document.onreadystatechange = (event) => {
-    if (document.readyState == "complete") {
+document.onreadystatechange = () => {
+    if (document.readyState == 'complete') {
         handleWindowControls();
         initEvents();
     }
 };
 
-window.onbeforeunload = (event) => {
+window.onbeforeunload = () => {
     /* If window is reloaded, remove win event listeners
     (DOM element listeners get auto garbage collected but not
     Electron win listeners as the win is not dereferenced unless closed) */
     win.removeAllListeners();
-}
+};
 function handleWindowControls() {
     // Make minimise/maximise/restore/close buttons work when they are clicked
-    document.getElementById('minimize-button').addEventListener("click", event => {
+    document.getElementById('minimize-button').addEventListener('click', () => {
         win.minimize();
     });
 
-    document.getElementById('close-button').addEventListener("click", event => {
+    document.getElementById('close-button').addEventListener('click', () => {
         win.close();
     });
 }
 async function addMainPanels() {
-    var mainPanelsElem = $("#main-panels");
-    var panelElements = "", name, id;
+    var mainPanelsElem = $('#main-panels');
+    var panelElements = '';
+    var name;
+    var id;
     var sectionsResponse = await dataAccess.getWeightageOfSections();
     var sections = sectionsResponse[0];
     var numberOfSections = sectionsResponse[1];
@@ -48,14 +50,14 @@ async function addMainPanels() {
         var section = sections[key];
         id = key;
         name = section.name;
-        total = section.total;
-        completed = section.completed;
+        var total = section.total;
+        var completed = section.completed;
         var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + id + '">'
                 + '<div class="panel black ui statistic"><div class="value">' + completed + '</div><div class="label">' + total + '</div></div>'
                 + '<div class="panel content">' + name + '</div>'
                 + '</div>';
         panelElements = panelElements + panelTemplate;
-    };
+    }
     //Set number of columns depending on number of sections
     if (numberOfSections == 0) {
         //Show splash screen, getting started
@@ -72,10 +74,10 @@ async function addMainPanels() {
 }
 function initEvents() {
     //Handling for 'Submit'
-    document.getElementById('task-submit-btn').addEventListener('click', event => {
+    document.getElementById('task-submit-btn').addEventListener('click', () => {
         addTask();
     });
-    document.getElementById('task-input__points').addEventListener('focusout', event => {
+    document.getElementById('task-input__points').addEventListener('focusout', () => {
         validatePoints();
     });
     addMainPanels();
@@ -85,6 +87,7 @@ async function addTask() {
     let taskNameInp = document.getElementById('task-input__task');
     let sectionNameInp = document.getElementById('task-input__section');
     let pointsInp = document.getElementById('task-input__points');
+    var taskName = taskNameInp.value;
     if (!isValidInput()) {
         return;
     }
@@ -98,15 +101,15 @@ async function addTask() {
     console.log(sectionObj);
     let sectionId = sectionObj.id;
     let taskInpObj = {
-        name: taskNameInp.value,
-        desc: "--", 
-        status: "completed", 
+        name: taskName,
+        desc: '--', 
+        status: 'completed', 
         weightage: points, 
         parentSectionId: sectionId
-    }
-    taskObj = await dataAccess.addTask(taskInpObj);
+    };
+    var taskObj = await dataAccess.addTask(taskInpObj);
     console.log(taskObj);
-    overallWeightage = await dataAccess.getOverallWeightage();
+    var overallWeightage = await dataAccess.getOverallWeightage();
     console.log(overallWeightage);
     //Clear inputs
     $('.ui.dropdown').dropdown('restore defaults');
@@ -115,7 +118,7 @@ async function addTask() {
     addMainPanels(); //Needs to update main panels on adding new entry
     populateInputsDropdown(); // Needs to update dropdown
     //Added toast
-    showToast('Task ' + taskNameInp.value + ' added with ' + points + ' points!', 'green');
+    showToast('Task ' + taskName + ' added with ' + points + ' points!', 'green');
 }
 
 function isValidInput() {
@@ -173,9 +176,9 @@ function showToast(message, color) {
 
 //For dropdown in inputs, refer to Fomantic-UI
 $('.ui.dropdown')
-  .dropdown({
-    allowAdditions: true
-  });
+    .dropdown({
+        allowAdditions: true
+    });
 
 //Populate dropdown entries for inputs, such as Section and Tasks
 async function populateInputsDropdown() {
@@ -224,7 +227,7 @@ function updatePopup(info) {
 //For logging from main process
 ipcRenderer.on('logger', (event, arg) => {
     console.log(arg);
-})
+});
 
 
 //Trigger check for update
@@ -256,7 +259,7 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
             console.log(arg[1]);
         }
     }
-})
+});
 
 //To update when user quits the application
 function alwaysUpdate() {
