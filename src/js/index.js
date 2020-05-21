@@ -127,20 +127,34 @@ function isValidInput() {
     let sectionNameInp = document.getElementById('task-input__section');
     let pointsInp = document.getElementById('task-input__points');
 
+    let taskNameInpValue = taskNameInp.value.trim();
+    let sectionNameInpValue = sectionNameInp.value.trim();
+    let pointsInpValue = pointsInp.value.trim();
     //Check empty
-    if (taskNameInp.value.trim() == '') {
-        valid = false;
-    }
-    if (sectionNameInp.value.trim() == '') {
-        valid = false;
-    }
-    if (pointsInp.value.trim() == '') {
+    if (taskNameInpValue == '' || sectionNameInpValue == '' || pointsInpValue == '') {
         valid = false;
     }
     if (!valid) {
         showToast('Fill in all fields', 'red');
         return false;
     }
+
+    //Check for invalid characters: 
+    //Restricted Characters <>" and Characters not restricted: '/& 
+    if (taskNameInpValue.includes('<') || taskNameInpValue.includes('>') || taskNameInpValue.includes('"')) {
+        valid = false;
+    }
+    if (sectionNameInpValue.includes('<') || sectionNameInpValue.includes('>') || sectionNameInpValue.includes('"')) {
+        valid = false;
+    }
+    if (pointsInpValue.includes('<') || pointsInpValue.includes('>') || pointsInpValue.includes('"')) {
+        valid = false;
+    }
+    if (!valid) {
+        showToast('Fields must not contain <u> <>" </u>', 'red');
+        return false;
+    }
+
     valid = validatePoints();
 
     return valid;
