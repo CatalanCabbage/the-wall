@@ -10,14 +10,18 @@
     - npm install
     
 # Build for all commits, shorter expiry
+# Builds Win and Mac tar.gz only, due to unavailability of Mac image
 # Used by App during testing period, till v1.0 release
 build:
   extends: .buildTemplate
   script:
     - npm run buildWin && npm cache --force clean && npm run buildMac
-    - echo 'Built for commit ' $CI_COMMIT_MESSAGE
+    - echo 'Built for Windows and Mac tar.gz; commit ' $CI_COMMIT_MESSAGE
+  except:
+    - tags
 
 # Build for Tags only, expiry extended
+# Builds all platforms
 # Should change feedURL for AutoUpdater to this Job after v1.0 release
 releaseBuild:
   extends: .buildTemplate
@@ -26,5 +30,5 @@ releaseBuild:
   artifacts:
     expire_in: 3 years
   script:
-    - npm run buildWin && npm cache --force clean && npm run buildMac
-    - echo 'Built for Windows and Mac; tag ' $CI_COMMIT_TAG
+    - npm run build
+    - echo 'Built for all platforms; tag ' $CI_COMMIT_TAG

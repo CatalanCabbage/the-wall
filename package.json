@@ -9,12 +9,12 @@
   },
   "scripts": {
     "start": "electron .",
-    "pack": "electron-builder --dir",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
-    "buildWin": "electron-builder build --win --publish never",
-    "buildMac": "electron-builder build --mac --publish never"
+    "buildWin": "electron-builder build --win",
+    "buildMac": "electron-builder build --mac tar.gz",
+    "build": "electron-builder build --mwl"
   },
   "build": {
     "appId": "cataxcab.thewall",
@@ -30,9 +30,6 @@
     ],
     "win": {
       "target": "nsis"
-    },
-    "mac": {
-        "target": "tar.gz"
     }
   },
   "nsis": {
