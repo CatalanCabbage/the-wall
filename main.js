@@ -2,6 +2,14 @@ const { app, BrowserWindow } = require('electron');
 require('electron-reload')('./src/js');
 const {autoUpdater} = require('electron-updater'); 
 const {ipcMain} = require('electron');
+require('dotenv').config();
+
+let isDev = false;
+if (process.env.NODE_ENV === 'dev') {
+    isDev = true;
+    require('dotenv').config();
+}
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
@@ -48,7 +56,9 @@ app.on('ready', () =>{
         win.show();
         splashScreen.destroy();
     });
-    win.webContents.openDevTools();
+    if (isDev) {
+        win.webContents.openDevTools();
+    }
 });
 
 // Quit when all windows are closed.

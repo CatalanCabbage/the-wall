@@ -1,7 +1,7 @@
 {
   "name": "the-wall",
   "version": "0.1.7",
-  "description": "We’re going to build a wall, folks. We’re going to build a wall. Don’t worry. That wall will go up so fast your head will spin.",
+  "description": "We’re going to build a wall, folks. Don’t worry. That wall will go up so fast your head will spin.",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "electron .",
+    "dev": "cross-env NODE_ENV=dev electron .",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
@@ -43,12 +44,14 @@
   },
   "license": "AGPLv3",
   "devDependencies": {
+    "cross-env": "^7.0.2",
     "electron": "^7.1.11",
     "electron-builder": "^22.6.0",
     "electron-rebuild": "^1.10.0",
     "eslint": "^7.0.0"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
     "electron-reload": "^1.5.0",
     "electron-updater": "^4.3.1",
     "jquery": "^3.3.1",

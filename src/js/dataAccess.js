@@ -5,14 +5,11 @@ const path = require('path');
 var fs = require('fs');
 
 //Check if folder exists to store db file
-var dbPath = path.join(app.getPath('appData'), 'the-wall', 'Local Storage');
-if (!fs.existsSync(dbPath)){
-    fs.mkdirSync(dbPath, { recursive: true });
+var dbDir = path.join(app.getPath('appData'), 'the-wall', 'Local Storage');
+if (!fs.existsSync(dbDir)){
+    fs.mkdirSync(dbDir, { recursive: true });
 }
-var dbFile;
-dbFile = './database.sqlite'; //Development
-//dbFile = path.join(dbPath, 'database.sqlite'); //Production
-
+let dbPath = path.join(dbDir, 'database.sqlite');
 
 console.log('Connected to DB yet?');
 // Create database connection
@@ -28,7 +25,7 @@ const sequelize = new Sequelize('database', 'username', 'password', {
         idle: 10000
     },
     logging: 0,
-    storage: dbFile,
+    storage: process.env.DB_PATH || dbPath,
     fileMustExist: true
 });
 
