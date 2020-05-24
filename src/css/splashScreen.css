@@ -1,0 +1,111 @@
+:root {
+    --background-color: black;
+    --text-color: rgb(48, 47, 47);   
+    --last-letter-primary-color: rgba(83, 81, 81, 0.322);
+    --last-letter-secondary-color: rgb(255, 238, 0);
+    --footnote-color: rgba(83, 81, 81, 0.548);
+    --total-time: 2.5s;
+}
+body {
+    margin: 0px;
+    width: 846px;
+    height: 546px;
+}
+#text-container {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 7em;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    height: 100%;
+    width: 100%;
+    border: 2px solid rgba(95, 95, 95, 0.378);
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+/**To move the whole letter 'L' as a whole*/
+#text__L-block {
+    position: absolute;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-left: 4px;
+}
+
+@keyframes revealPrimaryBlock {
+    0% {
+        animation-timing-function: steps(1, end);
+    }
+    100% {
+        background-color: var(--last-letter-primary-color);
+    }
+}
+/*Since last block is a different color*/
+@keyframes revealSecondaryBlock {
+    0% {
+        animation-timing-function: steps(1, end);
+    }
+    100% {
+        background-color: var(--last-letter-secondary-color);
+        box-shadow: 0px 0px 64px 5px rgb(243, 239, 16);
+    }
+}
+
+/**Bottom horizontal part of 'L'*/
+#text__L-block-1 {
+    display: inline-block;
+    height: 18px;
+    width: 37px;
+    background-color: var(--background-color);
+    animation: revealPrimaryBlock calc(var(--total-time) * 1 / 6);
+    animation-fill-mode: forwards;
+}
+
+/**Remaining are blocks of the stem stacked on each other*/
+#text__L-block-2 {
+    display: inline-block;
+    height: 20px;
+    width: 23px;
+    margin: auto auto 18px -56.7px;
+    background-color: var(--background-color);
+    animation: revealPrimaryBlock calc(var(--total-time) * 2 / 6);
+    animation-fill-mode: forwards;
+}
+#text__L-block-3 {
+    display: inline-block;
+    height: 20px;
+    width: 23px;
+    margin: auto auto 38px -42.7px;
+    background-color: var(--background-color);
+    animation: revealPrimaryBlock calc(var(--total-time) * 3 / 6);
+    animation-fill-mode: forwards;
+}
+#text__L-block-4 {
+    display: inline-block;
+    height: 20px;
+    width: 23px;
+    margin: auto auto 58px -42.8px;
+    background-color: var(--background-color);
+    animation: revealPrimaryBlock calc(var(--total-time) * 4 / 6);
+    animation-fill-mode: forwards;
+}
+#text__L-block-5 {
+    display: inline-block;
+    height: 20px;
+    width: 23px;
+    margin: auto auto 78px -42.8px;
+    box-shadow: 0px 0px 0px 0px;
+    background-color: var(--background-color);
+    animation: revealSecondaryBlock calc(var(--total-time) * 5 / 6);
+    animation-fill-mode: forwards;
+}
+
+#footnote {
+    position: absolute;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--footnote-color);
+    margin: 120px auto 58px -215px;
+    font-weight: bolder;
+}

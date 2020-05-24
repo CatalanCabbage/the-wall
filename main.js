@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const {app, BrowserWindow} = require('electron');
 require('electron-reload')('./src/js');
 const {autoUpdater} = require('electron-updater'); 
 const {ipcMain} = require('electron');
@@ -16,13 +16,13 @@ let win;
 function createWindow () {
     // Create the browser window.
     win = new BrowserWindow({
+        show: false,
         width: 850,
         height: 550,
         webPreferences: {
             nodeIntegration: true
         },
-        frame: false,
-        show: false
+        frame: false
     });
     // and load the index.html of the app.
     win.loadFile('./src/html/index.html');
@@ -47,18 +47,24 @@ function createSplashWindow () {
 }
 
 // This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// initialization and is ready to create browser windows
 app.on('ready', () =>{
     createSplashWindow();
-    createWindow();
-    win.once('ready-to-show', () => {
-        win.show();
-        splashScreen.destroy();
-    });
-    if (isDev) {
-        win.webContents.openDevTools();
-    }
+    //Creating window immediately causes a white flicker on startup; thus, create after 500ms
+    setTimeout(function() {
+        createWindow();
+        //Loading main window takes time; show lightweight splash screen for 2500ms
+        //Total app startup time is now 3000ms
+        win.once('ready-to-show', () => {
+            setTimeout( function() {
+                win.show();
+                splashScreen.destroy();
+            }, 2500);
+            if (isDev) {
+                win.webContents.openDevTools();
+            }
+        });
+    }, 500);
 });
 
 // Quit when all windows are closed.
