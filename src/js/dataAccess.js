@@ -45,6 +45,15 @@ function isConnected() {
 dataAccess.isConnected = isConnected();
 
 //Table definitions
+//AppParams
+const AppParam = sequelize.define('app_param', {
+    key: {type: Sequelize.STRING, allowNull: false, unique: true},
+    value: {type: Sequelize.STRING, allowNull: false, unique: false}
+}, {
+    updatedAt: 'updated_at',
+    createdAt: 'created_at'
+});
+
 //Sections
 const Section = sequelize.define('section', {
     id: {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
@@ -95,6 +104,57 @@ const TaskTagRel = sequelize.define('task_tag_rel', {
 
 
 sequelize.sync();
+
+//DataAccess for AppParams start---------------------------------------------------------------------------------------------
+dataAccess.addParam = async function addParam(param) {
+    if (typeof param != 'object' || param == null) {
+        console.log('addParam passed param is invalid');
+        return false;
+    }
+    return await AppParam.create(
+        {key: param.key, value: param.value},
+        {fields: ['key', 'value']}
+    )
+        .then (() => {
+            return true;
+        }) 
+        .catch (err => {
+            if (err.toString().includes('SequelizeUniqueConstraintError')) {
+                console.error('AppParam: Given key is not unique', err);
+                return false;
+            } else if (err.toString().includes('cannot be null')) {
+                console.error('AppParam: Param missing', err);
+                return false;
+            } else {
+                console.error(err);
+                return false;
+            }
+        })
+
+    ;
+};
+
+dataAccess.getParam = async function getParam(key) {
+    if (typeof key !== 'string') {
+        console.log('getParam key is not a string');
+        return null;
+    }
+    var param = await sequelize.query('select * from app_params where key=?',
+        {   
+            replacements: [key],
+            type: QueryTypes.SELECT }
+    );
+    return param[0].value;
+};
+
+
+dataAccess.getAllParams = async function getAllParams() {
+    var params = await sequelize.query('select key, value from app_params',
+        { type: QueryTypes.SELECT }
+    );
+    return params;
+};
+//DataAccess for AppParams ends----------------------------------------------------------------------------------------------
 
 //DataAccess for Tags start---------------------------------------------------------------------------------------------
 /**
@@ -631,6 +691,5 @@ dataAccess.deleteTaskTagRel = async function deleteTaskTagRel(TaskTagRelId) {
 
 
  */
-console.log('Db file ends');
 
 module.exports = dataAccess;
