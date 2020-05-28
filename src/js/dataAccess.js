@@ -1,13 +1,13 @@
 let dataAccess = {};
-const { QueryTypes } = require('sequelize');
+const {QueryTypes} = require('sequelize');
 const app = require('electron').remote.app;
 const path = require('path');
 var fs = require('fs');
 
 //Check if folder exists to store db file
 var dbDir = path.join(app.getPath('appData'), 'the-wall', 'Local Storage');
-if (!fs.existsSync(dbDir)){
-    fs.mkdirSync(dbDir, { recursive: true });
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, {recursive: true});
 }
 let dbPath = path.join(dbDir, 'database.sqlite');
 
@@ -95,8 +95,8 @@ const Tag = sequelize.define('tag', {
 
 //Task to Tag relational mapping
 const TaskTagRel = sequelize.define('task_tag_rel', {
-    task_id: {type: Sequelize.INTEGER, allowNull: false, references: {model: Task, key: 'id'}},
-    tag_id: {type: Sequelize.INTEGER, allowNull: false, references: {model: Tag, key: 'id'}},
+    task_id: {type: Sequelize.INTEGER, allowNull: false, unique: 'compositeKey', references: {model: Task, key: 'id'}},
+    tag_id: {type: Sequelize.INTEGER, allowNull: false, unique: 'compositeKey', references: {model: Tag, key: 'id'}},
 }, {
     updatedAt: 'updated_at',
     createdAt: 'created_at'
@@ -111,7 +111,7 @@ dataAccess.addParam = async function addParam(param) {
         console.log('addParam passed param is invalid');
         return false;
     }
-    return await AppParam.create(
+    return await AppParam.upsert(
         {key: param.key, value: param.value},
         {fields: ['key', 'value']}
     )
@@ -142,15 +142,18 @@ dataAccess.getParam = async function getParam(key) {
     var param = await sequelize.query('select * from app_params where key=?',
         {   
             replacements: [key],
-            type: QueryTypes.SELECT }
+            type: QueryTypes.SELECT}
     );
-    return param[0].value;
+    if (param[0] != null) {
+        return param[0].value;
+    }
+    return null;
 };
 
 
 dataAccess.getAllParams = async function getAllParams() {
     var params = await sequelize.query('select key, value from app_params',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     return params;
 };
@@ -173,13 +176,13 @@ dataAccess.addTag = async function addTag(tagDetails) {
         {name: tagDetails.name, desc: tagDetails.desc},
         {fields: ['name', 'desc']} //Allows insertion of only these fields
     )
-        .then(() => {
-            return true;
+        .then((res) => {
+            return res.dataValues;
         })
         .catch(err => {
             if (err.toString().includes('SequelizeUniqueConstraintError')) { //Tag name has been set as unique
                 console.error('Tags: Given tag name is not unique', err);
-                return false;
+                return 'SequelizeUniqueConstraintError';
             } else if (err.toString().includes('cannot be null')) {
                 console.error('Tags: Param missing', err);
                 return false;
@@ -191,60 +194,28 @@ dataAccess.addTag = async function addTag(tagDetails) {
 };
 
 /**
- * Gets entry from Tags table
- * @return Promise
- * @param tagId
- */
-dataAccess.getTag = async function getTag(tagId) {
-    return await Tag.findOne(
-        {
-            attributes: ['id', 'name', 'desc'],
-            where: {id: tagId}
-        })
-        .then(tag => {
-            return tag;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        });
-};
-
-/**
  * Gets all entries from Tags table
  * @return Promise
  */
 dataAccess.getTags = async function getTags() {
-    return await Tag.findAll(
-        {
-            attributes: ['id', 'name', 'desc']
-        })
-        .then(tags => {
-            return tags;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        });
+    var tags = await sequelize.query('select * from tags',
+        {type: QueryTypes.SELECT}
+    );
+    return tags;
 };
 
 /**
- * Deletes entry from Tags table
- * @return Promise
- * @param tagId
+ * Returns all distinct Tag names as an array
  */
-dataAccess.deleteTag = async function deleteTag(tagId) {
-    return await Tag
-        .destroy({
-            where: {id: tagId}
-        })
-        .then(() => {
-            return true;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        });
+dataAccess.getTagNames = async function getTagNames() {
+    var namesResult = await sequelize.query('select distinct name from tags',
+        {type: QueryTypes.SELECT}
+    );
+    var names = [];
+    namesResult.forEach(function(name) {
+        names.push(name.name);
+    });
+    return names;
 };
 //DataAccess for Tags ends----------------------------------------------------------------------------------------------
 
@@ -307,7 +278,7 @@ dataAccess.getSection = async function getSection(sectionName) {
  */
 dataAccess.getSections = async function getSections() {
     var sectionsResult = await sequelize.query('select * from sections',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     return sectionsResult;
 };
@@ -318,10 +289,10 @@ dataAccess.getSections = async function getSections() {
  */
 dataAccess.getSectionNames = async function getSectionNames() {
     var namesResult = await sequelize.query('select distinct name from sections',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     var names = [];
-    namesResult.forEach(function(name){
+    namesResult.forEach(function(name) {
         names.push(name.name);
     });
     return names;
@@ -335,18 +306,18 @@ dataAccess.getSectionNames = async function getSectionNames() {
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
     var totalWeightage = await sequelize.query('select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id order by total',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     var completedWeightage = await sequelize.query('select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is \'completed\' group by sections.id order by completed',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     var weightage = {};
     var totalSections = 0;
-    totalWeightage.forEach(function(totalWeightageObj){
+    totalWeightage.forEach(function(totalWeightageObj) {
         totalSections++;
         weightage[totalWeightageObj.id] = {'name' : totalWeightageObj.name, 'total' : totalWeightageObj.total, 'completed' : 0};
     });
-    completedWeightage.forEach(function(completedWeightageObj){
+    completedWeightage.forEach(function(completedWeightageObj) {
         var tempObj = weightage[completedWeightageObj.id];
         tempObj['completed'] = completedWeightageObj.completed;
         weightage[completedWeightageObj.id] = tempObj;
@@ -360,10 +331,10 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
  */
 dataAccess.getOverallWeightage = async function getOverallWeightage() {
     var totalWeightage = await sequelize.query('select sum(tasks.weightage) as total from tasks',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     var completedWeightage = await sequelize.query('select sum(tasks.weightage) as completed from tasks where tasks.status is \'completed\'',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     if(totalWeightage == null || completedWeightage == null) {
         return null;
@@ -371,23 +342,6 @@ dataAccess.getOverallWeightage = async function getOverallWeightage() {
     return {'total': totalWeightage['0']['total'], 'completed': completedWeightage['0']['completed']};
 };
 
-/**
- * Deletes entry from Sections table
- * @return Promise
- * @param sectionId
- */
-dataAccess.deleteSection = async function deleteSection(sectionId) {
-    return await Section.destroy({
-        where: {id: sectionId}
-    })
-        .then(() => {
-            return true;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        });
-};
 //DataAccess for Sections ends------------------------------------------------------------------------------------------
 
 //DataAccess for Tasks starts-------------------------------------------------------------------------------------------
@@ -474,7 +428,7 @@ dataAccess.updateTaskStatus = async function updateTaskStatus(taskDetails) {
  * @param taskId
  */
 dataAccess.getTask = async function getTask(taskId) {
-    return await TaskTagRel.findOne(
+    return await Task.findOne(
         {
             attributes: ['name', 'desc', 'status', 'weightage', 'entry_time', 'finish_time', 'parent_section_id'],
             where: {task_id: taskId}
@@ -494,17 +448,10 @@ dataAccess.getTask = async function getTask(taskId) {
  * @param taskId
  */
 dataAccess.getTasks = async function getTasks() {
-    return await Task.findAll(
-        {
-            attributes: ['name', 'desc', 'status', 'weightage', 'entry_time', 'finish_time', 'parent_section_id']
-        })
-        .then(tasks => {
-            return tasks;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        });
+    var tasks = await sequelize.query('select * from tasks', 
+        {type: QueryTypes.SELECT}
+    );
+    return tasks; 
 };
 
 /**
@@ -512,10 +459,10 @@ dataAccess.getTasks = async function getTasks() {
  */
 dataAccess.getTaskNames = async function getTaskNames() {
     var namesResult = await sequelize.query('select distinct name from tasks',
-        { type: QueryTypes.SELECT }
+        {type: QueryTypes.SELECT}
     );
     var names = [];
-    namesResult.forEach(function(name){
+    namesResult.forEach(function(name) {
         names.push(name.name);
     });
     return names;
@@ -578,6 +525,7 @@ dataAccess.addTaskTagRel = async function addTaskTagRel(taskTagRelDetails) {
         {fields: ['task_id', 'tag_id']} //Allows insertion of only these fields
     )
         .then(() => {
+            console.log(true);
             return true;
         })
         .catch(err => {
@@ -593,6 +541,42 @@ dataAccess.addTaskTagRel = async function addTaskTagRel(taskTagRelDetails) {
             }
         });
 };
+
+/**
+ * Adds multiple entries in TaskTagRel table
+ * @return Promise
+ * @param taskTagRelDetails Array containing Objects containing params
+ * taskTagRelDetails: [{task_id: x, tag_id: y}, ...]; note the snake case
+ * Params: taskId, tagId
+ */
+dataAccess.addMultipleTaskTagRel = async function addMultipleTaskTagRel(taskTagRelDetails) {
+    if (taskTagRelDetails == null || !Array.isArray(taskTagRelDetails)) {
+        console.error('TaskTagRels: Param passed is invalid');
+        return false;
+    }
+
+    return await TaskTagRel.bulkCreate(
+        taskTagRelDetails,
+        {fields: ['task_id', 'tag_id'], ignoreDuplicates: true}
+    )
+        .then((res) => {
+            console.log(res);
+            return true;
+        })
+        .catch(err => {
+            if (err.toString().includes('cannot be null')) {
+                console.error('TaskTagRel: Param missing', err);
+                return false;
+            } else if (err.toString().includes('ForeignKeyConstraintError')) {
+                console.error('TaskTagRel: Foreign Key constraint failed', err);
+                return false;
+            } else {
+                console.error(err);
+                return false;
+            }
+        });
+};
+
 
 /**
  * Gets entry from TaskTagRel table
@@ -615,22 +599,15 @@ dataAccess.getTaskTagRel = async function getTaskTagRel(taskId) {
 };
 
 /**
- * Gets entry from TaskTagRels
+ * Gets all entries from TaskTagRels
  * @return Promise
  * @param taskId
  */
 dataAccess.getTaskTagRels = async function getTaskTagRels() {
-    return await TaskTagRel.findAll(
-        {
-            attributes: ['id', 'task_id', 'tag_id']
-        })
-        .then(taskTagRels => {
-            return taskTagRels;
-        })
-        .catch(err => {
-            console.error(err);
-            return false;
-        });
+    var taskTagRels = await sequelize.query('select task_id, tag_id from task_tag_rels',
+        {QueryTypes: QueryTypes.SELECT}
+    );
+    return taskTagRels[0];
 };
 
 /**
@@ -651,45 +628,5 @@ dataAccess.deleteTaskTagRel = async function deleteTaskTagRel(TaskTagRelId) {
         });
 };
 //DataAccess for TaskTagRel ends----------------------------------------------------------------------------------------
-
-
-/*
- Example snippets:
- Tags:
-     Add:
-    tagDetails = {name: "testName", desc: "testDescription"};
-    dataAccess.addTag(tagDetails).then((result) => {
-        console.log(result);
-    })
-
- Sections:
-    Add:
-    sectionDetails = {name: "testName", parentSectionId: 1};
-    dataAccess.addSection(sectionDetails).then((result) => {
-        console.log(result);
-    })
-
- Tasks:
-     Add:
-     taskDetails = {name: "testName", desc:"testDesc", status: "Completed", weightage: 10, parentSectionId: 1};
-     dataAccess.addTask(taskDetails).then((result) => {
-        console.log(result);
-    })
-    Update:
-         taskDetails = {status: "Completed", id:1};
-         async function updateStatus(){
-             var data = await dataAccess.updateTaskStatus(taskDetails)
-             console.log(data);
-         }
-
- TaskTagRel:
-     Add:
-     taskTagRelDetails = {taskId: 1, tagId: 1};
-     dataAccess.addTaskTagRel(taskTagRelDetails).then((result) => {
-        console.log(result);
-    })
-
-
- */
 
 module.exports = dataAccess;

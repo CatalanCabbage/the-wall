@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
         <title>The Wall</title>
         <script>
             const jQuery = require('jquery')
@@ -24,7 +25,7 @@
     
     <main>
         <!--Used for updates-->
-        <div class="ui tiny update modal">
+        <div class="update ui tiny modal">
             <div class="header" style="text-align: center;">
               Update available
             </div>
@@ -46,23 +47,82 @@
                     Yes
                 </div>
             </div>
-          </div>
+        </div>
 
-
-        <form id="input-bar">
-            <select name="section" class="task-input ui search dropdown" id="task-input__section">
-                <option value="">Section</option>
-            </select>
-            <select name="task" class="task-input ui search dropdown" id="task-input__task">
-                <option value="">Task</option>
-            </select>
-            <div class="task-input ui input" id="task-input__points-container">
-                <input id="task-input__points" type="text" placeholder="points">
+        <!--Settings modal-->
+        <div class="settings ui tiny modal">
+            <div class="header" style="text-align: center;">
+              Settings
             </div>
-            <button id="task-submit-btn" class="ui button" type="button" autofocus>Submit</button>
-        </form>
-        <div id="main-panels" class="ui cards">
+            <div class="content">
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" id="settings__update-checkbox" name="settings__update-checkbox"/>
+                        <label>Always update automatically</label>
+                </div>
+            </p>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Discard
+                </div>
+                <div class="ui primary approve button">
+                    Save
+                </div>
+            </div>
+        </div>
 
+        <!--Add Tag modal-->
+        <div class="tag ui tiny modal">
+            <div class="header" style="text-align: center;">
+                Add new Tag
+            </div>
+            <div class="content">
+                <div class="add tag ui input" id="add-tag__name-container">
+                    <input id="add-tag__name" type="text" placeholder="Name">
+                </div>
+                <div class="add tag ui input fluid" id="add-tag__desc-container">
+                    <input id="add-tag__desc" type="text" placeholder="Description (optional)">
+                </div>
+            </p>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Cancel
+                </div>
+                <div class="ui primary approve button">
+                    Save Tag
+                </div>
+            </div>
+        </div>
+
+        <div id="top-bar">
+            <div class="settings ui top left pointing dropdown button" id="top-bar__settings">
+                <i><img src="../assets/burger.png" id="settings-btn" height="25px" width="25px"></img></i>
+                <div class="menu">
+                  <div class="item">Settings</div>
+                  <div class="ui divider"></div>
+                  <div class="item">About</div>
+                </div>
+              </div>
+            <form id="top-bar__input-bar">
+                <select name="task" class="task-input task ui search dropdown" id="task-input__task">
+                    <option value="">Task</option>
+                </select>
+                <select name="section" class="task-input section ui search dropdown" id="task-input__section">
+                    <option value="">Section</option>
+                </select>
+                <select name="tags" class="task-input tags ui search dropdown" multiple="" id="task-input__tag">
+                    <option value="">Tags</option>
+                </select>
+                <div class="task-input ui input" id="task-input__points-container">
+                    <input id="task-input__points" type="text" placeholder="points">
+                </div>
+                <button id="task-submit-btn" class="ui button" type="button" autofocus>Submit</button>
+            </form>
+        </div>
+
+        <div id="main-panels" class="ui cards">
+            <!--Added via JS-->
         </div>
     </main>
     </body>

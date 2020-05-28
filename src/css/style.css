@@ -68,8 +68,16 @@ main {
     height: 100%;
     width: 100%;
 }
-#input-bar{
-    display: flex;
+
+#top-bar__settings {
+    position: absolute;
+    padding: 5px;
+    margin-top: 20px;
+}
+
+#top-bar__input-bar {
+    flex: 3;
+    display: inline-flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -99,8 +107,10 @@ main {
 #task-input__points-container {
     width: 15%;
 }
-.task-input.ui.input {
-    width: 10%;
+
+#add-tag__desc-container {
+    display: inline-flex;
+    width: 60%;
 }
 
 #task-submit-btn{
