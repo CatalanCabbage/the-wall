@@ -17,7 +17,7 @@ body {
     width: 100%;
     left: 0px;
     top: 0px;
-    background: #254053;
+    background: rgb(31, 31, 31);
     -webkit-app-region: drag;
 }
 #title-bar__controls {
@@ -28,6 +28,7 @@ body {
     right: 0;
     height: 100%;
     -webkit-app-region: no-drag;
+    color: white;
 }
 .title-bar__button {
     grid-row: 1 / span 1;
@@ -36,7 +37,8 @@ body {
     align-items: center;
     width: 100%;
     height: 100%;
-    background: #387994;
+    background: rgb(31, 31, 31);
+    color: white;
 }
 #minimize-button {
     grid-column: 1;
@@ -55,12 +57,14 @@ body {
     background: #387994;
     align-items: center;
     justify-content: center;
+    background: rgb(31, 31, 31);
+    color: white;
 }
 main {
     padding: 40px 40px;
     display: grid;
     grid-template-rows: 1fr 9fr;
-    background: #aaaaaa;
+    background: #727070;
     height: 100%;
     width: 100%;
 }
@@ -69,69 +73,31 @@ main {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin: 10px 40px;
-}
-#points-panel{
-    font-size: 8rem;
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    animation-name: shaker;
-    animation-duration: 600ms;
-    animation-timing-function: ease-in-out;
-    animation-delay: 1s;
-}
-@keyframes shaker {
- 0% {
-  transform: translate(0px, 0px) rotate(0deg);
-  opacity: 0.8;
- }
- 10% {
-  transform: translate(10px, 7px) rotate(-9deg);
-  opacity: 0.6;
- }
- 20% {
-  transform: translate(13px, -19px) rotate(-3deg);
-  opacity: 0.3;
- }
- 30% {
-  transform: translate(-6px, -6px) rotate(2deg);
-  opacity: 0.4;
- }
- 40% {
-  transform: translate(-9px, -18px) rotate(-5deg);
-  opacity: 0.4;
- }
- 50% {
-  transform: translate(10px, -8px) rotate(5deg);
-  opacity: 0.7;
- }
- 60% {
-  transform: translate(-10px, 14px) rotate(-6deg);
-  opacity: 1;
- }
- 70% {
-  transform: translate(10px, 3px) rotate(6deg);
-  opacity: 0.1;
- }
- 80% {
-  transform: translate(-2px, 20px) rotate(-6deg);
-  opacity: 1;
- }
- 90% {
-  transform: translate(-7px, -19px) rotate(2deg);
-  opacity: 0.5;
- }
+    margin: 10px auto 10px 13%;
 }
 
+.task-input {
+    margin: 0px 1px;
+}
 
 .task-input:focus {
     border: 4px #123123 solid;
 }
 
+.task-input.task.ui.search.dropdown {
+    min-width: 35%;
+    width: 250%;
+    max-width: 250%;
+}
+.task-input.ui.search.dropdown {
+    font-size: 14px;
+    min-width: 20%;
+    width: 120%;
+    max-width: 120%;
+    max-height: 20%;
+}
 #task-input__points-container {
-    width: 10%;
+    width: 15%;
 }
 .task-input.ui.input {
     width: 10%;

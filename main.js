@@ -92,8 +92,8 @@ autoUpdater.setFeedURL({
     channel: 'latest',
     url: 'http://gitlab.com/api/v4/projects/16527632/jobs/artifacts/master/raw/dist?job=build'
 });
-//To be handled: check for updates with release notes as response, update
 ipcMain.on('updater-action', (event, arg) => {
+    event.sender.send('logger', 'from mainnnnnnnnn');
     if (arg == 'checkForUpdates') {
         autoUpdater.checkForUpdates();
     }
@@ -107,9 +107,12 @@ ipcMain.on('updater-action', (event, arg) => {
         event.sender.send('updater-action-response', ['error', err]);
     });
   
-    //Will always update while quitting
-    if (arg == 'alwaysUpdate') {
-        autoUpdater.autoInstallOnAppQuit = true;    
+    //Will decide if app always updates while quitting
+    if (arg.action == 'alwaysUpdate') {
+        if (arg.flag != null) {
+            autoUpdater.autoInstallOnAppQuit = (arg.flag == 'true');  
+            console.log('set AutoUpdater value');
+        }
     }
 
     //Update and force quit
@@ -124,7 +127,7 @@ ipcMain.on('updater-action', (event, arg) => {
     });
     autoUpdater.on('update-not-available', (info) => {
         console.log('Update not available.');
-        console.log(info);
+        console.log(typeof info);
     });
     autoUpdater.on('checking-for-update', (info) => {
         console.log('Checking for update');
