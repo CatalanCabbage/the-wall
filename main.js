@@ -2,14 +2,13 @@ const {app, BrowserWindow} = require('electron');
 require('electron-reload')('./src/js');
 const {autoUpdater} = require('electron-updater'); 
 const {ipcMain} = require('electron');
-require('dotenv').config();
 
 let isDev = false;
 if (process.env.NODE_ENV === 'dev') {
     isDev = true;
     require('dotenv').config();
 }
-
+console.log(process.env.NODE_ENV);
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
@@ -87,10 +86,14 @@ app.on('activate', () => {
 //Handle updates
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = false;
+var releaseBranch = process.env.RELEASE_BRANCH || 'release';
+console.log(releaseBranch);
+var url = 'http://gitlab.com/api/v4/projects/16527632/jobs/artifacts/' + releaseBranch + '/raw/dist?job=build';
+console.log(url);
 autoUpdater.setFeedURL({
     provider: 'generic',
     channel: 'latest',
-    url: 'http://gitlab.com/api/v4/projects/16527632/jobs/artifacts/master/raw/dist?job=build'
+    url: url
 });
 ipcMain.on('updater-action', (event, arg) => {
     event.sender.send('logger', 'from mainnnnnnnnn');
