@@ -148,3 +148,16 @@ main {
 .ui.tags.horizontal.label {
     margin-bottom: 5px;
 }
+/*To stop animation in progress bar*/
+.ui.active.progress .bar::after {
+    min-width: 2px;
+    animation: none;
+    -webkit-animation: none;
+}
+.footer.bar.points.display {
+    min-width: 1px;
+}
+
+#footer-progress {
+    margin: 35px -25px auto -25px;
+}

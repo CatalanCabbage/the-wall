@@ -518,3 +518,24 @@ function updateAndQuit() {
     console.log('sending updateAndQuit');
     ipcRenderer.send('updater-action', 'updateAndQuit');
 }
+
+//Generate progress bar footer
+async function generateProgressBar() {
+    var result = await dataAccess.getWeightageOfTags();
+    var tagsObj = result.tagsWeightage;
+    var totalWeightage = result.totalWeightage;
+    var barContainerTemplate = '';
+    var barsTemplate = '';
+    var weightsArray = [];
+    var targetWeightage = 500;
+    console.log(result);
+    for (var id in tagsObj) {
+        weightsArray.push(tagsObj[id].weightage);
+        barsTemplate = barsTemplate.concat('<div class="' + tagsObj[id].color + ' bar points display footer"></div>');
+    }
+    barContainerTemplate = barContainerTemplate.concat('<div class="ui multiple progress total points small" data-total="' + targetWeightage + '">');
+    barContainerTemplate = barContainerTemplate.concat(barsTemplate);
+    barContainerTemplate = barContainerTemplate.concat('<div class="label" id="footer-progress__label">' + totalWeightage + ' completed of ' + targetWeightage + '</div></div>');
+    $('#footer-progress').html(barContainerTemplate);
+    $('.ui.total.points.progress').progress('set progress', weightsArray);
+}
