@@ -108,9 +108,13 @@ main {
     width: 15%;
 }
 
-#add-tag__desc-container {
-    display: inline-flex;
-    width: 60%;
+#add-tag__color {
+    margin: 10px auto auto -5px;
+    width: 100%;
+}
+#add-tag__preview.ui.label {
+    max-width: 20%;
+    margin: 10px auto auto 42%;
 }
 
 #task-submit-btn{
@@ -122,6 +126,7 @@ main {
 
 #main-panels {
     overflow-y: auto;
+    height: 375px;
 }
 
 .panel.card{
@@ -131,4 +136,15 @@ main {
 
 .panel.card.card--small {
     height: 135px;
+}
+
+.panel.content {
+    text-align: center;
+}
+.panel.label {
+    margin: 3px 1px;
+    opacity: 0.8;
+}
+.ui.tags.horizontal.label {
+    margin-bottom: 5px;
 }

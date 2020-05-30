@@ -35,7 +35,6 @@ async function addMainPanels() {
     var mainPanelsElem = $('#main-panels');
     var panelElements = '';
     var name;
-    var id;
     var sectionsResponse = await dataAccess.getWeightageOfSections();
     var sections = sectionsResponse[0];
     var numberOfSections = sectionsResponse[1];
@@ -45,15 +44,40 @@ async function addMainPanels() {
     if (numberOfSections <= 4) {
         limitCardHeight = 'card--small';
     }
-
-    for (var key in sections) {
-        var section = sections[key];
-        id = key;
+    var tagsForEachSection = await dataAccess.getTagsForEachSection();
+    var allTags = await dataAccess.getTags();
+    for (var sectionId in sections) {
+        var section = sections[sectionId];
         name = section.name;
-        var total = section.total;
+        //var total = section.total;
+        var tags = 'no tags';
+        if (tagsForEachSection[sectionId].tags.length > 0) {
+            tags = tagsForEachSection[sectionId].tags;
+        }
         var completed = section.completed;
-        var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + id + '">'
-                + '<div class="panel black ui statistic"><div class="value">' + completed + '</div><div class="label">' + total + '</div></div>'
+        var tagsTemplate = '';
+        if (tags == 'no tags') {
+            tagsTemplate = tagsTemplate.concat('<div class="ui horizontal label">no tags</div>');
+        } else {
+            var numOfTags = 0;
+            tags.forEach((tag) => {
+                numOfTags++;
+                if (numOfTags <= 4) {
+                    var tagColor = allTags[tag.tag_id].color;
+                    tagsTemplate = tagsTemplate.concat('<div class="ui tags ' + tagColor +' horizontal label">' + tag.tag_name + '</div>');
+                }
+            });
+            if (numOfTags > 4) {
+                console.log(numOfTags - 4 + '');
+                var extraTags = numOfTags - 4;
+                tagsTemplate = tagsTemplate.concat('<div class="ui tags horizontal label">+' + extraTags + '</div>');
+            }
+        }
+        var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">'
+                + '<div class="panel black ui statistic">'
+                    + '<div class="value">' + completed + '</div>'
+                    + '<div class="panel label">' + tagsTemplate + '</div>'
+                + '</div>'
                 + '<div class="panel content">' + name + '</div>'
                 + '</div>';
         panelElements = panelElements + panelTemplate;
@@ -80,9 +104,14 @@ function initEvents() {
     document.getElementById('task-input__points').addEventListener('focusout', () => {
         validatePoints();
     });
+    document.getElementById('add-tag__name').addEventListener('focusout', () => {
+        setPreviewTagText(null);
+        console.log('focusout');
+    });
     //Rendering
     addMainPanels();
     populateInputsDropdown();
+    generateProgressBar();
 }
 async function addTask() {
     let taskNameInp = $('#task-input__task');
@@ -124,7 +153,7 @@ async function addTask() {
     inputTags.forEach(tagId => { //Form object to be inserted
         taskTagRel.push({tag_id: tagId, task_id: taskId});
     });
-    
+    dataAccess.addMultipleTaskTagRel(taskTagRel);
     //Clear inputs
     $('.task-input.ui.search.dropdown').dropdown('restore defaults');
     pointsInp.value = '';
@@ -132,6 +161,7 @@ async function addTask() {
     //Regenerate rendered data
     addMainPanels(); //Update main panels
     populateInputsDropdown(); //Update dropdown
+    generateProgressBar();
 
     showToast('Task ' + taskName + ' added with ' + points + ' points!', 'green');
 }
@@ -289,30 +319,64 @@ function addNewTag() {
             }
         })
         .modal('show');
+    //Clear previous inputs if any
+    setPreviewTagColor('');
+    setPreviewTagText('Sample Tag');
+    var addTagNameElem = $('#add-tag__name');
+    addTagNameElem[0].value = '';
+    //Populate colors
+    var tagColorContainer = $('#add-tag__color');
+    var colorButtonsTemplate = '';
+    var colorsEnum = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink'];
+    colorsEnum.forEach((color) => {
+        colorButtonsTemplate = colorButtonsTemplate.concat('<button class="ui ' + color + ' tags color button" onclick="setPreviewTagColor(\'' + color + '\')"></button>');
+    });
+    tagColorContainer.html(colorButtonsTemplate);
+}
+
+var previewTagColor = '';
+function setPreviewTagColor(color) { 
+    //Remove previous color class if any, and add new color class
+    console.log('Previous color = ' + previewTagColor + ' new color = ' + color);
+    var previewTagElem = $('#add-tag__preview');
+    previewTagElem.removeClass(previewTagColor);
+    previewTagColor = color;
+    previewTagElem.addClass(previewTagColor);
+}
+//If text param is null, sets preview tag's text from add-tag__name element
+function setPreviewTagText(text) {
+    var previewTagElem = $('#add-tag__preview');
+    if (text != null) {
+        previewTagElem.text(text);
+    } else {
+        var addTagNameElem = $('#add-tag__name');
+        var tagName = addTagNameElem[0].value;
+        if (tagName.trim() !== '') {
+            previewTagElem.text(tagName);
+        }
+    }
 }
 
 async function saveNewTag() {
     //Save tag    
     let tagNameInp = $('#add-tag__name');
-    let tagDescInp = $('#add-tag__desc');
     let tagName = tagNameInp[0].value.trim();
-    let tagDesc = tagDescInp[0].value.trim();
-    console.log(tagName + tagDesc);
+    console.log(tagName + ', color: ' + previewTagColor);
     //Validate Tags
     if (tagName == '') {
         showToast('Tag name cannot be empty', 'red');
+        return false;
+    }
+    if (previewTagColor == '') {
+        showToast('Select a color for the Tag', 'red');
         return false;
     }
     if (tagName.includes('<') || tagName.includes('>') || tagName.includes('"')) {
         showToast('Tag name must not contain <u> <>" </u>', 'red');
         return false;
     }
-    if (tagDesc.includes('<') || tagDesc.includes('>') || tagDesc.includes('"')) {
-        showToast('Tag description must not contain <u> <>" </u>', 'red');
-        return false;
-    }
     //Save tags
-    let tagObj = await dataAccess.addTag({name: tagName, desc: tagDesc});
+    let tagObj = await dataAccess.addTag({name: tagName, color: previewTagColor});
     if (tagObj == 'SequelizeUniqueConstraintError') {
         showToast('Tag <b>' + tagName + '</b> already exists', 'red');
         return false;
@@ -351,10 +415,10 @@ async function populateInputsDropdown() {
 
     //Get Tasks
     //Task.id doesn't need to be in the value, we don't require it to reference anything else
-    let tasks = await dataAccess.getTasks();
+    let tasks = await dataAccess.getTaskNames();
     var tasksTemplate = '<option value="">Task</option>';
     tasks.forEach(task => {
-        tasksTemplate = tasksTemplate.concat('<option value="' + task.name + '">' + task.name + '</option>');
+        tasksTemplate = tasksTemplate.concat('<option value="' + task + '">' + task + '</option>');
     });
     //Populate Tasks Dropdown
     let taskNameInp = $('#task-input__task');
@@ -363,9 +427,9 @@ async function populateInputsDropdown() {
     //Get Tags
     let tags = await dataAccess.getTags();
     var tagsTemplate = '<option value="">Task</option>';
-    tags.forEach(tag => {
-        tagsTemplate = tagsTemplate.concat('<option value="' + tag.id + '">' + tag.name + '</option>');
-    });
+    for (var tagId in tags) {
+        tagsTemplate = tagsTemplate.concat('<option value="' + tagId + '">' + tags[tagId].name + '</option>');
+    }
     tagsTemplate = tagsTemplate.concat('<option value="Add new Tag"><b>Add Tag</b></option>');
     //Populate Tags Dropdown
     let tagNameInp = $('#task-input__tag');

@@ -88,6 +88,7 @@ const Tag = sequelize.define('tag', {
     id: {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
     name: {type: Sequelize.STRING, allowNull: false, unique: true},
     desc: {type: Sequelize.STRING, allowNull: false},
+    color: {type: Sequelize.TEXT}
 }, {
     updatedAt: 'updated_at',
     createdAt: 'created_at'
@@ -173,8 +174,8 @@ dataAccess.addTag = async function addTag(tagDetails) {
     }
 
     return await Tag.create(
-        {name: tagDetails.name, desc: tagDetails.desc},
-        {fields: ['name', 'desc']} //Allows insertion of only these fields
+        {name: tagDetails.name, desc: tagDetails.desc || '', color: tagDetails.color},
+        {fields: ['name', 'desc', 'color']} //Allows insertion of only these fields
     )
         .then((res) => {
             return res.dataValues;
@@ -198,11 +199,58 @@ dataAccess.addTag = async function addTag(tagDetails) {
  * @return Promise
  */
 dataAccess.getTags = async function getTags() {
-    var tags = await sequelize.query('select * from tags',
+    var queryResult = await sequelize.query('select id, name, desc, color from tags',
         {type: QueryTypes.SELECT}
     );
+    var tags = {};
+    queryResult.forEach((row) => {
+        tags[row.id] = {name: row.name, desc: row.desc, color: row.color};
+    });
     return tags;
 };
+
+dataAccess.getTagsForEachSection = async function getTagsForEachSection() {
+    var query = 'select distinct sections.id as section_id, tags.id as tag_id, sections.name as section, tags.name as tag' +
+                ' from sections' +
+                ' left outer join tasks on sections.id=tasks.parent_section_id' +
+                ' left outer join task_tag_rels on tasks.id=task_tag_rels.task_id' +
+                ' left outer join tags on task_tag_rels.tag_id=tags.id';
+    var queryResult = await sequelize.query(query, 
+        {type: QueryTypes.SELECT}
+    );
+    var tagsForEachSection = {};
+    queryResult.forEach((row) => {
+        var sectionId = row.section_id;
+        var tags = [];
+        if(tagsForEachSection[sectionId] != null) {
+            tags = tagsForEachSection[sectionId].tags;
+        }
+        if(row.tag != null) {
+            tags.push({tag_id: row.tag_id, tag_name: row.tag});
+        }
+        tagsForEachSection[sectionId] = {section: row.section, tags: tags};
+    });
+    return tagsForEachSection;
+};
+
+dataAccess.getWeightageOfTags = async function getWeightageOfTags() {
+    var query = 'select tags.id, tags.name, tags.color, coalesce(sum(tasks.weightage), 0) as weightage' + 
+                ' from tags' +
+                ' left outer join task_tag_rels on tags.id=task_tag_rels.tag_id' + 
+                ' left outer join tasks on task_tag_rels.task_id=tasks.id' + 
+                ' group by tags.id';
+    var result = await sequelize.query(query,
+        {type: QueryTypes.SELECT}
+    );
+    var tagsWeightage = {};
+    var totalWeightage = 0;
+    result.forEach(row => {
+        totalWeightage = totalWeightage + row.weightage;
+        tagsWeightage[row.id] = {name: row.name, color: row.color, weightage: row.weightage};
+    });
+    return {totalWeightage: totalWeightage, tagsWeightage: tagsWeightage};
+};
+
 
 /**
  * Returns all distinct Tag names as an array
@@ -305,10 +353,20 @@ dataAccess.getSectionNames = async function getSectionNames() {
  * {id : {name : xyz, total : 123, completed : 12}}, id2 : {...} ...}
  */
 dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
-    var totalWeightage = await sequelize.query('select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total from sections left outer join tasks on sections.id=tasks.parent_section_id group by sections.id order by total',
+    var totalQuery = 'select distinct sections.id as id, sections.name as name, coalesce(sum(tasks.weightage), 0) as total' + 
+                ' from sections' +
+                ' left outer join tasks on sections.id=tasks.parent_section_id' + 
+                ' group by sections.id order by total';
+    var completedQuery = 'select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed' +
+                ' from sections' +
+                ' left outer join tasks on sections.id=tasks.parent_section_id' +
+                ' where tasks.status is \'completed\'' +
+                ' group by sections.id' +
+                ' order by completed';
+    var totalWeightage = await sequelize.query(totalQuery,
         {type: QueryTypes.SELECT}
     );
-    var completedWeightage = await sequelize.query('select distinct sections.id as id, sections.name as name, sum(tasks.weightage) as completed from sections left outer join tasks on sections.id=tasks.parent_section_id where tasks.status is \'completed\' group by sections.id order by completed',
+    var completedWeightage = await sequelize.query(completedQuery,
         {type: QueryTypes.SELECT}
     );
     var weightage = {};
