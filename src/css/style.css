@@ -116,7 +116,6 @@ main {
     max-width: 20%;
     margin: 10px auto auto 42%;
 }
-
 #task-submit-btn{
     margin: 10px 10px;
 }
@@ -154,10 +153,17 @@ main {
     animation: none;
     -webkit-animation: none;
 }
+
 .footer.bar.points.display {
     min-width: 1px;
 }
 
 #footer-progress {
     margin: 35px -25px auto -25px;
+}
+
+#add-tag__message {
+    text-align: center;
+    margin: -15px auto 20px auto;
+    color: gray;
 }

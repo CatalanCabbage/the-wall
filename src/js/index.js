@@ -31,6 +31,7 @@ function handleWindowControls() {
         win.close();
     });
 }
+var totalTagsCount = 0;
 async function addMainPanels() {
     var mainPanelsElem = $('#main-panels');
     var panelElements = '';
@@ -46,6 +47,7 @@ async function addMainPanels() {
     }
     var tagsForEachSection = await dataAccess.getTagsForEachSection();
     var allTags = await dataAccess.getTags();
+    totalTagsCount = Object.keys(allTags).length;
     for (var sectionId in sections) {
         var section = sections[sectionId];
         name = section.name;
@@ -60,17 +62,19 @@ async function addMainPanels() {
             tagsTemplate = tagsTemplate.concat('<div class="ui horizontal label">no tags</div>');
         } else {
             var numOfTags = 0;
+            var extraTags = '';
             tags.forEach((tag) => {
                 numOfTags++;
+                var tagColor = allTags[tag.tag_id].color || '';
                 if (numOfTags <= 4) {
-                    var tagColor = allTags[tag.tag_id].color;
                     tagsTemplate = tagsTemplate.concat('<div class="ui tags ' + tagColor +' horizontal label">' + tag.tag_name + '</div>');
+                } else {
+                    extraTags = extraTags.concat('<div class="ui tags ' + tagColor +' horizontal label">' + tag.tag_name + '</div>');
                 }
             });
             if (numOfTags > 4) {
-                console.log(numOfTags - 4 + '');
-                var extraTags = numOfTags - 4;
-                tagsTemplate = tagsTemplate.concat('<div class="ui tags horizontal label">+' + extraTags + '</div>');
+                var extraTagsCount = numOfTags - 4;
+                tagsTemplate = tagsTemplate.concat('<div class="ui extra tags horizontal label" data-html=\'<div style="margin-left: 10px">' + extraTags + '</div>\' data-position="bottom center" data-variation="tiny basic">+' + extraTagsCount + '</div>');
             }
         }
         var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">'
@@ -95,6 +99,10 @@ async function addMainPanels() {
         mainPanelsElem.addClass('three');
     }
     mainPanelsElem.html(panelElements);
+    $('.ui.extra.tags').popup({
+        transition: 'vertical flip',
+        preserve: true
+    });
 }
 function initEvents() {
     //Inputs 
@@ -251,7 +259,6 @@ $('.task-input.tags.ui.dropdown')
         },
         onChange: async function(value) {
             if(value == 'Add new Tag' || (Array.isArray(value) && value.includes('Add new Tag'))) {
-                console.log($('.task-input.tags.ui.search.dropdown'));
                 await addNewTag();    
                 $('.task-input.tags.ui.search.dropdown').dropdown('restore defaults');            
             }
@@ -324,6 +331,20 @@ function addNewTag() {
     setPreviewTagText('Sample Tag');
     var addTagNameElem = $('#add-tag__name');
     addTagNameElem[0].value = '';
+    $('.task-input.ui.search.dropdown').dropdown('restore defaults');
+    let pointsInp = $('#task-input__points');
+    pointsInp.value = '';
+
+    //Add message
+    var tagMessageContainer = $('#add-tag__message');
+    var tagsMessageTemplate = '<i>Designed to represent <u>very broad</u> fields</i>';
+    console.log(totalTagsCount);
+    if (totalTagsCount >= 3 && totalTagsCount <=7) {
+        tagsMessageTemplate = tagsMessageTemplate.concat('<br><i>Ideally, should be very few!</i>');
+    } else if (totalTagsCount > 7) {
+        tagsMessageTemplate = tagsMessageTemplate.concat('<br><i>Try not to create too many!</i>');
+    }
+    tagMessageContainer.html(tagsMessageTemplate);
     //Populate colors
     var tagColorContainer = $('#add-tag__color');
     var colorButtonsTemplate = '';
@@ -434,6 +455,58 @@ async function populateInputsDropdown() {
     //Populate Tags Dropdown
     let tagNameInp = $('#task-input__tag');
     tagNameInp.html(tagsTemplate);
+
+    addTooltips();
+}
+
+//Messages to show on input tooltip
+var messages = {};
+var messageId = 0;
+/* eslint-disable indent */
+messages[messageId++] = {task:   {line1: 'Eg. Be really specific!', line2: 'Read a couple of pages...'}, 
+                        section: {line1: 'Which book?', line2: 'Pragmatic Programmer'},
+                        tags:    {line1: 'About what, overall?', line2: 'Dev'}, 
+                        points:  {line1: 'How much value does it add?', line2: '20'}};
+messages[messageId++] = {task:   {line1: 'Eg. Why are you crying?', line2: 'Perfectly aligned a div'}, 
+                        section: {line1: 'Which project?', line2: 'Portfolio website'},
+                        tags:    {line1: 'Tech used:', line2: '\'JS\' and \'CSS\''}, 
+                        points:  {line1: 'How much did you learn?', line2: '15'}};
+messages[messageId++] = {task:   {line1: 'Eg. What did you read?', line2: 'Read an article about containers'}, 
+                        section: {line1: 'Uses what specifically?', line2: 'Docker'},
+                        tags:    {line1: 'Which field?', line2: 'DevOps'}, 
+                        points:  {line1: 'How useful was it?', line2: '25'}};
+messages[messageId++] = {task:   {line1: 'Eg. What did you code?', line2: 'Implemented a BST'}, 
+                        section: {line1: 'From?', line2: 'Coursera Princeton Course'},
+                        tags:    {line1: 'Belongs under:', line2: '\'Algos\' and \'Java\''}, 
+                        points:  {line1: 'How much value does it add?', line2: '45'}};
+messages[messageId++] = {task:   {line1: 'Eg. Why are you sweating?!', line2: 'Did 3.141 push-ups'}, 
+                        section: {line1: 'Whaat?!', line2: 'Exercise'},
+                        tags:    {line1: 'Also belongs under:', line2: 'Fitness'}, 
+                        points:  {line1: 'How much value does it add?', line2: '20'}};
+messages[messageId++] = {task:   {line1: 'Eg. What did you make?', line2: 'A stickman'}, 
+                        section: {line1: 'Why is it grayscale?', line2: 'Pencil sketching'},
+                        tags:    {line1: 'Belongs under:', line2: 'Art'}, 
+                        points:  {line1: 'How much value does it add?', line2: '40'}};
+messages[messageId++] = {task:   {line1: 'Eg. What did you learn?', line2: 'Async-await and promises'}, 
+                        section: {line1: 'It\'s relevant to:', line2: 'JS'},
+                        tags:    {line1: 'The broad field is also:', line2: 'JS'}, 
+                        points:  {line1: 'How valuable do you think it is?', line2: '40'}};
+/* eslint-enable indent */
+//Add on-hover info tooltips to input buttons
+function addTooltips() {
+    //Pick a random message
+    var activeMsgId = Math.floor(Math.random() * (Object.keys(messages).length));
+    console.log(activeMsgId);
+    console.log(Object.keys(messages).length);
+    $('.task-input').attr('data-position', 'bottom center');
+    $('.task-input.task').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].task.line1 + '<br><i>' + messages[activeMsgId].task.line2 + '</i></div>');
+    $('.task-input.section').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].section.line1 + '<br><i>' + messages[activeMsgId].section.line2 + '</i></div>');
+    $('.task-input.tags').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].tags.line1 + '<br><i>' + messages[activeMsgId].tags.line2 + '</i></div>');
+    $('.task-input.points').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].points.line1 + '<br><i>' + messages[activeMsgId].points.line2 + '</i></div>');
+    $('.task-input').popup({
+        preserve: true,
+        delay: {show: 350}
+    });
 }
 
 //Handle updates
@@ -528,14 +601,17 @@ async function generateProgressBar() {
     var barsTemplate = '';
     var weightsArray = [];
     var targetWeightage = 500;
-    console.log(result);
     for (var id in tagsObj) {
         weightsArray.push(tagsObj[id].weightage);
-        barsTemplate = barsTemplate.concat('<div class="' + tagsObj[id].color + ' bar points display footer"></div>');
+        barsTemplate = barsTemplate.concat('<div class="' + tagsObj[id].color + ' bar points display footer" data-html="' + tagsObj[id].name + '" data-variation="tiny basic"></div>');
     }
     barContainerTemplate = barContainerTemplate.concat('<div class="ui multiple progress total points small" data-total="' + targetWeightage + '">');
     barContainerTemplate = barContainerTemplate.concat(barsTemplate);
     barContainerTemplate = barContainerTemplate.concat('<div class="label" id="footer-progress__label">' + totalWeightage + ' completed of ' + targetWeightage + '</div></div>');
     $('#footer-progress').html(barContainerTemplate);
     $('.ui.total.points.progress').progress('set progress', weightsArray);
+    $('.bar.points.display.footer').popup({
+        transition: 'scale',
+        preserve: true
+    });
 }

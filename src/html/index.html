@@ -77,13 +77,16 @@
                     Add new Tag
                 </div>
                 <div class="content">
+                    <div id="add-tag__message">
+                        <!--Added via JS-->                        
+                    </div>
                     <div class="add tag fluid ui input" id="add-tag__name-container">
                         <input id="add-tag__name" type="text" placeholder="Name">
                     </div>
                     <div class="ui fluid buttons" id="add-tag__color">
                         <!--Added via JS-->
                     </div>
-                    <div id="add-tag__preview" class="ui tagsColor horizontal label">Sample tag</div>
+                    <div id="add-tag__preview" class="ui horizontal label">Sample tag</div>
                 </p>
                 </div>
                 <div class="actions">
@@ -115,7 +118,7 @@
                     <select name="tags" class="task-input tags ui search dropdown" multiple="" id="task-input__tag">
                         <option value="">Tags</option>
                     </select>
-                    <div class="task-input ui input" id="task-input__points-container">
+                    <div class="task-input points ui input" id="task-input__points-container">
                         <input id="task-input__points" type="text" placeholder="Points">
                     </div>
                     <button id="task-submit-btn" class="ui button" type="button" autofocus>Submit</button>
@@ -126,17 +129,7 @@
                 <!--Added via JS-->
             </div>
             <div id="footer-progress">
-                <div class="ui multiple progress total points small" data-total="1000" data-value="100,30,20,30">
-                    <div class="blue bar points display footer">
-                    </div>
-                    <div class="yellow bar points display footer">
-                    </div>
-                    <div class="purple bar">
-                    </div>
-                    <div class="green bar">
-                    </div>
-                    <div class="label" id="footer-progress__label">Progress to 1000</div>
-                    </div>
+                <!--Added via JS-->
             </div>
         </main>
     </body>
