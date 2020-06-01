@@ -1,108 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
-        <title>The Wall</title>
-        <script>
-            const jQuery = require('jquery')
-            const $ = jQuery
-            require('../../lib/semantic.min.js')
-          </script>
-        <link rel="stylesheet" type="text/css" href="../../lib/semantic.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/style.css">
-    </head>
-    <body>
-        <header id="title-bar">
-            <div id="title-bar__title">
-                The Wall
-            </div>
-            <div id="title-bar__controls">
-                <div class="title-bar__button" id="minimize-button">-</div>
-                <div class="title-bar__button" id="close-button">x</div>
-            </div>
-        </header>
-        
-        <main>
-            <!--Used for updates-->
-            <div class="update ui tiny modal">
-                <div class="header" style="text-align: center;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <title>The Wall</title>
+    <script>
+        const jQuery = require('jquery')
+        const $ = jQuery
+        require('../../lib/semantic.min.js')
+    </script>
+    <link rel="stylesheet" type="text/css" href="../../lib/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+
+<body>
+    <header id="title-bar">
+        <div id="title-bar__title">
+            The Wall
+        </div>
+        <div id="title-bar__controls">
+            <div class="title-bar__button" id="minimize-button">-</div>
+            <div class="title-bar__button" id="close-button">x</div>
+        </div>
+    </header>
+
+    <main>
+        <!--Used for updates-->
+        <div class="update ui tiny modal">
+            <div class="header" style="text-align: center;">
                 Update available
+            </div>
+            <div class="content">
+                <div id="release-notes">
+
                 </div>
-                <div class="content">
-                    <div id="release-notes">
-                        
-                    </div>
-                    <p>Do you want to update the app now?</p>
+                <p>Do you want to update the app now?</p>
+            </div>
+            <div class="actions">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="update-checkbox" name="update-checkbox" />
+                    <label>Always update automatically</label>
                 </div>
-                <div class="actions">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="update-checkbox" name="update-checkbox"/>
-                            <label>Always update automatically</label>
-                    </div>
-                    <div class="ui red deny button">
-                        No
-                    </div>
-                    <div class="ui green approve button">
-                        Yes
-                    </div>
+                <div class="ui red deny button">
+                    No
+                </div>
+                <div class="ui green approve button">
+                    Yes
                 </div>
             </div>
+        </div>
 
-            <!--Settings modal-->
-            <div class="settings ui tiny modal">
-                <div class="header" style="text-align: center;">
+        <!--Settings modal-->
+        <div class="settings ui tiny modal">
+            <div class="header" style="text-align: center;">
                 Settings
+            </div>
+            <div class="content">
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" id="settings__update-checkbox" name="settings__update-checkbox" />
+                    <label>Always update automatically</label>
                 </div>
-                <div class="content">
-                    <div class="ui toggle checkbox">
-                        <input type="checkbox" id="settings__update-checkbox" name="settings__update-checkbox"/>
-                            <label>Always update automatically</label>
-                    </div>
                 </p>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Discard
                 </div>
-                <div class="actions">
-                    <div class="ui deny button">
-                        Discard
-                    </div>
-                    <div class="ui primary approve button">
-                        Save
-                    </div>
+                <div class="ui primary approve button">
+                    Save
                 </div>
             </div>
+        </div>
 
-            <!--Add Tag modal-->
-            <div class="tag ui tiny modal">
-                <div class="header" style="text-align: center;">
-                    Add new Tag
+        <!--Add Tag modal-->
+        <div class="tag ui tiny modal">
+            <div class="header" style="text-align: center;">
+                Add new Tag
+            </div>
+            <div class="content">
+                <div id="add-tag__message">
+                    <!--Added via JS-->
                 </div>
-                <div class="content">
-                    <div id="add-tag__message">
-                        <!--Added via JS-->                        
-                    </div>
-                    <div class="add tag fluid ui input" id="add-tag__name-container">
-                        <input id="add-tag__name" type="text" placeholder="Name">
-                    </div>
-                    <div class="ui fluid buttons" id="add-tag__color">
-                        <!--Added via JS-->
-                    </div>
-                    <div id="add-tag__preview" class="ui horizontal label">Sample tag</div>
+                <div class="add tag fluid ui input" id="add-tag__name-container">
+                    <input id="add-tag__name" type="text" placeholder="Name">
+                </div>
+                <div class="ui fluid buttons" id="add-tag__color">
+                    <!--Added via JS-->
+                </div>
+                <div id="add-tag__preview" class="ui horizontal label">Sample tag</div>
                 </p>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Cancel
                 </div>
-                <div class="actions">
-                    <div class="ui deny button">
-                        Cancel
-                    </div>
-                    <div class="ui primary approve button">
-                        Save Tag
-                    </div>
+                <div class="ui primary approve button">
+                    Save Tag
                 </div>
             </div>
+        </div>
 
-            <div id="top-bar">
-                <div class="settings ui top left pointing dropdown button" id="top-bar__settings">
-                    <i><img src="../assets/burger.png" id="settings-btn" height="25px" width="25px"></img></i>
-                    <div class="menu">
+        <div id="top-bar">
+            <div class="settings ui top left pointing dropdown button" id="top-bar__settings">
+                <i><img src="../assets/burger.png" id="settings-btn" height="25px" width="25px"></img></i>
+                <div class="menu">
                     <div class="item">Settings</div>
                     <div class="ui divider"></div>
                     <div class="item">About</div>

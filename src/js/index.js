@@ -67,9 +67,9 @@ async function addMainPanels() {
                 numOfTags++;
                 var tagColor = allTags[tag.tag_id].color || '';
                 if (numOfTags <= 4) {
-                    tagsTemplate = tagsTemplate.concat('<div class="ui tags ' + tagColor +' horizontal label">' + tag.tag_name + '</div>');
+                    tagsTemplate = tagsTemplate.concat('<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>');
                 } else {
-                    extraTags = extraTags.concat('<div class="ui tags ' + tagColor +' horizontal label">' + tag.tag_name + '</div>');
+                    extraTags = extraTags.concat('<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>');
                 }
             });
             if (numOfTags > 4) {
@@ -77,15 +77,16 @@ async function addMainPanels() {
                 tagsTemplate = tagsTemplate.concat('<div class="ui extra tags horizontal label" data-html=\'<div style="margin-left: 10px">' + extraTags + '</div>\' data-position="bottom center" data-variation="tiny basic">+' + extraTagsCount + '</div>');
             }
         }
-        var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">'
-                + '<div class="panel black ui statistic">'
-                    + '<div class="value">' + completed + '</div>'
-                    + '<div class="panel label">' + tagsTemplate + '</div>'
-                + '</div>'
-                + '<div class="panel content">' + name + '</div>'
-                + '</div>';
+        var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">' +
+            '<div class="panel black ui statistic">' +
+            '<div class="value">' + completed + '</div>' +
+            '<div class="panel label">' + tagsTemplate + '</div>' +
+            '</div>' +
+            '<div class="panel content">' + name + '</div>' +
+            '</div>';
         panelElements = panelElements + panelTemplate;
     }
+    mainPanelsElem.html(panelElements);
     //Set number of columns depending on number of sections
     if (numberOfSections == 0) {
         //Show splash screen, getting started
@@ -98,12 +99,13 @@ async function addMainPanels() {
         mainPanelsElem.removeClass('two');
         mainPanelsElem.addClass('three');
     }
-    mainPanelsElem.html(panelElements);
     $('.ui.extra.tags').popup({
         transition: 'vertical flip',
-        preserve: true
+        preserve: true,
+        boundary: '#main-panels'
     });
 }
+
 function initEvents() {
     //Inputs 
     document.getElementById('task-submit-btn').addEventListener('click', () => {
@@ -138,22 +140,22 @@ async function addTask() {
     if (sectionNameInp.dropdown('get text') == sectionNameInp.dropdown('get value')) {
         //Try to check if already present in DB; if not, add it
         let sectionObj = await dataAccess.getSection(sectionNameInp.dropdown('get value').toLowerCase());
-        if(sectionObj == null) { //Todo, change to findOrCreate
+        if (sectionObj == null) { //Todo, change to findOrCreate
             sectionObj = await dataAccess.addSection({name: sectionNameInp.dropdown('get value').toLowerCase(), parentSectionId: 0});
         }
         sectionId = sectionObj.id;
     }
-    
+
     //Add Task
     let taskInpObj = {
         name: taskName,
-        desc: '--', 
-        status: 'completed', 
-        weightage: points, 
+        desc: '--',
+        status: 'completed',
+        weightage: points,
         parentSectionId: sectionId
     };
     var taskObj = await dataAccess.addTask(taskInpObj);
-    
+
     //Add TaskTagRel
     var inputTags = $('.task-input.tags.ui.dropdown').dropdown('get value'); //Array of IDs
     var taskId = taskObj.id;
@@ -165,7 +167,7 @@ async function addTask() {
     //Clear inputs
     $('.task-input.ui.search.dropdown').dropdown('restore defaults');
     pointsInp.value = '';
-    
+
     //Regenerate rendered data
     addMainPanels(); //Update main panels
     populateInputsDropdown(); //Update dropdown
@@ -253,14 +255,14 @@ $('.task-input.tags.ui.dropdown')
         useLabels: false,
         transition: 'scale',
         message: {
-            count         : '{count} tags',
-            maxSelections : 'Max {maxCount} tags',
-            noResults     : 'No tags found'
+            count: '{count} tags',
+            maxSelections: 'Max {maxCount} tags',
+            noResults: 'No tags found'
         },
         onChange: async function(value) {
-            if(value == 'Add new Tag' || (Array.isArray(value) && value.includes('Add new Tag'))) {
-                await addNewTag();    
-                $('.task-input.tags.ui.search.dropdown').dropdown('restore defaults');            
+            if (value == 'Add new Tag' || (Array.isArray(value) && value.includes('Add new Tag'))) {
+                await addNewTag();
+                $('.task-input.tags.ui.search.dropdown').dropdown('restore defaults');
             }
             console.log('Tag value ' + value);
         }
@@ -290,12 +292,11 @@ async function handleSettingsModal() {
     console.log('In handleSettingsModal');
     $('.settings.ui.modal')
         .modal({
-            onApprove : function() {
+            onApprove: function() {
                 saveSettings();
             }
         })
-        .modal('show')
-    ;
+        .modal('show');
     //Initialize autoUpdate checkbox
     var autoUpdateFlag = await dataAccess.getParam('autoUpdate');
     console.log('In Initialize autoUpdate checkbox, param=' + autoUpdateFlag);
@@ -311,7 +312,7 @@ function addNewTag() {
     //Open modal
     $('.tag.ui.modal')
         .modal({
-            onApprove : function () {
+            onApprove: function() {
                 console.log('cleared');
                 //Add Tag with Description
                 saveNewTag().then((res) => {
@@ -339,7 +340,7 @@ function addNewTag() {
     var tagMessageContainer = $('#add-tag__message');
     var tagsMessageTemplate = '<i>Designed to represent <u>very broad</u> fields</i>';
     console.log(totalTagsCount);
-    if (totalTagsCount >= 3 && totalTagsCount <=7) {
+    if (totalTagsCount >= 3 && totalTagsCount <= 7) {
         tagsMessageTemplate = tagsMessageTemplate.concat('<br><i>Ideally, should be very few!</i>');
     } else if (totalTagsCount > 7) {
         tagsMessageTemplate = tagsMessageTemplate.concat('<br><i>Try not to create too many!</i>');
@@ -356,7 +357,8 @@ function addNewTag() {
 }
 
 var previewTagColor = '';
-function setPreviewTagColor(color) { 
+
+function setPreviewTagColor(color) {
     //Remove previous color class if any, and add new color class
     console.log('Previous color = ' + previewTagColor + ' new color = ' + color);
     var previewTagElem = $('#add-tag__preview');
@@ -463,41 +465,53 @@ async function populateInputsDropdown() {
 var messages = {};
 var messageId = 0;
 /* eslint-disable indent */
-messages[messageId++] = {task:   {line1: 'Eg. Be really specific!', line2: 'Read a couple of pages...'}, 
-                        section: {line1: 'Which book?', line2: 'Pragmatic Programmer'},
-                        tags:    {line1: 'About what, overall?', line2: 'Dev'}, 
-                        points:  {line1: 'How much value does it add?', line2: '20'}};
-messages[messageId++] = {task:   {line1: 'Eg. Why are you crying?', line2: 'Perfectly aligned a div'}, 
-                        section: {line1: 'Which project?', line2: 'Portfolio website'},
-                        tags:    {line1: 'Tech used:', line2: '\'JS\' and \'CSS\''}, 
-                        points:  {line1: 'How much did you learn?', line2: '15'}};
-messages[messageId++] = {task:   {line1: 'Eg. What did you read?', line2: 'Read an article about containers'}, 
-                        section: {line1: 'Uses what specifically?', line2: 'Docker'},
-                        tags:    {line1: 'Which field?', line2: 'DevOps'}, 
-                        points:  {line1: 'How useful was it?', line2: '25'}};
-messages[messageId++] = {task:   {line1: 'Eg. What did you code?', line2: 'Implemented a BST'}, 
-                        section: {line1: 'From?', line2: 'Coursera Princeton Course'},
-                        tags:    {line1: 'Belongs under:', line2: '\'Algos\' and \'Java\''}, 
-                        points:  {line1: 'How much value does it add?', line2: '45'}};
-messages[messageId++] = {task:   {line1: 'Eg. Why are you sweating?!', line2: 'Did 3.141 push-ups'}, 
-                        section: {line1: 'Whaat?!', line2: 'Exercise'},
-                        tags:    {line1: 'Also belongs under:', line2: 'Fitness'}, 
-                        points:  {line1: 'How much value does it add?', line2: '20'}};
-messages[messageId++] = {task:   {line1: 'Eg. What did you make?', line2: 'A stickman'}, 
-                        section: {line1: 'Why is it grayscale?', line2: 'Pencil sketching'},
-                        tags:    {line1: 'Belongs under:', line2: 'Art'}, 
-                        points:  {line1: 'How much value does it add?', line2: '40'}};
-messages[messageId++] = {task:   {line1: 'Eg. What did you learn?', line2: 'Async-await and promises'}, 
-                        section: {line1: 'It\'s relevant to:', line2: 'JS'},
-                        tags:    {line1: 'The broad field is also:', line2: 'JS'}, 
-                        points:  {line1: 'How valuable do you think it is?', line2: '40'}};
+messages[messageId++] = {
+    task: {line1: 'Eg. Be really specific!', line2: 'Read a couple of pages...'},
+    section: {line1: 'Which book?', line2: 'Pragmatic Programmer'},
+    tags: {line1: 'About what, overall?', line2: 'Dev'},
+    points: {line1: 'How much value does it add?', line2: '20'}
+};
+messages[messageId++] = {
+    task: {line1: 'Eg. Why are you crying?', line2: 'Perfectly aligned a div'},
+    section: {line1: 'Which project?', line2: 'Portfolio website'},
+    tags: {line1: 'Tech used:', line2: '\'JS\' and \'CSS\''},
+    points: {line1: 'How much did you learn?', line2: '15'}
+};
+messages[messageId++] = {
+    task: {line1: 'Eg. What did you read?', line2: 'Read an article about containers'},
+    section: {line1: 'Uses what specifically?', line2: 'Docker'},
+    tags: {line1: 'Which field?', line2: 'DevOps'},
+    points: {line1: 'How useful was it?', line2: '25'}
+};
+messages[messageId++] = {
+    task: {line1: 'Eg. What did you code?', line2: 'Implemented a BST'},
+    section: {line1: 'From?', line2: 'Coursera Princeton Course'},
+    tags: {line1: 'Belongs under:', line2: '\'Algos\' and \'Java\''},
+    points: {line1: 'How much value does it add?', line2: '45'}
+};
+messages[messageId++] = {
+    task: {line1: 'Eg. Why are you sweating?!', line2: 'Did 3.141 push-ups'},
+    section: {line1: 'Whaat?!', line2: 'Exercise'},
+    tags: {line1: 'Also belongs under:', line2: 'Fitness'},
+    points: {line1: 'How much value does it add?', line2: '20'}
+};
+messages[messageId++] = {
+    task: {line1: 'Eg. What did you make?', line2: 'A stickman'},
+    section: {line1: 'Why is it grayscale?', line2: 'Pencil sketching'},
+    tags: {line1: 'Belongs under:', line2: 'Art'},
+    points: {line1: 'How much value does it add?', line2: '40'}
+};
+messages[messageId++] = {
+    task: {line1: 'Eg. What did you learn?', line2: 'Async-await and promises'},
+    section: {line1: 'It\'s relevant to:', line2: 'JS'},
+    tags: {line1: 'The broad field is also:', line2: 'JS'},
+    points: {line1: 'How valuable do you think it is?', line2: '40'}
+};
 /* eslint-enable indent */
 //Add on-hover info tooltips to input buttons
 function addTooltips() {
     //Pick a random message
     var activeMsgId = Math.floor(Math.random() * (Object.keys(messages).length));
-    console.log(activeMsgId);
-    console.log(Object.keys(messages).length);
     $('.task-input').attr('data-position', 'bottom center');
     $('.task-input.task').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].task.line1 + '<br><i>' + messages[activeMsgId].task.line2 + '</i></div>');
     $('.task-input.section').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].section.line1 + '<br><i>' + messages[activeMsgId].section.line2 + '</i></div>');
@@ -517,7 +531,7 @@ function updatePopup(info) {
     }
     $('.update.ui.modal')
         .modal({
-            onApprove : function() {
+            onApprove: function() {
                 if ($('#update-checkbox')[0].checked) {
                     console.log('checked');
                     alwaysUpdate('true');
@@ -526,8 +540,7 @@ function updatePopup(info) {
                 updateAndQuit();
             }
         })
-        .modal('show')
-    ;
+        .modal('show');
 }
 
 //For logging from main process
@@ -542,6 +555,7 @@ ipcRenderer.on('logger', (event, arg) => {
 //If no, do nothing
 //arg format: 
 var errorMessageCount = 0;
+
 function checkForUpdates() {
     ipcRenderer.send('updater-action', 'checkForUpdates');
     console.log('Started check for updates');
@@ -559,7 +573,7 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
     //Display if there's an error; is displayed only 2 times, unless checkForUpdates is clicked again
     if (arg[0] == 'error') {
         //errorMessageCount++;
-        if(errorMessageCount < 3) {
+        if (errorMessageCount < 3) {
             //Todo Display error message
             console.log('error: ' + arg[1]);
             console.log(arg[1]);
@@ -597,6 +611,11 @@ async function generateProgressBar() {
     var result = await dataAccess.getWeightageOfTags();
     var tagsObj = result.tagsWeightage;
     var totalWeightage = result.totalWeightage;
+    console.log(totalWeightage);
+    //When no data is added, no need to display progress bar
+    if (totalWeightage < 1) {
+        return false;
+    }
     var barContainerTemplate = '';
     var barsTemplate = '';
     var weightsArray = [];

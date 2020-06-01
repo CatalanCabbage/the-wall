@@ -127,6 +127,10 @@ main {
     overflow-y: auto;
     height: 375px;
 }
+#main-panels.initial {
+    background-color: white; 
+    height: 430px;
+}
 
 .panel.card{
     color: black !important;
@@ -167,3 +171,4 @@ main {
     margin: -15px auto 20px auto;
     color: gray;
 }
+

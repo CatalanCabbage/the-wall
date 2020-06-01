@@ -1,6 +1,6 @@
 const {app, BrowserWindow} = require('electron');
 require('electron-reload')('./src/js');
-const {autoUpdater} = require('electron-updater'); 
+const {autoUpdater} = require('electron-updater');
 const {ipcMain} = require('electron');
 
 let isDev = false;
@@ -12,7 +12,8 @@ console.log(process.env.NODE_ENV);
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
-function createWindow () {
+
+function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
         show: false,
@@ -27,16 +28,17 @@ function createWindow () {
     win.loadFile('./src/html/index.html');
     // Emitted when the window is closed.
     win.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
         win = null;
     });
 }
 
 //Introduce splash-screen to reduce jarring page load delay of main window
 var splashScreen;
-function createSplashWindow () {
+
+function createSplashWindow() {
     splashScreen = new BrowserWindow({
         width: 850,
         height: 550,
@@ -47,7 +49,7 @@ function createSplashWindow () {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows
-app.on('ready', () =>{
+app.on('ready', () => {
     createSplashWindow();
     //Creating window immediately causes a white flicker on startup; thus, create after 500ms
     setTimeout(function() {
@@ -55,7 +57,7 @@ app.on('ready', () =>{
         //Loading main window takes time; show lightweight splash screen for 2500ms
         //Total app startup time is now 3000ms
         win.once('ready-to-show', () => {
-            setTimeout( function() {
+            setTimeout(function() {
                 win.show();
                 splashScreen.destroy();
             }, 2500);
@@ -109,11 +111,11 @@ ipcMain.on('updater-action', (event, arg) => {
         console.log('Error in auto-updater. ' + err);
         event.sender.send('updater-action-response', ['error', err]);
     });
-  
+
     //Will decide if app always updates while quitting
     if (arg.action == 'alwaysUpdate') {
         if (arg.flag != null) {
-            autoUpdater.autoInstallOnAppQuit = (arg.flag == 'true');  
+            autoUpdater.autoInstallOnAppQuit = (arg.flag == 'true');
             console.log('set AutoUpdater value');
         }
     }
@@ -138,4 +140,3 @@ ipcMain.on('updater-action', (event, arg) => {
     });
     //For debugging----------------
 });
-

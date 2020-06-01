@@ -241,7 +241,11 @@ dataAccess.getWeightageOfTags = async function getWeightageOfTags() {
                 ' group by tags.id';
     var result = await sequelize.query(query,
         {type: QueryTypes.SELECT}
-    );
+    ).catch(err => new Error(err));
+    if (result instanceof Error) {
+        console.error(result);
+        return null;
+    }
     var tagsWeightage = {};
     var totalWeightage = 0;
     result.forEach(row => {
