@@ -103,8 +103,10 @@ const TaskTagRel = sequelize.define('task_tag_rel', {
     createdAt: 'created_at'
 });
 
+(async () => {
+    await sequelize.sync();
+})();
 
-sequelize.sync();
 
 //DataAccess for AppParams start---------------------------------------------------------------------------------------------
 dataAccess.addParam = async function addParam(param) {
