@@ -89,7 +89,12 @@ async function addMainPanels() {
     mainPanelsElem.html(panelElements);
     //Set number of columns depending on number of sections
     if (numberOfSections == 0) {
-        //Show splash screen, getting started
+        //Show splash screen, initially when no task has been added
+        var intialScreenTemplate = $('#initial-content').html();
+        mainPanelsElem.html(intialScreenTemplate);
+        $('.ui.about.button').click(function() {
+            $('.about.ui.modal').modal('show');
+        });
     } else if (numberOfSections == 1) {
         mainPanelsElem.addClass('one');
     } else if (numberOfSections >= 2 && numberOfSections <= 4) {
@@ -282,7 +287,7 @@ function handleSettingsMenu(value) {
             handleSettingsModal();
             break;
         case 'about':
-            console.log('about');
+            $('.about.ui.modal').modal('show');
             break;
     }
 }
@@ -306,6 +311,12 @@ async function handleSettingsModal() {
         $('#settings__update-checkbox')[0].checked = false;
     }
 }
+
+$('.about.popup').popup({
+    preserve: true,
+    hoverable: true
+});
+
 
 //Modal to get new Tag
 function addNewTag() {
@@ -332,17 +343,14 @@ function addNewTag() {
     setPreviewTagText('Sample Tag');
     var addTagNameElem = $('#add-tag__name');
     addTagNameElem[0].value = '';
-    $('.task-input.ui.search.dropdown').dropdown('restore defaults');
-    let pointsInp = $('#task-input__points');
-    pointsInp.value = '';
 
     //Add message
     var tagMessageContainer = $('#add-tag__message');
     var tagsMessageTemplate = '<i>Designed to represent <u>very broad</u> fields</i>';
     console.log(totalTagsCount);
-    if (totalTagsCount >= 3 && totalTagsCount <= 7) {
+    if (totalTagsCount >= 5 && totalTagsCount <= 9) {
         tagsMessageTemplate = tagsMessageTemplate.concat('<br><i>Ideally, should be very few!</i>');
-    } else if (totalTagsCount > 7) {
+    } else if (totalTagsCount > 9) {
         tagsMessageTemplate = tagsMessageTemplate.concat('<br><i>Try not to create too many!</i>');
     }
     tagMessageContainer.html(tagsMessageTemplate);
@@ -606,6 +614,7 @@ function updateAndQuit() {
     ipcRenderer.send('updater-action', 'updateAndQuit');
 }
 
+var targetWeightage = 500;
 //Generate progress bar footer
 async function generateProgressBar() {
     var result = await dataAccess.getWeightageOfTags();
@@ -619,7 +628,6 @@ async function generateProgressBar() {
     var barContainerTemplate = '';
     var barsTemplate = '';
     var weightsArray = [];
-    var targetWeightage = 500;
     for (var id in tagsObj) {
         weightsArray.push(tagsObj[id].weightage);
         barsTemplate = barsTemplate.concat('<div class="' + tagsObj[id].color + ' bar points display footer" data-html="' + tagsObj[id].name + '" data-variation="tiny basic"></div>');
