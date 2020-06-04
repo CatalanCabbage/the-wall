@@ -59,6 +59,7 @@ body {
     justify-content: center;
     background: rgb(31, 31, 31);
     color: white;
+    -webkit-app-region: no-drag;
 }
 main {
     padding: 40px 40px;
@@ -172,3 +173,6 @@ main {
     color: gray;
 }
 
+.popup.wall.tag.active-tags {
+    opacity: 80%;
+}

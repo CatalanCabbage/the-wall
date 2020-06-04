@@ -10,7 +10,7 @@ $('title').html('The Wall v' + version);
 // When document has loaded, initialise
 document.onreadystatechange = () => {
     if (document.readyState == 'complete') {
-        handleWindowControls();
+        handleTitleBarEvents();
         initEvents();
     }
 };
@@ -23,14 +23,94 @@ window.onbeforeunload = () => {
 };
 
 //Handle minimise/close buttons
-function handleWindowControls() {
+function handleTitleBarEvents() {
     document.getElementById('minimize-button').addEventListener('click', () => {
         win.minimize();
     });
     document.getElementById('close-button').addEventListener('click', () => {
         win.close();
     });
+    document.getElementById('title-bar__title').addEventListener('click', () => {
+        switch (currentPanel) {
+            case 'cards':
+                displayTheWall();
+                currentPanel = 'wall';
+                break;
+            case 'wall':
+                addMainPanels();
+                currentPanel = 'cards';
+                break;
+            default:
+                addMainPanels();
+                currentPanel = 'cards';
+                break;
+        }
+    });
 }
+
+var currentPanel = 'cards';
+
+async function displayTheWall() {
+    var mainPanelsElem = $('#main-panels');
+    var theWallGraphicTemplate = '';
+    var result = await dataAccess.getWeightageOfTags();
+    var tagsObj = result.tagsWeightage;
+    var totalWeightage = result.totalWeightage;
+    var keys = Object.keys(tagsObj);
+    console.log(tagsObj);
+    var numOfKeys = keys.length;
+    var keyIndex = 0;
+    var colorsRendered = {red: 'rgb(220, 40, 41)', orange: 'rgb(242, 113, 29)', yellow: 'rgb(253, 189, 4)', olive: 'rgb(181, 205, 23)', 
+        green: 'rgb(34, 186, 67)', teal: 'rgb(0, 181, 174)', blue: 'rgb(33, 133, 208)', violet: 'rgb(99, 53, 201)', purple: 'rgb(163, 50, 200)', pink: 'rgb(222, 59, 152)'};
+    console.log('Total, target' + totalWeightage + '  ' + targetWeightage);
+    theWallGraphicTemplate = theWallGraphicTemplate.concat('<div style="display: flex; justify-content: center; width: 100%; height: auto; background: white;"><div style="margin: 20px auto; display: grid; grid-template-columns: repeat(20, 25px); grid-template-rows: repeat(25, 15px);">');
+    var tagName;
+    for(var i = 0; i < targetWeightage; i++) { 
+        var color;
+        if(i < (targetWeightage - totalWeightage)) {
+            color = 'grey';
+        } else {
+            if (tagsObj[keys[keyIndex]].weightage > 0) {
+                color = colorsRendered[tagsObj[keys[keyIndex]].color];
+                tagsObj[keys[keyIndex]].weightage--;
+                tagName = tagsObj[keys[keyIndex]].name;
+            } else if (keyIndex < numOfKeys - 1) {
+                //If weightage for a tag reaches 0, move on to the next tag
+                while (tagsObj[keys[keyIndex]].weightage == 0) {
+                    //In case next tag has weightage 0
+                    keyIndex++;
+                }
+                color = colorsRendered[tagsObj[keys[keyIndex]].color];
+                tagsObj[keys[keyIndex]].weightage--;
+                tagName = tagsObj[keys[keyIndex]].name;
+            }
+        }
+        theWallGraphicTemplate = theWallGraphicTemplate.concat('<div ');
+        //If there's no tag name, no popup will be shown
+        if(tagName != null) {
+            theWallGraphicTemplate = theWallGraphicTemplate.concat('data-html="' + tagName + '" class="popup wall tag id' + keys[keyIndex] + '"');
+        }
+        theWallGraphicTemplate = theWallGraphicTemplate.concat('style="background: ' + color + '; border: 1px solid #FFF; border-radius: 0px;"></div>');
+    }
+    theWallGraphicTemplate = theWallGraphicTemplate.concat('</div></div>');
+    mainPanelsElem.html(theWallGraphicTemplate);
+
+    //Set popups to all bricks
+    $('.popup.wall.tag').popup({
+        preserve: true
+    });
+
+    //Dim all bricks of same ID on hover
+    $('.popup.wall.tag').on('mouseover', (elem) => {
+        var idClass = elem.target.classList[3];
+        $('.popup.wall.tag.' + idClass).addClass('active-tags');
+    });
+    $('.popup.wall.tag').on('mouseout', (elem) => {
+        var idClass = elem.target.classList[3];
+        $('.popup.wall.tag.' + idClass).removeClass('active-tags');
+    });
+}
+
 var totalTagsCount = 0;
 async function addMainPanels() {
     var mainPanelsElem = $('#main-panels');
@@ -86,7 +166,9 @@ async function addMainPanels() {
             '</div>';
         panelElements = panelElements + panelTemplate;
     }
+    
     mainPanelsElem.html(panelElements);
+
     //Set number of columns depending on number of sections
     if (numberOfSections == 0) {
         //Show splash screen, initially when no task has been added
