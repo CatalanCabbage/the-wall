@@ -145,12 +145,12 @@ main {
 .panel.content {
     text-align: center;
 }
+.panel.value {
+    margin: 10px auto;
+}
 .panel.label {
     margin: 3px 1px;
     opacity: 0.8;
-}
-.ui.tags.horizontal.label {
-    margin-bottom: 5px;
 }
 /*To stop animation in progress bar*/
 .ui.active.progress .bar::after {
@@ -175,4 +175,37 @@ main {
 
 .popup.wall.tag.active-tags {
     opacity: 80%;
+}
+
+.force-hide {
+    display: none !important;
+}
+
+#settings__content {
+    display: grid;
+    margin-left: 0px;
+    grid-template-columns: auto auto auto 100px;
+    grid-template-rows: auto auto;
+}
+#settings__update-checkbox-text {
+    grid-column: 1/4;
+    grid-row: 1;
+}
+#settings__update-checkbox {
+    grid-row: 1;
+}
+#settings__target-slider {
+    grid-row: 2;
+    grid-column: 2/4;
+    margin-top: 10px;
+}
+#settings__target-text {
+    grid-row: 2;
+    margin-block-start: auto;
+}
+#settings__target-slider-text {
+    grid-row: 2;
+    margin-left: 10px;
+    margin-block-start: auto;
+    margin-block-end: auto;
 }

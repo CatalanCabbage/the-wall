@@ -54,12 +54,15 @@
             <div class="header" style="text-align: center;">
                 Settings
             </div>
-            <div class="content">
-                <div class="ui toggle checkbox">
+            <div class="content" id="settings__content">
+                <label id= "settings__update-checkbox-text" for="settings__update-checkbox">Always update automatically</label>
+                <div class="update ui toggle checkbox">
                     <input type="checkbox" id="settings__update-checkbox" name="settings__update-checkbox" />
-                    <label>Always update automatically</label>
+                    <label for="settings__update-checkbox"></label>
                 </div>
-                </p>
+                <p id="settings__target-text">Target points</p>
+                <div class="ui target slider" id="settings__target-slider"></div>
+                <p id="settings__target-slider-text">-</p>
             </div>
             <div class="actions">
                 <div class="ui deny button">
@@ -80,6 +83,7 @@
                 <div id="add-tag__message">
                     <!--Added via JS-->
                 </div>
+                <!--Container is specified separately since Fomantic-UI requires it-->
                 <div class="add tag fluid ui input" id="add-tag__name-container">
                     <input id="add-tag__name" type="text" placeholder="Name">
                 </div>
@@ -133,7 +137,8 @@
                     <br><i style="font-size: 15px"> Tip: Hover over the input boxes for some examples.</i>
                 </div>
                 <div>
-                    <button id="about-button" style="text-align: center; font-size: 21px; margin:15px" class="ui yellow button about" type="button" autofocus>
+                    <button id="about-button" style="text-align: center; font-size: 21px; margin:15px"
+                        class="ui yellow button about" type="button" autofocus>
                         What is this?
                     </button>
                 </div>
@@ -322,6 +327,9 @@
             </div>
         </div>
         <div id="main-panels" class="ui cards">
+            <!--Added via JS-->
+        </div>
+        <div id="the-wall">
             <!--Added via JS-->
         </div>
         <div id="footer-progress">

@@ -569,6 +569,22 @@ dataAccess.deleteTask = async function deleteTask(taskId) {
             return false;
         });
 };
+
+dataAccess.getTotalWeightage = async function getTotalWeightage() {
+    var query = 'select coalesce(sum(tasks.weightage), 0) as weightage from tasks';
+    var result = await sequelize.query(query,
+        {type: QueryTypes.SELECT}
+    ).catch(err => new Error(err));
+    if (result instanceof Error) {
+        console.error(result);
+        return 0;
+    }
+    var weightage = parseInt(result[0].weightage);
+    if (weightage == null || isNaN(weightage)) {
+        weightage = 0;
+    }
+    return (weightage);
+};
 //DataAccess for Tasks ends---------------------------------------------------------------------------------------------
 
 //DataAccess for TaskTagRel starts--------------------------------------------------------------------------------------

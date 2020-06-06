@@ -22,6 +22,51 @@ window.onbeforeunload = () => {
     win.removeAllListeners();
 };
 
+async function initEvents() {
+    //Inputs 
+    document.getElementById('task-submit-btn').addEventListener('click', () => {
+        addTask();
+    });
+    document.getElementById('task-input__points').addEventListener('focusout', () => {
+        validatePoints();
+    });
+    document.getElementById('add-tag__name').addEventListener('focusout', () => {
+        setPreviewTagText(null);
+        console.log('focusout');
+    });
+    //Rendering
+    await initTargetWeightage();
+
+    addMainPanels();
+    populateInputsDropdown();
+    generateProgressBar();
+
+    displayTheWall();
+    var theWallElem = $('#the-wall');
+    var mainPanelsElem = $('#main-panels');
+    theWallElem.addClass('force-hide');
+
+    document.getElementById('title-bar__title').addEventListener('click', () => {
+        switch (currentPanel) {
+            case 'cards':
+                theWallElem.removeClass('force-hide');
+                mainPanelsElem.addClass('force-hide');
+                currentPanel = 'wall';
+                break;
+            case 'wall':
+                mainPanelsElem.removeClass('force-hide');
+                theWallElem.addClass('force-hide');
+                currentPanel = 'cards';
+                break;
+            default:
+                theWallElem.addClass('force-hide');
+                mainPanelsElem.removeClass('force-hide');
+                currentPanel = 'cards';
+                break;
+        }
+    });
+}
+
 //Handle minimise/close buttons
 function handleTitleBarEvents() {
     document.getElementById('minimize-button').addEventListener('click', () => {
@@ -30,44 +75,41 @@ function handleTitleBarEvents() {
     document.getElementById('close-button').addEventListener('click', () => {
         win.close();
     });
-    document.getElementById('title-bar__title').addEventListener('click', () => {
-        switch (currentPanel) {
-            case 'cards':
-                displayTheWall();
-                currentPanel = 'wall';
-                break;
-            case 'wall':
-                addMainPanels();
-                currentPanel = 'cards';
-                break;
-            default:
-                addMainPanels();
-                currentPanel = 'cards';
-                break;
-        }
-    });
+}
+
+var maxWeightage = 100000;
+
+async function initTargetWeightage () {
+    targetWeightage = parseInt(await dataAccess.getParam('targetWeightage'));
+    console.log('Getting from DB, targetWeightage is: ' + targetWeightage);
+    if (targetWeightage == null || isNaN(targetWeightage)) { //if not in DB, init and add to DB
+        var totalWeightage = parseInt(await dataAccess.getTotalWeightage());
+        targetWeightage = totalWeightage + (maxWeightage-totalWeightage)%100;
+        console.log('NaN/null, so targetWeightage is: ' + targetWeightage);
+        dataAccess.addParam({key: 'targetWeightage', value: targetWeightage});
+    }
 }
 
 var currentPanel = 'cards';
 
 async function displayTheWall() {
-    var mainPanelsElem = $('#main-panels');
+    var mainPanelsElem = $('#the-wall');
     var theWallGraphicTemplate = '';
     var result = await dataAccess.getWeightageOfTags();
-    var tagsObj = result.tagsWeightage;
-    var totalWeightage = result.totalWeightage;
+    var rawTagsObj = result.tagsWeightage;
+    var normalizedTags = normalizeWeightage(rawTagsObj);
+    var tagsObj = normalizedTags.normalizedTags;
+    var unusedBricks = totalBricks - normalizedTags.totalUsedBricks;
     var keys = Object.keys(tagsObj);
-    console.log(tagsObj);
     var numOfKeys = keys.length;
     var keyIndex = 0;
     var colorsRendered = {red: 'rgb(220, 40, 41)', orange: 'rgb(242, 113, 29)', yellow: 'rgb(253, 189, 4)', olive: 'rgb(181, 205, 23)', 
         green: 'rgb(34, 186, 67)', teal: 'rgb(0, 181, 174)', blue: 'rgb(33, 133, 208)', violet: 'rgb(99, 53, 201)', purple: 'rgb(163, 50, 200)', pink: 'rgb(222, 59, 152)'};
-    console.log('Total, target' + totalWeightage + '  ' + targetWeightage);
     theWallGraphicTemplate = theWallGraphicTemplate.concat('<div style="display: flex; justify-content: center; width: 100%; height: auto; background: white;"><div style="margin: 20px auto; display: grid; grid-template-columns: repeat(20, 25px); grid-template-rows: repeat(25, 15px);">');
     var tagName;
-    for(var i = 0; i < targetWeightage; i++) { 
+    for(var i = 0; i < totalBricks; i++) {
         var color;
-        if(i < (targetWeightage - totalWeightage)) {
+        if(i < unusedBricks) {
             color = 'grey';
         } else {
             if (tagsObj[keys[keyIndex]].weightage > 0) {
@@ -94,7 +136,6 @@ async function displayTheWall() {
     }
     theWallGraphicTemplate = theWallGraphicTemplate.concat('</div></div>');
     mainPanelsElem.html(theWallGraphicTemplate);
-
     //Set popups to all bricks
     $('.popup.wall.tag').popup({
         preserve: true
@@ -109,6 +150,29 @@ async function displayTheWall() {
         var idClass = elem.target.classList[3];
         $('.popup.wall.tag.' + idClass).removeClass('active-tags');
     });
+}
+
+/*
+ * Takes an object with tags to weightage mapping;
+ * Normalizes(scales) weights to match number of bricks to be rendered in the Wall view.
+ * Eg: If total bricks is 100, but target weightage is 200, it means that 2 points == 1 brick
+ * Similarly, a tag with 10 weightage should become 5 weightage, etc.
+ * 
+ * totalUsedBricks is the total number of bricks mapped to tags after normalization.
+ * 
+ * Returns an object: {normalizedTags: <similarToInputObj>, totalUsedBricks: <n>}
+ */
+var totalBricks = 500;
+function normalizeWeightage(tagsToWeightage) {
+    console.log(tagsToWeightage);
+    var totalUsedBricks = 0;
+    var weightagePerBrick = targetWeightage / totalBricks;
+    for (var key in tagsToWeightage) {
+        tagsToWeightage[key].weightage = Math.floor(tagsToWeightage[key].weightage/weightagePerBrick);
+        totalUsedBricks = totalUsedBricks + tagsToWeightage[key].weightage;
+    }
+    var result = {normalizedTags: tagsToWeightage, totalUsedBricks: totalUsedBricks};
+    return result;
 }
 
 var totalTagsCount = 0;
@@ -142,24 +206,25 @@ async function addMainPanels() {
             tagsTemplate = tagsTemplate.concat('<div class="ui horizontal label">no tags</div>');
         } else {
             var numOfTags = 0;
+            var numOfTagsToBeShown = 3;
             var extraTags = '';
             tags.forEach((tag) => {
                 numOfTags++;
                 var tagColor = allTags[tag.tag_id].color || '';
-                if (numOfTags <= 4) {
+                if (numOfTags <= numOfTagsToBeShown) {
                     tagsTemplate = tagsTemplate.concat('<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>');
                 } else {
                     extraTags = extraTags.concat('<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>');
                 }
             });
-            if (numOfTags > 4) {
-                var extraTagsCount = numOfTags - 4;
+            if (numOfTags > numOfTagsToBeShown) {
+                var extraTagsCount = numOfTags - numOfTagsToBeShown;
                 tagsTemplate = tagsTemplate.concat('<div class="ui extra tags horizontal label" data-html=\'<div style="margin-left: 10px">' + extraTags + '</div>\' data-position="bottom center" data-variation="tiny basic">+' + extraTagsCount + '</div>');
             }
         }
         var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">' +
             '<div class="panel black ui statistic">' +
-            '<div class="value">' + completed + '</div>' +
+            '<div class="panel value">' + completed + '</div>' +
             '<div class="panel label">' + tagsTemplate + '</div>' +
             '</div>' +
             '<div class="panel content">' + name + '</div>' +
@@ -193,23 +258,7 @@ async function addMainPanels() {
     });
 }
 
-function initEvents() {
-    //Inputs 
-    document.getElementById('task-submit-btn').addEventListener('click', () => {
-        addTask();
-    });
-    document.getElementById('task-input__points').addEventListener('focusout', () => {
-        validatePoints();
-    });
-    document.getElementById('add-tag__name').addEventListener('focusout', () => {
-        setPreviewTagText(null);
-        console.log('focusout');
-    });
-    //Rendering
-    addMainPanels();
-    populateInputsDropdown();
-    generateProgressBar();
-}
+
 async function addTask() {
     let taskNameInp = $('#task-input__task');
     let sectionNameInp = $('#task-input__section');
@@ -376,7 +425,6 @@ function handleSettingsMenu(value) {
 
 //Handles display of modal and high-level actions
 async function handleSettingsModal() {
-    console.log('In handleSettingsModal');
     $('.settings.ui.modal')
         .modal({
             onApprove: function() {
@@ -386,12 +434,26 @@ async function handleSettingsModal() {
         .modal('show');
     //Initialize autoUpdate checkbox
     var autoUpdateFlag = await dataAccess.getParam('autoUpdate');
-    console.log('In Initialize autoUpdate checkbox, param=' + autoUpdateFlag);
     if (autoUpdateFlag == 'true') {
         $('#settings__update-checkbox')[0].checked = true;
     } else {
         $('#settings__update-checkbox')[0].checked = false;
     }
+    //Initialize Slider
+    var totalWeightage = await dataAccess.getTotalWeightage();
+    var minWeightageLimit = totalWeightage + (maxWeightage-totalWeightage)%100;
+    $('.ui.target.slider')
+        .slider({
+            min: minWeightageLimit,
+            max: 10000,
+            start: 0,
+            step: 100,
+            onMove: function(targetPointsInput) {
+                $('#settings__target-slider-text').html(targetPointsInput);
+            }
+        });
+    $('.ui.target.slider').slider('set value', targetWeightage);
+    $('#settings__target-slider-text').html(targetWeightage); //Init text box next to the slider
 }
 
 $('.about.popup').popup({
@@ -511,7 +573,24 @@ function saveSettings() {
         alwaysUpdate('false');
         console.log('unchecked');
     }
+    //Set targetWeightage
+    var targetText = $('#settings__target-slider-text');
+    var newTargetWeightage = parseInt(targetText[0].innerText);
+    console.log(targetText[0].innerText);
+    console.log(newTargetWeightage);
+
+    if(targetWeightage != newTargetWeightage) {
+        setTargetWeightage(newTargetWeightage);
+        targetWeightage = newTargetWeightage;
+        //Reinit progressBar and Wall
+        generateProgressBar();
+        displayTheWall();
+    }
     console.log('approved');
+}
+
+function setTargetWeightage(newTargetWeightage) {
+    dataAccess.addParam({key: 'targetWeightage', value: newTargetWeightage});
 }
 
 //Populate dropdown entries for inputs, such as Section and Tasks
@@ -662,11 +741,10 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
     }
     //Display if there's an error; is displayed only 2 times, unless checkForUpdates is clicked again
     if (arg[0] == 'error') {
-        //errorMessageCount++;
+        errorMessageCount++;
         if (errorMessageCount < 3) {
             //Todo Display error message
-            console.log('error: ' + arg[1]);
-            console.log(arg[1]);
+            //console.log('error: ' + arg[1]);
         }
     }
 });
@@ -674,12 +752,9 @@ ipcRenderer.on('updater-action-response', (event, arg) => {
 //To always update when user quits the application
 alwaysUpdate();
 async function alwaysUpdate(inputFlag) {
-    console.log('sending alwaysUpdate; input flag:');
-    console.log(inputFlag);
     var autoUpdateFlag = await dataAccess.getParam('autoUpdate');
     //If first startup
     if (inputFlag == null) {
-        console.log('inputFlag null, and ' + (autoUpdateFlag == 'true'));
         inputFlag = (autoUpdateFlag == 'true');
     } else {
         //When flag is received explicitly, set in DB also
@@ -696,13 +771,15 @@ function updateAndQuit() {
     ipcRenderer.send('updater-action', 'updateAndQuit');
 }
 
-var targetWeightage = 500;
+var targetWeightage;
 //Generate progress bar footer
 async function generateProgressBar() {
     var result = await dataAccess.getWeightageOfTags();
+    if (targetWeightage == null) {
+        await initTargetWeightage();
+    }
     var tagsObj = result.tagsWeightage;
     var totalWeightage = result.totalWeightage;
-    console.log(totalWeightage);
     //When no data is added, no need to display progress bar
     if (totalWeightage < 1) {
         return false;

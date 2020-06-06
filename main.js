@@ -98,7 +98,7 @@ autoUpdater.setFeedURL({
     url: url
 });
 ipcMain.on('updater-action', (event, arg) => {
-    event.sender.send('logger', 'from mainnnnnnnnn');
+    //event.sender.send('logger', 'from mainnnnnnnnn');
     if (arg == 'checkForUpdates') {
         autoUpdater.checkForUpdates();
     }
