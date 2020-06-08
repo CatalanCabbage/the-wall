@@ -209,3 +209,16 @@ main {
     margin-block-start: auto;
     margin-block-end: auto;
 }
+
+.ui.tags.horizontal.label {
+    margin-bottom: 5px;
+}
+
+.unused.wall.tag {
+    border: 0px !important;
+}
+
+#wall-right-pane {
+    display: flexbox;
+    flex-direction: column;
+}

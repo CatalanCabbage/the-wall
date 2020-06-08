@@ -81,7 +81,6 @@ var maxWeightage = 100000;
 
 async function initTargetWeightage () {
     targetWeightage = parseInt(await dataAccess.getParam('targetWeightage'));
-    console.log('Getting from DB, targetWeightage is: ' + targetWeightage);
     if (targetWeightage == null || isNaN(targetWeightage)) { //if not in DB, init and add to DB
         var totalWeightage = parseInt(await dataAccess.getTotalWeightage());
         targetWeightage = totalWeightage + (maxWeightage-totalWeightage)%100;
@@ -97,7 +96,7 @@ async function displayTheWall() {
     var theWallGraphicTemplate = '';
     var result = await dataAccess.getWeightageOfTags();
     var rawTagsObj = result.tagsWeightage;
-    var normalizedTags = normalizeWeightage(rawTagsObj);
+    var normalizedTags = processTags(rawTagsObj);
     var tagsObj = normalizedTags.normalizedTags;
     var unusedBricks = totalBricks - normalizedTags.totalUsedBricks;
     var keys = Object.keys(tagsObj);
@@ -105,7 +104,7 @@ async function displayTheWall() {
     var keyIndex = 0;
     var colorsRendered = {red: 'rgb(220, 40, 41)', orange: 'rgb(242, 113, 29)', yellow: 'rgb(253, 189, 4)', olive: 'rgb(181, 205, 23)', 
         green: 'rgb(34, 186, 67)', teal: 'rgb(0, 181, 174)', blue: 'rgb(33, 133, 208)', violet: 'rgb(99, 53, 201)', purple: 'rgb(163, 50, 200)', pink: 'rgb(222, 59, 152)'};
-    theWallGraphicTemplate = theWallGraphicTemplate.concat('<div style="display: flex; justify-content: center; width: 100%; height: auto; background: white;"><div style="margin: 20px auto; display: grid; grid-template-columns: repeat(20, 25px); grid-template-rows: repeat(25, 15px);">');
+    theWallGraphicTemplate = theWallGraphicTemplate.concat('<div style="display: flex; justify-content: center; width: 100%; height: auto; background: white;"><div style="margin: 20px 20px 20px 60px; display: grid; grid-template-columns: repeat(20, 25px); grid-template-rows: repeat(25, 15px);">');
     var tagName;
     for(var i = 0; i < totalBricks; i++) {
         var color;
@@ -132,14 +131,76 @@ async function displayTheWall() {
         if(tagName != null) {
             theWallGraphicTemplate = theWallGraphicTemplate.concat('data-html="' + tagName + '" class="popup wall tag id' + keys[keyIndex] + '"');
         }
+        else {
+            theWallGraphicTemplate = theWallGraphicTemplate.concat('class="popup wall tag unused"');
+        }
         theWallGraphicTemplate = theWallGraphicTemplate.concat('style="background: ' + color + '; border: 1px solid #FFF; border-radius: 0px;"></div>');
     }
-    theWallGraphicTemplate = theWallGraphicTemplate.concat('</div></div>');
+    var rightPaneTemplate = '<div id="the-wall__right-pane">';
+    var oldestTask = await dataAccess.getOldestTask();
+    var oldestTaskDate = new Date(oldestTask.created_at);
+    var currentDate = new Date();
+
+    var weightageByTime = await getWeightageByTime();
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container">');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container-title">Points</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Weekly</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
+    //Show only if a week has elapsed
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">this</div>' + weightageByTime.currentWeekWeightage + '</div>');
+    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth() || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1)) {
+        rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">last</div>' + weightageByTime.lastWeekWeightage + '</div>');
+    }
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Monthly</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">this</div>' + weightageByTime.currentMonthWeightage + '</div>');
+    //Show only if a month has elapsed
+    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth()) {
+        rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">last</div>' + weightageByTime.lastMonthWeightage + '</div>');
+    }
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container">');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Highest Tag</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label">' + normalizedTags.maxTag.weightage + '</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+
+    var streakData = await getStreakData();
+    var longestStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">tasks</div>' + streakData.maxStreakTasks.length + '</div>'; 
+    longestStreakPopupData = longestStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">points</div>' + streakData.maxStreakPoints + '</div>');
+    var currentStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">tasks</div>' + streakData.currentTasks.length + '</div>'; 
+    currentStreakPopupData = currentStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">points</div>' + streakData.currentPoints + '</div>');
+
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Longest Streak</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + longestStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">days</div>' + streakData.maxStreak + '</div></div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Current Streak</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + currentStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">days</div>' + streakData.currentStreak + '</div></div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+
+    theWallGraphicTemplate = theWallGraphicTemplate.concat('</div>');
+    theWallGraphicTemplate = theWallGraphicTemplate.concat(rightPaneTemplate);
+    theWallGraphicTemplate = theWallGraphicTemplate.concat('</div>');
+    theWallGraphicTemplate = theWallGraphicTemplate.concat('');
     mainPanelsElem.html(theWallGraphicTemplate);
     //Set popups to all bricks
     $('.popup.wall.tag').popup({
         preserve: true
     });
+    //Set popups to stats
+    $('.popup.stat').popup();
 
     //Dim all bricks of same ID on hover
     $('.popup.wall.tag').on('mouseover', (elem) => {
@@ -152,6 +213,70 @@ async function displayTheWall() {
     });
 }
 
+async function getStreakData() {
+    var tasks = await dataAccess.getTasks();
+    var currentStreak = 1;
+    var currentTasks = [];
+    var currentPoints = 0;
+    var maxStreak = 0;
+    var maxStreakTasks = [];
+    var maxStreakPoints = 0;
+    var currentDate = new Date(0);
+    var nextDate = new Date(0);
+    nextDate = new Date(nextDate.setDate(currentDate.getDate() + 1));
+    var taskDate;
+    //Assumes data is ordered by created_at ascending
+    tasks.forEach((task)=> {
+        taskDate = new Date(task.created_at);
+        if (taskDate.getFullYear() > currentDate.getFullYear() || taskDate.getMonth() > currentDate.getMonth() || taskDate.getDate() > currentDate.getDate()) {
+            //If taskDate is more than current but the same as nextDate, increase streak and update current and next date.
+            if (taskDate.getFullYear() == nextDate.getFullYear() && taskDate.getMonth() == nextDate.getMonth() && taskDate.getDate() == nextDate.getDate()) {
+                currentStreak++;
+                currentTasks.push(task);
+                currentPoints = currentPoints + task.weightage;
+            } else {
+                //If taskDate isn't the nextDate, then there's a blank day and streak has been broken; reset all info
+                if (maxStreak < currentStreak) {
+                    maxStreak = currentStreak; 
+                    maxStreakPoints = currentPoints; 
+                    maxStreakTasks = currentTasks;
+                }
+                currentStreak = 1;
+                currentPoints = 0;
+                currentTasks = [];
+            }
+            currentDate = taskDate;
+            nextDate = new Date(currentDate);
+            nextDate = new Date(nextDate.setDate(nextDate.getDate() + 1));
+        } else {
+            //If taskDate is same as current date, no need to update streak; just add points.
+            currentTasks.push(task);
+            currentPoints = currentPoints + task.weightage;
+        }
+    });
+    var streakData = {maxStreak: maxStreak, maxStreakPoints: maxStreakPoints, maxStreakTasks: maxStreakTasks,
+        currentStreak: currentStreak, currentPoints: currentPoints, currentTasks: currentTasks};
+    return streakData;
+}
+
+async function getWeightageByTime() {
+    var weightageByTime = {};
+    var date = new Date();
+    //Last Monday till today, this week
+    var daysToLastMonday = - date.getDay() + date.getDay() === 0? -6 : 1;
+    var currentWeekWeightage = await dataAccess.getWeightageByDays(daysToLastMonday);
+    var lastWeekWeightage = await dataAccess.getWeightageByDays([daysToLastMonday - 7, daysToLastMonday]);
+    
+    var currentMonthWeightage = await dataAccess.getWeightageByMonths(-1);
+    var lastMonthWeightage = await dataAccess.getWeightageByMonths([-2, -1]);
+    
+    
+    weightageByTime = {currentWeekWeightage: currentWeekWeightage, lastWeekWeightage: lastWeekWeightage,
+        currentMonthWeightage: currentMonthWeightage, lastMonthWeightage: lastMonthWeightage};
+    return weightageByTime;
+}
+
+
 /*
  * Takes an object with tags to weightage mapping;
  * Normalizes(scales) weights to match number of bricks to be rendered in the Wall view.
@@ -163,15 +288,19 @@ async function displayTheWall() {
  * Returns an object: {normalizedTags: <similarToInputObj>, totalUsedBricks: <n>}
  */
 var totalBricks = 500;
-function normalizeWeightage(tagsToWeightage) {
-    console.log(tagsToWeightage);
+function processTags(tagsToWeightage) {
     var totalUsedBricks = 0;
     var weightagePerBrick = targetWeightage / totalBricks;
+    var maxTag;
     for (var key in tagsToWeightage) {
         tagsToWeightage[key].weightage = Math.floor(tagsToWeightage[key].weightage/weightagePerBrick);
         totalUsedBricks = totalUsedBricks + tagsToWeightage[key].weightage;
+        if (maxTag == null || maxTag.weightage < tagsToWeightage[key].weightage) {
+            maxTag = {id: key, name: tagsToWeightage[key].name, 
+                weightage: tagsToWeightage[key].weightage, color: tagsToWeightage[key].color};
+        }
     }
-    var result = {normalizedTags: tagsToWeightage, totalUsedBricks: totalUsedBricks};
+    var result = {normalizedTags: tagsToWeightage, totalUsedBricks: totalUsedBricks, maxTag: maxTag};
     return result;
 }
 
@@ -195,7 +324,6 @@ async function addMainPanels() {
     for (var sectionId in sections) {
         var section = sections[sectionId];
         name = section.name;
-        //var total = section.total;
         var tags = 'no tags';
         if (tagsForEachSection[sectionId].tags.length > 0) {
             tags = tagsForEachSection[sectionId].tags;
@@ -241,6 +369,10 @@ async function addMainPanels() {
         mainPanelsElem.html(intialScreenTemplate);
         $('.ui.about.button').click(function() {
             $('.about.ui.modal').modal('show');
+        });
+        $('.about.popup').popup({
+            preserve: true,
+            hoverable: true
         });
     } else if (numberOfSections == 1) {
         mainPanelsElem.addClass('one');
@@ -419,6 +551,10 @@ function handleSettingsMenu(value) {
             break;
         case 'about':
             $('.about.ui.modal').modal('show');
+            $('.about.popup').popup({
+                preserve: true,
+                hoverable: true
+            });
             break;
     }
 }
@@ -455,11 +591,6 @@ async function handleSettingsModal() {
     $('.ui.target.slider').slider('set value', targetWeightage);
     $('#settings__target-slider-text').html(targetWeightage); //Init text box next to the slider
 }
-
-$('.about.popup').popup({
-    preserve: true,
-    hoverable: true
-});
 
 
 //Modal to get new Tag
@@ -727,7 +858,6 @@ var errorMessageCount = 0;
 
 function checkForUpdates() {
     ipcRenderer.send('updater-action', 'checkForUpdates');
-    console.log('Started check for updates');
     errorMessageCount = 0;
 }
 checkForUpdates();

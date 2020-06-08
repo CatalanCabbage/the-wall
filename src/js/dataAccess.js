@@ -657,6 +657,73 @@ dataAccess.getTotalWeightage = async function getTotalWeightage() {
     }
     return (weightage);
 };
+
+/*
+ * Gets weightage added in the timeframe given by input days 
+ * Input param can be a single value or an array: start or [start, end]
+ * If single value is given, end is taken as current date + 1 (to make today inclusive)
+ * Date is calculated from current time; thus, for 2 days ago, input should be -2
+ */
+dataAccess.getWeightageByDays = async function getWeightageByDays(days) {
+    var startDate = new Date();
+    var endDate = new Date();
+    var startDateInp = new Date(startDate.setDate(startDate.getDate() + (days[0] || days)));
+    //1 is added here to make endDate inclusive
+    var endDateInp = new Date(endDate.setDate(endDate.getDate() + (days[1] || 1)));
+
+    startDate = startDateInp.getUTCFullYear() + '-' + ('0' + (startDateInp.getMonth() + 1)).slice(-2) + '-' + ('0' + startDateInp.getDate()).slice(-2);
+    endDate = endDateInp.getUTCFullYear() + '-' + ('0' + (endDateInp.getMonth() + 1)).slice(-2) + '-' + ('0' + endDateInp.getDate()).slice(-2);
+    
+    // eslint-disable-next-line quotes
+    var query = "select coalesce(sum(tasks.weightage), 0) as weightage from tasks where created_at > '" + startDate + "' and created_at <= '" + endDate + "'";
+    var result = await sequelize.query(query,{
+        type: QueryTypes.SELECT
+    }
+    ).catch(err => new Error(err));
+    if (result instanceof Error) {
+        console.error(result);
+        return 0;
+    }
+    var weightage = parseInt(result[0].weightage);
+    if (weightage == null || isNaN(weightage)) {
+        console.log(weightage);
+        weightage = 0;
+    }
+    return (weightage);
+};
+
+/*
+ * Similar to getWeightageByDays();
+ * If currentMonth is June, [-2, -1] will give weightage from April 1st to May 1st(exclusive)
+ * If currentMonth is June, [-1] will give weightage from June 1st to July 1st(exclusive)
+ */
+dataAccess.getWeightageByMonths = async function getWeightageByMonths(months) {
+    var startMonth = new Date();
+    var endMonth = new Date();
+    //+1 month, since getMonth() is 0-indexed
+    var startMonthInp = new Date(startMonth.setMonth(startMonth.getMonth() + (months[0] || months) + 1));
+    var endMonthInp = new Date(endMonth.setMonth(endMonth.getMonth() + (months[1] || 0) + 1));
+
+    //Hard-code date, since we want to start counting from 1st of each month
+    startMonth = startMonthInp.getUTCFullYear() + '-' + ('0' + (startMonthInp.getMonth() + 1)).slice(-2) + '-' + '01';
+    endMonth = endMonthInp.getUTCFullYear() + '-' + ('0' + (endMonthInp.getMonth() + 1)).slice(-2) + '-' + '01';
+    // eslint-disable-next-line quotes
+    var query = "select coalesce(sum(tasks.weightage), 0) as weightage from tasks where created_at >= '" + startMonth + "' and created_at < '" + endMonth + "'";
+    var result = await sequelize.query(query,{
+        type: QueryTypes.SELECT
+    }
+    ).catch(err => new Error(err));
+    if (result instanceof Error) {
+        console.error(result);
+        return 0;
+    }
+    var weightage = parseInt(result[0].weightage);
+    if (weightage == null || isNaN(weightage)) {
+        console.log(weightage);
+        weightage = 0;
+    }
+    return (weightage);
+};
 //DataAccess for Tasks ends---------------------------------------------------------------------------------------------
 
 //DataAccess for TaskTagRel starts--------------------------------------------------------------------------------------
