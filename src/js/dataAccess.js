@@ -45,8 +45,18 @@ function isConnected() {
 dataAccess.isConnected = isConnected();
 
 //Table definitions
-//AppParams
+//AppParams: Used to store key-value pairs, such as settings
 const AppParam = sequelize.define('app_param', {
+    key: {type: Sequelize.STRING, allowNull: false, unique: true},
+    value: {type: Sequelize.STRING, allowNull: false, unique: false}
+}, {
+    updatedAt: 'updated_at',
+    createdAt: 'created_at'
+});
+
+//DataCache: Used to store user data. 
+//Use-cases: Some data obtained by computation, but doesn't change over time. 
+const DataCache = sequelize.define('data_cache', {
     key: {type: Sequelize.STRING, allowNull: false, unique: true},
     value: {type: Sequelize.STRING, allowNull: false, unique: false}
 }, {
@@ -161,6 +171,60 @@ dataAccess.getAllParams = async function getAllParams() {
     return params;
 };
 //DataAccess for AppParams ends----------------------------------------------------------------------------------------------
+
+//DataAccess for DataCache start---------------------------------------------------------------------------------------------
+dataAccess.addToCache = async function addToCache(data) {
+    if (typeof data != 'object' || data == null || data.key == null || data.value == null) {
+        console.log('addToCache: passed param is invalid');
+        return false;
+    }
+    return await DataCache.upsert(
+        {key: data.key, value: data.value},
+        {fields: ['key', 'value']}
+    )
+        .then (() => {
+            return true;
+        }) 
+        .catch (err => {
+            if (err.toString().includes('SequelizeUniqueConstraintError')) {
+                console.error('addToCache: Given key is not unique', err);
+                return false;
+            } else if (err.toString().includes('cannot be null')) {
+                console.error('addToCache: Param missing', err);
+                return false;
+            } else {
+                console.error(err);
+                return false;
+            }
+        })
+
+    ;
+};
+
+dataAccess.getFromCache = async function getFromCache(key) {
+    if (typeof key !== 'string') {
+        console.log('getFromCache: key is not a string');
+        return null;
+    }
+    var data = await sequelize.query('select * from data_caches where key=?',
+        {   
+            replacements: [key],
+            type: QueryTypes.SELECT}
+    );
+    if (data[0] != null) {
+        return data[0].value;
+    }
+    return null;
+};
+
+
+dataAccess.getAllCacheData = async function getAllCacheData() {
+    var data = await sequelize.query('select key, value from dataCaches',
+        {type: QueryTypes.SELECT}
+    );
+    return data;
+};
+//DataAccess for DataCache ends----------------------------------------------------------------------------------------------
 
 //DataAccess for Tags start---------------------------------------------------------------------------------------------
 /**
@@ -512,11 +576,19 @@ dataAccess.getTask = async function getTask(taskId) {
  * @param taskId
  */
 dataAccess.getTasks = async function getTasks() {
-    var tasks = await sequelize.query('select * from tasks', 
+    var tasks = await sequelize.query('select * from tasks order by created_at asc', 
         {type: QueryTypes.SELECT}
     );
     return tasks; 
 };
+
+dataAccess.getOldestTask = async function getOldestTask() {
+    var task = await sequelize.query('select * from tasks order by created_at limit 1', 
+        {type: QueryTypes.SELECT}
+    );
+    return task[0]; 
+};
+
 
 /**
  * Returns all distinct Task names as an array
