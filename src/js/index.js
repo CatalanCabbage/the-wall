@@ -143,48 +143,56 @@ async function displayTheWall() {
 
     var weightageByTime = await getWeightageByTime();
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container-title">Points</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Weekly</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Weekly points</div>');
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    //Show only if a week has elapsed
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">this</div>' + weightageByTime.currentWeekWeightage + '</div>');
+    //Show popup with week only if a week has elapsed
     if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth() || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1)) {
-        rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">last</div>' + weightageByTime.lastWeekWeightage + '</div>');
+        rightPaneTemplate = rightPaneTemplate.concat('<div class="stat popup" data-position="left center" data-html=\'<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.lastWeekWeightage + '</div>last week</div>\'>');
     }
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.currentWeekWeightage + '</div>this week</div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    //Close only if week popup was shown
+    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth() || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1)) {
+        rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    }
 
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Monthly</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Monthly points</div>');
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">this</div>' + weightageByTime.currentMonthWeightage + '</div>');
-    //Show only if a month has elapsed
+    //Show popup only if a month has elapsed
     if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth()) {
-        rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">last</div>' + weightageByTime.lastMonthWeightage + '</div>');
+        rightPaneTemplate = rightPaneTemplate.concat('<div class="stat popup" data-position="left center" data-html=\'<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.lastMonthWeightage + '</div>last month</div>\'>');
     }
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.currentMonthWeightage + '</div>this month</div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    //Close only if month popup was shown
+    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth()) {
+        rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    }
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
 
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container">');
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Highest Tag</div>');
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label">' + normalizedTags.maxTag.weightage + '</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="stat popup" data-position="left center" data-html=\'<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + normalizedTags.maxTag.weightage + '</div>points</div>\'>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui small horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>');
+    rightPaneTemplate = rightPaneTemplate.concat('</div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
 
     var streakData = await getStreakData();
-    var longestStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">tasks</div>' + streakData.maxStreakTasks.length + '</div>'; 
-    longestStreakPopupData = longestStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">points</div>' + streakData.maxStreakPoints + '</div>');
-    var currentStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">tasks</div>' + streakData.currentTasks.length + '</div>'; 
-    currentStreakPopupData = currentStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">points</div>' + streakData.currentPoints + '</div>');
+    var longestStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreakTasks.length + '</div>tasks</div>'; 
+    longestStreakPopupData = longestStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreakPoints + '</div>points</div>');
+    var currentStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentTasks.length + '</div>tasks</div>'; 
+    currentStreakPopupData = currentStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentPoints + '</div>points</div>');
 
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Longest Streak</div>');
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + longestStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">days</div>' + streakData.maxStreak + '</div></div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + longestStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreak + '</div>days</div></div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
     
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Current Streak</div>');
     rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + currentStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">days</div>' + streakData.currentStreak + '</div></div>');
+    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + currentStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentStreak + '</div>days</div></div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
     rightPaneTemplate = rightPaneTemplate.concat('</div>');
 
