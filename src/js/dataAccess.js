@@ -450,7 +450,7 @@ dataAccess.getWeightageOfSections = async function getWeightageOfSections() {
         tempObj['completed'] = completedWeightageObj.completed;
         weightage[completedWeightageObj.id] = tempObj;
     });
-    return [weightage, totalSections];
+    return {weightage: weightage, totalSections: totalSections};
 };
 
 /**
