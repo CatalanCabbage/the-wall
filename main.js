@@ -8,7 +8,6 @@ if (process.env.NODE_ENV === 'dev') {
     isDev = true;
     require('dotenv').config();
 }
-console.log(process.env.NODE_ENV);
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;

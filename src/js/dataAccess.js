@@ -276,7 +276,7 @@ dataAccess.getTags = async function getTags() {
 };
 
 dataAccess.getTagsForEachSection = async function getTagsForEachSection() {
-    var query = 'select distinct sections.id as section_id, tags.id as tag_id, sections.name as section, tags.name as tag' +
+    var query = 'select distinct sections.id as section_id, tags.id as tag_id, sections.name as section, tags.name as tag, tags.color as tag_color' +
                 ' from sections' +
                 ' left outer join tasks on sections.id=tasks.parent_section_id' +
                 ' left outer join task_tag_rels on tasks.id=task_tag_rels.task_id' +
@@ -292,7 +292,7 @@ dataAccess.getTagsForEachSection = async function getTagsForEachSection() {
             tags = tagsForEachSection[sectionId].tags;
         }
         if(row.tag != null) {
-            tags.push({tag_id: row.tag_id, tag_name: row.tag});
+            tags.push({tag_id: row.tag_id, tag_name: row.tag, tag_color: row.tag_color});
         }
         tagsForEachSection[sectionId] = {section: row.section, tags: tags};
     });

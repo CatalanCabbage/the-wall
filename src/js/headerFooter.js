@@ -72,7 +72,7 @@ async function addTask() {
     pointsInp.value = '';
 
     //Regenerate rendered data
-    views.addCards(); //Update main panels
+    views.renderCardView(); //Update main panels
     headerFooter.populateInputsDropdown(); //Update dropdown
     headerFooter.generateProgressBar();
 
@@ -330,10 +330,10 @@ function addTooltips() {
     //Pick a random message
     var activeMsgId = Math.floor(Math.random() * (Object.keys(messages).length));
     $('.task-input').attr('data-position', 'bottom center');
-    $('.task-input.task').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].task.line1 + '<br><i>' + messages[activeMsgId].task.line2 + '</i></div>');
-    $('.task-input.section').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].section.line1 + '<br><i>' + messages[activeMsgId].section.line2 + '</i></div>');
-    $('.task-input.tags').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].tags.line1 + '<br><i>' + messages[activeMsgId].tags.line2 + '</i></div>');
-    $('.task-input.points').attr('data-html', '<div style="text-align:center">' + messages[activeMsgId].points.line1 + '<br><i>' + messages[activeMsgId].points.line2 + '</i></div>');
+    $('.task-input.task').attr('data-html', '<div class="input-tooltip">' + messages[activeMsgId].task.line1 + '<br><i>' + messages[activeMsgId].task.line2 + '</i></div>');
+    $('.task-input.section').attr('data-html', '<div class="input-tooltip">' + messages[activeMsgId].section.line1 + '<br><i>' + messages[activeMsgId].section.line2 + '</i></div>');
+    $('.task-input.tags').attr('data-html', '<div class="input-tooltip">' + messages[activeMsgId].tags.line1 + '<br><i>' + messages[activeMsgId].tags.line2 + '</i></div>');
+    $('.task-input.points').attr('data-html', '<div class="input-tooltip">' + messages[activeMsgId].points.line1 + '<br><i>' + messages[activeMsgId].points.line2 + '</i></div>');
     $('.task-input').popup({
         preserve: true,
         delay: {show: 350}

@@ -1,0 +1,62 @@
+/* CardsView */
+#main-panels {
+    overflow-y: auto;
+    height: 375px;
+}
+#main-panels.initial {
+    background-color: white; 
+    height: 430px;
+}
+.ui.tags.horizontal.label {
+    margin-bottom: 5px;
+}
+.extra-tag__popup {
+    margin-left: 10px;
+    display: flex;
+}
+.panel.card{
+    color: black !important;
+    background-color: white !important;
+}
+.panel.card.card--small {
+    height: 135px;
+}
+.panel.content {
+    text-align: center;
+}
+.panel.value {
+    margin: 10px auto;
+}
+.panel.label {
+    margin: 3px 1px;
+    opacity: 0.8;
+}
+
+/* WallView */
+#wall-view {
+    display: flex; 
+    justify-content: center; 
+    width: 100%; 
+    height: auto; 
+    background: white;
+}
+#wall-view__graphic {
+    margin: 20px 20px 20px 60px; 
+    display: grid; 
+    grid-template-columns: repeat(20, 25px); 
+    grid-template-rows: repeat(25, 15px);
+}
+#wall-right-pane {
+    display: flexbox;
+    flex-direction: column;
+}
+.wall.brick {
+    border: 1px solid #FFF; 
+    border-radius: 0px;
+}
+.wall.brick.unused {
+    border: 0px !important;
+}
+.wall.brick.active-tags {
+    opacity: 80%;
+}

@@ -9,6 +9,15 @@ var maxWeightage = 100000;
 var totalTagsCount; 
 var targetWeightage;
 
+
+general.isDevEnv = async function isDevEnv() {
+    let isDev = false;
+    if (process.env.NODE_ENV === 'dev') {
+        isDev = true;
+    }
+    return isDev;
+};
+
 /* 
  * Return target weightage from DB; if not in DB,
  * take current weightage's closest multiple of 100 as target and set it in DB too 

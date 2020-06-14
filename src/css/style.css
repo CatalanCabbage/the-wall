@@ -9,6 +9,20 @@ body {
     margin:0;
     padding:0;
 }
+main {
+    padding: 40px 40px;
+    display: grid;
+    grid-template-rows: 1fr 9fr;
+    background: #727070;
+    height: 100%;
+    width: 100%;
+}
+.force-hide {
+    display: none !important;
+}
+
+/* Title bar*/
+
 #title-bar {
     display: grid;
     grid-template-columns: repeat(3, auto);
@@ -61,21 +75,13 @@ body {
     color: white;
     -webkit-app-region: no-drag;
 }
-main {
-    padding: 40px 40px;
-    display: grid;
-    grid-template-rows: 1fr 9fr;
-    background: #727070;
-    height: 100%;
-    width: 100%;
-}
 
+/* Header */
 #top-bar__settings {
     position: absolute;
     padding: 5px;
     margin-top: 20px;
 }
-
 #top-bar__input-bar {
     flex: 3;
     display: inline-flex;
@@ -84,15 +90,12 @@ main {
     justify-content: center;
     margin: 10px auto 10px 13%;
 }
-
 .task-input {
     margin: 0px 1px;
 }
-
 .task-input:focus {
     border: 4px #123123 solid;
 }
-
 .task-input.task.ui.search.dropdown {
     min-width: 35%;
     width: 250%;
@@ -108,7 +111,6 @@ main {
 #task-input__points-container {
     width: 15%;
 }
-
 #add-tag__color {
     margin: 10px auto auto -5px;
     width: 100%;
@@ -123,63 +125,30 @@ main {
 *:focus {
     outline: none;
 }
-
-#main-panels {
-    overflow-y: auto;
-    height: 375px;
-}
-#main-panels.initial {
-    background-color: white; 
-    height: 430px;
-}
-
-.panel.card{
-    color: black !important;
-    background-color: white !important;
-}
-
-.panel.card.card--small {
-    height: 135px;
-}
-
-.panel.content {
-    text-align: center;
-}
-.panel.value {
-    margin: 10px auto;
-}
-.panel.label {
-    margin: 3px 1px;
-    opacity: 0.8;
-}
-/*To stop animation in progress bar*/
-.ui.active.progress .bar::after {
-    min-width: 2px;
-    animation: none;
-    -webkit-animation: none;
-}
-
-.footer.bar.points.display {
-    min-width: 1px;
-}
-
-#footer-progress {
-    margin: 35px -25px auto -25px;
-}
-
 #add-tag__message {
     text-align: center;
     margin: -15px auto 20px auto;
     color: gray;
 }
-
-.popup.wall.tag.active-tags {
-    opacity: 80%;
+.input-tooltip {
+    text-align:center;
 }
 
-.force-hide {
-    display: none !important;
+/* Footer */
+/*To stop FUI animation in progress bar*/
+.ui.active.progress .bar::after {
+    min-width: 2px;
+    animation: none;
+    -webkit-animation: none;
 }
+.footer.bar.points.display {
+    min-width: 1px;
+}
+#footer-progress {
+    margin: 35px -25px auto -25px;
+}
+
+/* Settings */
 
 #settings__content {
     display: grid;
@@ -208,17 +177,4 @@ main {
     margin-left: 10px;
     margin-block-start: auto;
     margin-block-end: auto;
-}
-
-.ui.tags.horizontal.label {
-    margin-bottom: 5px;
-}
-
-.unused.wall.tag {
-    border: 0px !important;
-}
-
-#wall-right-pane {
-    display: flexbox;
-    flex-direction: column;
 }

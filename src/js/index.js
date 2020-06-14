@@ -3,7 +3,11 @@ const remote = require('electron').remote;
 const views = require('./../js/views.js');
 const headerFooter = require('./../js/headerFooter.js');
 const general = require('./../js/general.js');
-const dataAccess = require('./../js/dataAccess.js');
+if (general.isDevEnv) { 
+    //Added so that it can be tested from the console
+    // eslint-disable-next-line no-unused-vars
+    var dataAccess = require('./../js/dataAccess.js');
+}
 
 const win = remote.getCurrentWindow();
 const {ipcRenderer} = require('electron');
@@ -35,11 +39,11 @@ async function initEvents() {
     headerFooter.initEventListeners();
     
     //Rendering
-    views.addCards();
+    views.renderCardView();
     headerFooter.populateInputsDropdown();
     headerFooter.generateProgressBar();
 
-    views.displayTheWall();
+    views.renderWallView();
     var theWallElem = $('#the-wall');
     var mainPanelsElem = $('#main-panels');
     theWallElem.addClass('force-hide');
@@ -125,5 +129,5 @@ function handleSettingsModal() {
 
 function renderTargetDependantViews() {
     headerFooter.generateProgressBar();
-    views.displayTheWall();
+    views.renderWallView();
 }

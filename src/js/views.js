@@ -5,74 +5,55 @@ module.exports = views;
 const dataAccess = require('./../js/dataAccess.js');
 const general = require('./../js/general.js'); 
 
-views.addCards = async function addCards() {
-    var mainPanelsElem = $('#main-panels');
+var mainPanelsElem = $('#main-panels');
+
+views.renderCardView = async function renderCardView() {
     var panelElements = '';
-    var name;
     var sectionsResponse = await dataAccess.getWeightageOfSections();
-    var sectionsWeightage = sectionsResponse.weightage;
     var numberOfSections = sectionsResponse.totalSections;
     //When very few Cards are present, they expand in height to take up the full container
-    //Need to limit heights manually when very few are present 
+    //Limit card heights when very few are present 
     var limitCardHeight = '';
     if (numberOfSections <= 4) {
         limitCardHeight = 'card--small';
     }
+
+    var sectionsWeightage = sectionsResponse.weightage;
     var tagsForEachSection = await dataAccess.getTagsForEachSection();
-    var allTags = await dataAccess.getTags();
+    //Create a card for each section
     for (var sectionId in sectionsWeightage) {
         var section = sectionsWeightage[sectionId];
-        name = section.name;
-        var tags = 'no tags';
-        if (tagsForEachSection[sectionId].tags.length > 0) {
-            tags = tagsForEachSection[sectionId].tags;
-        }
-        var completed = section.completed;
-        var tagsTemplate = '';
-        if (tags == 'no tags') {
-            tagsTemplate = tagsTemplate.concat('<div class="ui horizontal label">no tags</div>');
-        } else {
-            var numOfTags = 0;
-            var numOfTagsToBeShown = 3;
-            var extraTags = '';
-            tags.forEach((tag) => {
-                numOfTags++;
-                var tagColor = allTags[tag.tag_id].color || '';
-                if (numOfTags <= numOfTagsToBeShown) {
-                    tagsTemplate = tagsTemplate.concat('<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>');
-                } else {
-                    extraTags = extraTags.concat('<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>');
-                }
-            });
-            if (numOfTags > numOfTagsToBeShown) {
-                var extraTagsCount = numOfTags - numOfTagsToBeShown;
-                tagsTemplate = tagsTemplate.concat('<div class="ui extra tags horizontal label" data-html=\'<div style="margin-left: 10px">' + extraTags + '</div>\' data-position="bottom center" data-variation="tiny basic">+' + extraTagsCount + '</div>');
-            }
-        }
+        var name = section.name;
+        var completedWeigtage = section.completed;
+        var tagsTemplate = await getTagsTemplateForSection(sectionId, tagsForEachSection);
+        
+        //Complete Template for a card: Weightage, tags and section name
         var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">' +
-            '<div class="panel black ui statistic">' +
-            '<div class="panel value">' + completed + '</div>' +
-            '<div class="panel label">' + tagsTemplate + '</div>' +
-            '</div>' +
-            '<div class="panel content">' + name + '</div>' +
-            '</div>';
+        '<div class="panel black ui statistic">' +
+        '<div class="panel value">' + completedWeigtage + '</div>' +
+        '<div class="panel label">' + tagsTemplate + '</div>' +
+        '</div>' +
+        '<div class="panel content">' + name + '</div>' +
+        '</div>';
         panelElements = panelElements + panelTemplate;
     }
     
     mainPanelsElem.html(panelElements);
+    setCardViewColumns(numberOfSections);
 
-    //Set number of columns depending on number of sections
+    //Init popups that show extra tags
+    $('.ui.extra-tag').popup({
+        transition: 'vertical flip',
+        preserve: true,
+        boundary: '#main-panels'
+    });
+};
+
+//Set number of columns depending on number of sections
+function setCardViewColumns(numberOfSections) {
     if (numberOfSections == 0) {
         //Show splash screen, initially when no task has been added
-        var intialScreenTemplate = $('#initial-content').html();
-        mainPanelsElem.html(intialScreenTemplate);
-        $('.ui.about.button').click(function() {
-            $('.about.ui.modal').modal('show');
-        });
-        $('.about.popup').popup({
-            preserve: true,
-            hoverable: true
-        });
+        showInitialContent();
     } else if (numberOfSections == 1) {
         mainPanelsElem.addClass('one');
     } else if (numberOfSections >= 2 && numberOfSections <= 4) {
@@ -82,18 +63,50 @@ views.addCards = async function addCards() {
         mainPanelsElem.removeClass('two');
         mainPanelsElem.addClass('three');
     }
-    $('.ui.extra.tags').popup({
-        transition: 'vertical flip',
-        preserve: true,
-        boundary: '#main-panels'
+}
+
+//To be displayed when no Task has been added
+function showInitialContent() {
+    var intialScreenTemplate = $('#initial-content').html();
+    mainPanelsElem.html(intialScreenTemplate);
+    $('.ui.about.button').click(function() {
+        $('.about.ui.modal').modal('show');
     });
-};
+    $('.about.popup').popup({
+        preserve: true,
+        hoverable: true
+    });
+}
+
+//For each Section card, returns the HTML template to show Tags
+async function getTagsTemplateForSection (sectionId, tagsForEachSection) {
+    var numOfTags = 0;
+    var numOfTagsToBeShown = 3;
+    var extraTags = '';
+    var tagsTemplate = '';
+    var tags = tagsForEachSection[sectionId].tags;
+    tags.forEach((tag) => {
+        numOfTags++;
+        var tagColor = tag.tag_color || '';
+        //Hide extra tags if number of tags is more than tags to be shown
+        if (numOfTags <= numOfTagsToBeShown) {
+            tagsTemplate += '<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>';
+        } else {
+            extraTags += '<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>';
+        }
+    });
+    if (numOfTags > numOfTagsToBeShown) {
+        //Show extra tags as popup
+        var extraTagsCount = numOfTags - numOfTagsToBeShown;
+        tagsTemplate += '<div class="ui extra-tag horizontal label" ' 
+            + 'data-html=\'<div class="extra-tag__popup">' + extraTags + '</div>' 
+            + '\' data-position="bottom center" data-variation="tiny basic">+' + extraTagsCount + '</div>';
+    }
+    return tagsTemplate;
+}
 
 
-
-
-views.displayTheWall = async function displayTheWall() {
-    console.time('wall');
+views.renderWallView = async function renderWallView() {
     var mainPanelsElem = $('#the-wall');
     var theWallGraphicTemplate = '';
     var result = await dataAccess.getWeightageOfTags();
@@ -104,13 +117,12 @@ views.displayTheWall = async function displayTheWall() {
     var keys = Object.keys(tagsObj);
     var numOfKeys = keys.length;
     var keyIndex = 0;
+    //Used in order to match Fomantic UI's colors
     var colorsRendered = {red: 'rgb(220, 40, 41)', orange: 'rgb(242, 113, 29)', yellow: 'rgb(253, 189, 4)', olive: 'rgb(181, 205, 23)', 
         green: 'rgb(34, 186, 67)', teal: 'rgb(0, 181, 174)', blue: 'rgb(33, 133, 208)', violet: 'rgb(99, 53, 201)', purple: 'rgb(163, 50, 200)', pink: 'rgb(222, 59, 152)'};
-    theWallGraphicTemplate = theWallGraphicTemplate.concat('<div style="display: flex; justify-content: center; width: 100%; height: auto; background: white;"><div style="margin: 20px 20px 20px 60px; display: grid; grid-template-columns: repeat(20, 25px); grid-template-rows: repeat(25, 15px);">');
+    theWallGraphicTemplate += '<div id="wall-view">' 
+        + '<div id="wall-view__graphic">';
     var tagName;
-    console.timeLog('wall');
-    console.log('starting for loop');
-    console.log('total bricks:' + totalBricks);
     for(var i = 0; i < totalBricks; i++) {
         var color;
         if(i < unusedBricks) {
@@ -131,110 +143,154 @@ views.displayTheWall = async function displayTheWall() {
                 tagName = tagsObj[keys[keyIndex]].name;
             }
         }
-        theWallGraphicTemplate = theWallGraphicTemplate.concat('<div ');
+        theWallGraphicTemplate += '<div ';
         //If there's no tag name, no popup will be shown
         if(tagName != null) {
-            theWallGraphicTemplate = theWallGraphicTemplate.concat('data-html="' + tagName + '" class="popup wall tag id' + keys[keyIndex] + '"');
+            theWallGraphicTemplate += 'data-html="' + tagName + '" class="popup wall brick id' + keys[keyIndex] + '"';
         }
         else {
-            theWallGraphicTemplate = theWallGraphicTemplate.concat('class="popup wall tag unused"');
+            theWallGraphicTemplate += 'class="popup wall brick unused"';
         }
-        theWallGraphicTemplate = theWallGraphicTemplate.concat('style="background: ' + color + '; border: 1px solid #FFF; border-radius: 0px;"></div>');
+        theWallGraphicTemplate += 'style="background: ' + color + ';"></div>';
     }
-    console.timeLog('wall');
-    console.log('starting right pane template');
+    var rightPaneTemplate = await getWallRightPaneTemplate(normalizedTags);
+    
+    theWallGraphicTemplate += '</div>';
+    theWallGraphicTemplate += rightPaneTemplate;
+    theWallGraphicTemplate += '</div>';
+    theWallGraphicTemplate += ''; 
+    mainPanelsElem.html(theWallGraphicTemplate);    
+    //Set popups to all bricks. 
+    //This block needs to be optimized, takes almost 2s 
+    $('.popup.wall.brick').popup({
+        preserve: true
+    });
+    //Set popups to stats
+    $('.popup.stat').popup();    
+    //Dim all bricks of same ID on hover
+    $('.popup.wall.brick').on('mouseover', (elem) => {
+        //Get 'id' class of that brick, in order to select all bricks with same id 
+        var idClass;
+        var classList = elem.target.classList;
+        for(var classValue of classList) {
+            if(classValue.startsWith('id')) {
+                idClass = classValue;
+                break;
+            }
+        }
+        $('.popup.wall.brick.' + idClass).addClass('active-tags');
+    });
+    $('.popup.wall.brick').on('mouseout', (elem) => {
+        //Get 'id' class of that brick, in order to select all bricks with same id 
+        var idClass;
+        var classList = elem.target.classList;
+        for(var classValue of classList) {
+            if(classValue.startsWith('id')) {
+                idClass = classValue;
+                break;
+            }
+        }
+        $('.popup.wall.brick.' + idClass).removeClass('active-tags');
+    });
+};
+
+async function getWallRightPaneTemplate(normalizedTags) {
     var rightPaneTemplate = '<div id="the-wall__right-pane">';
     var oldestTask = await dataAccess.getOldestTask();
     var oldestTaskDate = new Date(oldestTask.created_at);
     var currentDate = new Date();
 
+    var oneMonthElapsed = oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth();
+    var oneWeekElapsed = oneMonthElapsed || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1);
+
     var weightageByTime = await getWeightageByTime();
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Weekly points</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    //Show popup with week only if a week has elapsed
-    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth() || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1)) {
-        rightPaneTemplate = rightPaneTemplate.concat('<div class="stat popup" data-position="left center" data-html=\'<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.lastWeekWeightage + '</div>last week</div>\'>');
+    //Pane container with Weekly and Monthly points
+    rightPaneTemplate += '<div class="right-pane__container">';
+    //Weekly points
+    rightPaneTemplate += '<div class="right-pane__stat-title">Weekly points</div>';
+    rightPaneTemplate += '<div class="right-pane__stat">';
+    if (oneWeekElapsed) {
+        //Show last week as a popup if present
+        rightPaneTemplate += '<div class="stat popup" data-position="left center" ' 
+            + 'data-html=\'<div class="ui tiny horizontal black label">' 
+            + '<div class="ui tiny horizontal white label">' + weightageByTime.lastWeekWeightage + '</div>' 
+            + 'last week</div>\'>';
     }
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.currentWeekWeightage + '</div>this week</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
-    //Close only if week popup was shown
-    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth() || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1)) {
-        rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate += '<div class="ui tiny horizontal black label">' 
+        + '<div class="ui tiny horizontal white label">' + weightageByTime.currentWeekWeightage + '</div>' 
+        + 'this week</div>'
+        + '</div>';
+    if (oneWeekElapsed) {
+        rightPaneTemplate += '</div>';
     }
 
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Monthly points</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    //Show popup only if a month has elapsed
-    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth()) {
-        rightPaneTemplate = rightPaneTemplate.concat('<div class="stat popup" data-position="left center" data-html=\'<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.lastMonthWeightage + '</div>last month</div>\'>');
+    //Monthly points
+    rightPaneTemplate += '<div class="right-pane__stat-title">Monthly points</div>';
+    rightPaneTemplate += '<div class="right-pane__stat">';
+    if (oneMonthElapsed) {
+        //Show last month as a popup if present
+        rightPaneTemplate += '<div class="stat popup" data-position="left center"' 
+            + 'data-html=\'<div class="ui tiny horizontal black label">' 
+            + '<div class="ui tiny horizontal white label">' + weightageByTime.lastMonthWeightage + '</div>' 
+            + 'last month</div>\'>';
     }
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + weightageByTime.currentMonthWeightage + '</div>this month</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
-    //Close only if month popup was shown
-    if (oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth()) {
-        rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate += '<div class="ui tiny horizontal black label">' 
+        + '<div class="ui tiny horizontal white label">' + weightageByTime.currentMonthWeightage + '</div>' 
+        + 'this month</div>';
+    rightPaneTemplate += '</div>';
+    if (oneMonthElapsed) {
+        rightPaneTemplate += '</div>';
     }
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate += '</div>';
 
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__container">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Highest Tag</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="stat popup" data-position="left center" data-html=\'<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + normalizedTags.maxTag.weightage + '</div>points</div>\'>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="ui small horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    //Pane container with Highest Tag
+    rightPaneTemplate += '<div class="right-pane__container">';
+    rightPaneTemplate += '<div class="right-pane__stat-title">Highest Tag</div>';
+    rightPaneTemplate += '<div class="right-pane__stat">';
+    rightPaneTemplate += '<div class="stat popup" data-position="left center"' 
+        + ' data-html=\'<div class="ui tiny horizontal black label">' 
+        + '<div class="ui tiny horizontal white label">' + normalizedTags.maxTag.weightage + '</div>' 
+        + 'points</div>\'>';
+    rightPaneTemplate += '<div class="ui small horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>';
+    rightPaneTemplate += '</div>';
+    rightPaneTemplate += '</div>';
+    rightPaneTemplate += '</div>';
 
+    //Pane container with Longest Streaks
+    rightPaneTemplate += '<div class="right-pane__container">';
     var streakData = await getStreakData();
-    var longestStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreakTasks.length + '</div>tasks</div>'; 
-    longestStreakPopupData = longestStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreakPoints + '</div>points</div>');
-    var currentStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentTasks.length + '</div>tasks</div>'; 
-    currentStreakPopupData = currentStreakPopupData.concat('<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentPoints + '</div>points</div>');
-
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Longest Streak</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + longestStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreak + '</div>days</div></div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    //Longest Streak
+    var longestStreakPopupData = '<div class="ui tiny horizontal black label">' 
+        + '<div class="ui tiny horizontal white label">' + streakData.maxStreakTasks.length + '</div>' 
+        + 'tasks</div>'; 
+    longestStreakPopupData += '<div class="ui tiny horizontal black label">' 
+        + '<div class="ui tiny horizontal white label">' + streakData.maxStreakPoints + '</div>' 
+        + 'points</div>';
     
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat__title">Current Streak</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="right-pane__stat">');
-    rightPaneTemplate = rightPaneTemplate.concat('<div class="popup stat" data-html=\'' + currentStreakPopupData + '\' data-position="right center" data-variation="tiny"><div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentStreak + '</div>days</div></div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate += '<div class="right-pane__stat-title">Longest Streak</div>';
+    rightPaneTemplate += '<div class="right-pane__stat">';
+    rightPaneTemplate += '<div class="popup stat" data-html=\'' + longestStreakPopupData + '\' data-position="right center" data-variation="tiny">' 
+        + '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.maxStreak + '</div>' 
+        + 'days</div></div>';
+    rightPaneTemplate += '</div>';
+    
+    //Current Streak
+    var currentStreakPopupData = '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentTasks.length + '</div>tasks</div>'; 
+    currentStreakPopupData += '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentPoints + '</div>points</div>';
 
-    rightPaneTemplate = rightPaneTemplate.concat('</div>');
+    rightPaneTemplate += '<div class="right-pane__stat-title">Current Streak</div>';
+    rightPaneTemplate += '<div class="right-pane__stat">';
+    rightPaneTemplate += '<div class="popup stat" data-html=\'' + currentStreakPopupData + '\' data-position="right center" data-variation="tiny">' 
+        + '<div class="ui tiny horizontal black label"><div class="ui tiny horizontal white label">' + streakData.currentStreak + '</div>' 
+        + 'days</div></div>';
+    rightPaneTemplate += '</div>';
+    rightPaneTemplate += '</div>';
 
-    theWallGraphicTemplate = theWallGraphicTemplate.concat('</div>');
-    theWallGraphicTemplate = theWallGraphicTemplate.concat(rightPaneTemplate);
-    theWallGraphicTemplate = theWallGraphicTemplate.concat('</div>');
-    theWallGraphicTemplate = theWallGraphicTemplate.concat('');
-    console.timeLog('wall');
-    console.log('going to set to html');
-    mainPanelsElem.html(theWallGraphicTemplate);
-    console.timeLog('wall');
-    console.log('completed set to html');
-    //Set popups to all bricks
-    $('.popup.wall.tag').popup({
-        preserve: true
-    });
-    //Set popups to stats
-    $('.popup.stat').popup();
-    console.timeLog('wall');
-    console.log('completed setting poups');
-    //Dim all bricks of same ID on hover
-    $('.popup.wall.tag').on('mouseover', (elem) => {
-        var idClass = elem.target.classList[3];
-        $('.popup.wall.tag.' + idClass).addClass('active-tags');
-    });
-    $('.popup.wall.tag').on('mouseout', (elem) => {
-        var idClass = elem.target.classList[3];
-        $('.popup.wall.tag.' + idClass).removeClass('active-tags');
-    });
-    console.timeEnd('wall');
-};
+    rightPaneTemplate += '</div>';
 
+    return rightPaneTemplate;
 
+}
 
 
 async function getStreakData() {
@@ -309,21 +365,23 @@ async function getWeightageByTime() {
  * Similarly, a tag with 10 weightage should become 5 weightage, etc.
  * 
  * totalUsedBricks is the total number of bricks mapped to tags after normalization.
- * 
- * Returns an object: {normalizedTags: <similarToInputObj>, totalUsedBricks: <n>}
+ * maxTag is the tag with most weightage WITHOUT normalization
  */
 var totalBricks = 500;
 async function processTags(tagsToWeightage) {
     var totalUsedBricks = 0;
     var weightagePerBrick = (await general.getTargetWeightage()) / totalBricks;
-
     var maxTag;
+    var maxWeightage = 0;
     for (var key in tagsToWeightage) {
+        if(tagsToWeightage[key].weightage > maxWeightage) {
+            maxWeightage = tagsToWeightage[key].weightage;
+        }
         tagsToWeightage[key].weightage = Math.floor(tagsToWeightage[key].weightage/weightagePerBrick);
         totalUsedBricks = totalUsedBricks + tagsToWeightage[key].weightage;
         if (maxTag == null || maxTag.weightage < tagsToWeightage[key].weightage) {
             maxTag = {id: key, name: tagsToWeightage[key].name, 
-                weightage: tagsToWeightage[key].weightage, color: tagsToWeightage[key].color};
+                weightage: maxWeightage, color: tagsToWeightage[key].color};
         }
     }
     var result = {normalizedTags: tagsToWeightage, totalUsedBricks: totalUsedBricks, maxTag: maxTag};
