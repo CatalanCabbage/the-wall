@@ -1,11 +1,9 @@
 # Build for all platforms
 image: 
-- electronuserland/builder:wine
+    - electronuserland/builder:wine
 artifacts:
-expire_in: 30 days
-paths:
-  - /dist/*.*
-before_script:
-- npm install
-script:
-- npm run build
+    paths:
+        - /dist/*.*
+install:
+    - npm install
+    - npm run build
