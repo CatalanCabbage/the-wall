@@ -15,7 +15,7 @@
     "postinstall": "electron-builder install-app-deps",
     "buildWin": "electron-builder build --win",
     "buildMac": "electron-builder build --mac tar.gz",
-    "build": "electron-builder build --mwl"
+    "build": "electron-builder build -mwl"
   },
   "build": {
     "appId": "cataxcab.thewall",
