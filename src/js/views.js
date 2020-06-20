@@ -4,8 +4,13 @@ module.exports = views;
 //Without the ../ it looks inside node_modules
 const dataAccess = require('./../js/dataAccess.js');
 const general = require('./../js/general.js'); 
+const about = require('./about.js');
 
 var mainPanelsElem = $('#main-panels');
+
+//Used in order to match Fomantic UI's colors
+var colorsRendered = {red: 'rgb(220, 40, 41)', orange: 'rgb(242, 113, 29)', yellow: 'rgb(253, 189, 4)', olive: 'rgb(181, 205, 23)', 
+    green: 'rgb(34, 186, 67)', teal: 'rgb(0, 181, 174)', blue: 'rgb(33, 133, 208)', violet: 'rgb(99, 53, 201)', purple: 'rgb(163, 50, 200)', pink: 'rgb(222, 59, 152)'};
 
 views.renderCardView = async function renderCardView() {
     var panelElements = '';
@@ -28,8 +33,8 @@ views.renderCardView = async function renderCardView() {
         var tagsTemplate = await getTagsTemplateForSection(sectionId, tagsForEachSection);
         
         //Complete Template for a card: Weightage, tags and section name
-        var panelTemplate = '<div class="panel ' + limitCardHeight + ' card" id="section' + sectionId + '">' +
-        '<div class="panel black ui statistic">' +
+        var panelTemplate = '<div class="main panel ' + limitCardHeight + ' card" id="section' + sectionId + '">' +
+        '<div class="panel ui statistic">' +
         '<div class="panel value">' + completedWeigtage + '</div>' +
         '<div class="panel label">' + tagsTemplate + '</div>' +
         '</div>' +
@@ -70,11 +75,7 @@ function showInitialContent() {
     var intialScreenTemplate = $('#initial-content').html();
     mainPanelsElem.html(intialScreenTemplate);
     $('.ui.about.button').click(function() {
-        $('.about.ui.modal').modal('show');
-    });
-    $('.about.popup').popup({
-        preserve: true,
-        hoverable: true
+        about.showAboutModal();
     });
 }
 
@@ -90,9 +91,9 @@ async function getTagsTemplateForSection (sectionId, tagsForEachSection) {
         var tagColor = tag.tag_color || '';
         //Hide extra tags if number of tags is more than tags to be shown
         if (numOfTags <= numOfTagsToBeShown) {
-            tagsTemplate += '<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>';
+            tagsTemplate += '<div class="ui tags horizontal label ' + tagColor + '">' + tag.tag_name + '</div>';
         } else {
-            extraTags += '<div class="ui tags ' + tagColor + ' horizontal label">' + tag.tag_name + '</div>';
+            extraTags += '<div class="ui tags horizontal label ' + tagColor + '">' + tag.tag_name + '</div>';
         }
     });
     if (numOfTags > numOfTagsToBeShown) {
@@ -117,16 +118,13 @@ views.renderWallView = async function renderWallView() {
     var keys = Object.keys(tagsObj);
     var numOfKeys = keys.length;
     var keyIndex = 0;
-    //Used in order to match Fomantic UI's colors
-    var colorsRendered = {red: 'rgb(220, 40, 41)', orange: 'rgb(242, 113, 29)', yellow: 'rgb(253, 189, 4)', olive: 'rgb(181, 205, 23)', 
-        green: 'rgb(34, 186, 67)', teal: 'rgb(0, 181, 174)', blue: 'rgb(33, 133, 208)', violet: 'rgb(99, 53, 201)', purple: 'rgb(163, 50, 200)', pink: 'rgb(222, 59, 152)'};
     theWallGraphicTemplate += '<div id="wall-view">' 
         + '<div id="wall-view__graphic">';
     var tagName;
     for(var i = 0; i < totalBricks; i++) {
         var color;
         if(i < unusedBricks) {
-            color = 'grey';
+            color = '';
         } else {
             if (tagsObj[keys[keyIndex]].weightage > 0) {
                 color = colorsRendered[tagsObj[keys[keyIndex]].color];
@@ -145,13 +143,13 @@ views.renderWallView = async function renderWallView() {
         }
         theWallGraphicTemplate += '<div ';
         //If there's no tag name, no popup will be shown
-        if(tagName != null) {
-            theWallGraphicTemplate += 'data-html="' + tagName + '" class="popup wall brick id' + keys[keyIndex] + '"';
+        if(tagName == null) {
+            theWallGraphicTemplate += 'class="popup wall brick unused" style="background: ' + color + ';"></div>';
         }
         else {
-            theWallGraphicTemplate += 'class="popup wall brick unused"';
+            //tagColor and tagName are used in popups
+            theWallGraphicTemplate += 'tagColor="' + color + '" tagName="' + tagName + '" class="popup wall brick id' + keys[keyIndex] + '" style="background: ' + color + ';"></div>';
         }
-        theWallGraphicTemplate += 'style="background: ' + color + ';"></div>';
     }
     var rightPaneTemplate = await getWallRightPaneTemplate(normalizedTags);
     
@@ -160,11 +158,6 @@ views.renderWallView = async function renderWallView() {
     theWallGraphicTemplate += '</div>';
     theWallGraphicTemplate += ''; 
     mainPanelsElem.html(theWallGraphicTemplate);    
-    //Set popups to all bricks. 
-    //This block needs to be optimized, takes almost 2s 
-    $('.popup.wall.brick').popup({
-        preserve: true
-    });
     //Set popups to stats
     $('.popup.stat').popup();    
     //Dim all bricks of same ID on hover
@@ -178,6 +171,12 @@ views.renderWallView = async function renderWallView() {
                 break;
             }
         }
+        if(idClass != null) {
+            var tagName = elem.target.attributes.tagName.value;
+            var tagColor = elem.target.attributes.tagColor.value;
+            console.log(tagColor);
+            $('#right-pane__active-tag').html('<div class="ui tags horizontal label" style="background: ' + tagColor + '; color: white; opacity: 0.8">' + tagName + '</div>');
+        }
         $('.popup.wall.brick.' + idClass).addClass('active-tags');
     });
     $('.popup.wall.brick').on('mouseout', (elem) => {
@@ -190,6 +189,7 @@ views.renderWallView = async function renderWallView() {
                 break;
             }
         }
+        $('#right-pane__active-tag').html('');
         $('.popup.wall.brick.' + idClass).removeClass('active-tags');
     });
 };
@@ -197,6 +197,9 @@ views.renderWallView = async function renderWallView() {
 async function getWallRightPaneTemplate(normalizedTags) {
     var rightPaneTemplate = '<div id="the-wall__right-pane">';
     var oldestTask = await dataAccess.getOldestTask();
+    if (oldestTask == null) {
+        return;
+    }
     var oldestTaskDate = new Date(oldestTask.created_at);
     var currentDate = new Date();
 
@@ -245,13 +248,13 @@ async function getWallRightPaneTemplate(normalizedTags) {
 
     //Pane container with Highest Tag
     rightPaneTemplate += '<div class="right-pane__container">';
-    rightPaneTemplate += '<div class="right-pane__stat-title">Highest Tag</div>';
+    rightPaneTemplate += '<div class="right-pane__stat-title">Highest Skill</div>';
     rightPaneTemplate += '<div class="right-pane__stat">';
     rightPaneTemplate += '<div class="stat popup" data-position="left center"' 
         + ' data-html=\'<div class="ui tiny horizontal black label">' 
         + '<div class="ui tiny horizontal white label">' + normalizedTags.maxTag.weightage + '</div>' 
         + 'points</div>\'>';
-    rightPaneTemplate += '<div class="ui small horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>';
+    rightPaneTemplate += '<div class="ui medium horizontal ' + normalizedTags.maxTag.color + ' label">' + normalizedTags.maxTag.name + '</div>';
     rightPaneTemplate += '</div>';
     rightPaneTemplate += '</div>';
     rightPaneTemplate += '</div>';
@@ -286,8 +289,11 @@ async function getWallRightPaneTemplate(normalizedTags) {
     rightPaneTemplate += '</div>';
     rightPaneTemplate += '</div>';
 
+    //Show current tag
+    rightPaneTemplate += '<div id="right-pane__active-tag" class="right-pane__container">';
     rightPaneTemplate += '</div>';
 
+    rightPaneTemplate += '</div>';
     return rightPaneTemplate;
 
 }
@@ -372,17 +378,13 @@ async function processTags(tagsToWeightage) {
     var totalUsedBricks = 0;
     var weightagePerBrick = (await general.getTargetWeightage()) / totalBricks;
     var maxTag;
-    var maxWeightage = 0;
     for (var key in tagsToWeightage) {
-        if(tagsToWeightage[key].weightage > maxWeightage) {
-            maxWeightage = tagsToWeightage[key].weightage;
+        if (maxTag == null || tagsToWeightage[key].weightage > maxTag.weightage) {
+            maxTag = {id: key, name: tagsToWeightage[key].name, 
+                weightage: tagsToWeightage[key].weightage, color: tagsToWeightage[key].color};
         }
         tagsToWeightage[key].weightage = Math.floor(tagsToWeightage[key].weightage/weightagePerBrick);
         totalUsedBricks = totalUsedBricks + tagsToWeightage[key].weightage;
-        if (maxTag == null || maxTag.weightage < tagsToWeightage[key].weightage) {
-            maxTag = {id: key, name: tagsToWeightage[key].name, 
-                weightage: maxWeightage, color: tagsToWeightage[key].color};
-        }
     }
     var result = {normalizedTags: tagsToWeightage, totalUsedBricks: totalUsedBricks, maxTag: maxTag};
     return result;

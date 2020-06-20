@@ -77,7 +77,7 @@
         <!--Add Tag modal-->
         <div class="tag ui tiny modal">
             <div class="header" style="text-align: center;">
-                Add new Tag
+                Add new Skill
             </div>
             <div class="content">
                 <div id="add-tag__message">
@@ -90,7 +90,7 @@
                 <div class="ui fluid buttons" id="add-tag__color">
                     <!--Added via JS-->
                 </div>
-                <div id="add-tag__preview" class="ui horizontal label">Sample tag</div>
+                <div id="add-tag__preview" class="ui horizontal label">Sample Skill</div>
                 </p>
             </div>
             <div class="actions">
@@ -98,13 +98,13 @@
                     Cancel
                 </div>
                 <div class="ui primary approve button">
-                    Save Tag
+                    Save Skill
                 </div>
             </div>
         </div>
 
         <div id="top-bar">
-            <div class="settings ui top left pointing dropdown button" id="top-bar__settings">
+            <div class="settings inverted ui top left pointing dropdown button" id="top-bar__settings">
                 <i><img src="../assets/burger.png" id="settings-btn" height="25px" width="25px"></img></i>
                 <div class="menu">
                     <div class="item">Settings</div>
@@ -113,28 +113,28 @@
                 </div>
             </div>
             <form id="top-bar__input-bar">
-                <select name="task" class="task-input task ui search dropdown" id="task-input__task">
+                <select name="task" class="task-input task inverted ui search dropdown" id="task-input__task">
                     <option value="">Task</option>
                 </select>
-                <select name="section" class="task-input section ui search dropdown" id="task-input__section">
-                    <option value="">Section</option>
+                <select name="section" class="task-input section inverted ui search dropdown" id="task-input__section">
+                    <option value="">Activity</option>
                 </select>
-                <select name="tags" class="task-input tags ui search dropdown" multiple="" id="task-input__tag">
-                    <option value="">Tags</option>
+                <select name="tags" class="task-input tags ui search inverted dropdown" multiple="" id="task-input__tag">
+                    <option value="">Skill</option>
                 </select>
                 <div class="task-input points ui input" id="task-input__points-container">
                     <input id="task-input__points" type="text" placeholder="Points">
                 </div>
-                <button id="task-submit-btn" class="ui button" type="button" autofocus>Submit</button>
+                <button id="task-submit-btn" class="ui inverted yellow basic button" type="button" autofocus>Submit</button>
             </form>
         </div>
 
         <!--Shown only when no content is present-->
         <div style="display: none;" id="initial-content">
             <div style="width: 100%; margin-top:100px; display:flex; flex-direction: column; align-items: center;">
-                <div style="text-align: center; font-size: 18px;">
+                <div style="text-align: center; font-size: 18px; color: rgb(219, 219, 219)">
                     Enter a task to get started!
-                    <br><i style="font-size: 15px"> Tip: Hover over the input boxes for some examples.</i>
+                    <br><i style="font-size: 14px; opacity: 0.8;"> Tip: Hover over the input boxes for some examples.</i>
                 </div>
                 <div>
                     <button id="about-button" style="text-align: center; font-size: 21px; margin:15px"
@@ -147,184 +147,188 @@
 
 
 
-        <div id="about-modal" class="about ui modal" style="width: 650px;">
-            <div class="header" style="text-align: center;">
-                The Wall
-            </div>
+        <div id="about-modal" class="about ui modal">
+            <div class="header" style="text-align: center;">The Wall</div> 
             <div class="content" id="about-modal_content">
-                <div id="about-modal__content__header" style="text-align: center;">
-                    <div class="about popup" data-position="bottom center" data-variation="tiny"
-                        data-html='<div style="">me: CatalanCabbage<br>also me: tall, glasses, tee<br>like: code, barca, coke(liquid kind)<br>catalancabbage@zoho.com</div>'>
-                        Davis Jeffrey</div>
-                    <i style="font-size: 12px;">powered by ElectronJS</i>
+                <div id="about-modal__content__header" class="center-text">
+                    <div class="about popup" data-position="bottom center" data-variation="tiny" data-html="me: CatalanCabbage<br>contact: catalancabbage@zoho.com<br>also me: tall, glasses, tee<br>like: code, barca, coke(liquid kind)">
+                        Davis Jeffrey
+                    </div>
+                  <i style="font-size: 12px;">powered by ElectronJS</i>
                 </div>
-                <div id="about-modal__content__body" style="width: 550px; margin: 20px auto;">
-                    <div class="ui small message question"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-right: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                <div id="about-modal__content__body">
+
+                    <div class="ui small message question">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
-                                Curious cat
+                        <div class="question-content">
+                            <div class="about-content-text">
+                                <p>What does The Wall do?</p>
                             </div>
-                            <p>What does The Wall do?</p>
+                            <div class="sender">Curious cat</div>
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
-                                Humpty
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                <p>It tracks your progress over time across various skills</p>
                             </div>
-                            <p>It tracks your progress over time across various fields or skills!</p>
+                            <div class="sender">Humpty</div>
                         </div>
                     </div>
 
-                    <div class="ui small message question"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-right: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message question">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
-                                Curious cat <span class="metadata" style="font-size: smaller; color: gray;">(life 8
-                                    of 9)</span>
+                        <div class="question-content">
+                            <div class="about-content-text">
+                                <p>How does it do that?</p>
                             </div>
-                            <p>How does it do that?</p>
+                            <div class="sender">
+                                Curious cat <span class="metadata">(life 8 of 9)</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                You enter points for each task you complete. Later, you can view total points and set
+                                targets to achieve too!
+                            </div>
+                            <div class="sender">
                                 Dumpty
                             </div>
-                            You enter points for each task completed. Later, you can view total points and set
-                            targets to achieve too!
                         </div>
                     </div>
 
-                    <div class="ui small message question"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-right: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message question">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="question-content">
+                            <div class="about-content-text">
+                                <p>Points?! What are you, five? <i>*sniggers*</i>
+                                <br>Heard of the 10,000 hour rule?</p>
+                            </div>
+                            <div class="sender">
                                 Mocking Bird
                             </div>
-                            <p>Points?! What are you, five? <i>*sniggers*</i>
-                                <br>Do you even know the 10,000 hour rule?</p>
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                This takes inspiration from the 10,000 hour rule.
+                                <br>However, hours don't factor in the importance of the task; you are the best judge of how much value(~points) a task brings to you!
+                            </div>
+                            <div class="sender">
                                 Humpty
                             </div>
-                            More than the time itself - how difficult or important was what you just did in that
-                            time?
-                            <br>You are the best judge of how much value an activity brings to you!
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                10,000 hours isn't a checklist either; the journey is what matters, which is why this exists - to keep you going!
+                            </div>
+                            <div class="sender">
                                 Dumpty
                             </div>
-                            Also if that's your thing, set your target at 10,000 points, and you're good to go with
-                            the 10,000-hour rule!
                         </div>
                     </div>
 
-                    <div class="ui small message question"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-right: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+
+                    <div class="ui small message question">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="question-content">
+                            <div class="about-content-text">
+                                <p>But Task, Activity, Skill: What's what?!</p>
+                            </div>
+                            <div class="sender">
                                 Bamboozled doggo
                             </div>
-                            <p>But Task, Section, Tag: How do I even decide?!</p>
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                Task is specifically what you did,<br>
+                                Activity is: If you did two similar tasks, how would you <u>group them
+                                    together</u>?
+                                <br> 
+                                Skills are what it makes you better at.
+                                <br> <i style="font-size: 11px;">Tip: Hover over inputs on the main screen for examples!</i>
+                            </div>
+                            <div class="sender">
                                 Humpty
                             </div>
-                            <b>Task:</b> Specific activity that you did
-                            <br> <b>Section:</b> If you did two similar tasks, how would you <u>group them
-                                together</u>?
-                            <br> <b>Tags:</b> Broad <u>skills in which your experience has grown</u> by doing the
-                            task.
-                            <br> <i>Tip: Hover over inputs on the main screen for examples!</i>
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                For example, if you learnt an algorithm while taking a Java x coding course: 
+                                <br><i>Learnt an algorithm</i> is the task, <i>x coding course</i> is the activity, and <i>Java</i> and <i>Algorithms</i> are the skills.  
+                            </div>
+                            <div class="sender">
                                 Dumpty
                             </div>
-                            <i>By design, we prioritize tags in reports!</i>
-                            <br>Reading an article <i>(task)</i> about Flexbox <i>(section)</i> makes you better at
-                            UI and CSS <i>(tags)</i>.
-                            <br>Looking back, growth in UI and CSS seem to be more relevant than Flexbox.
                         </div>
                     </div>
 
-                    <div class="ui small message question"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-right: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message question">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="question-content">
+                            <div class="about-content-text">
+                                "We’re going to build a wall, folks. We’re going to build a wall.
+                                <br>We’re going to build it. Don’t worry. We’re going to build a wall.
+                                <br>That wall will go up so fast your head will spin."
+                            </div>
+                            <div class="sender">
                                 Trum Pet
                             </div>
-                            "We’re going to build a wall, folks. We’re going to build a wall.
-                            <br>We’re going to build it. Don’t worry. We’re going to build a wall.
-                            <br>That wall will go up so fast your head will spin."
                         </div>
                     </div>
-                    <div class="ui small message reply"
-                        style="box-shadow: none; display: flex; flex-direction: row; margin-left: 100px;">
-                        <div style="display: inline-block;">
-                            <img src="../assets/burger.png" style="width: 30px; height: 30px; margin-right: 10px;">
+                    <div class="ui small message reply">
+                        <div class="about-avatar-container">
+                            <img src="../assets/burger.png" class="about-avatar">
                         </div>
-                        <div style="display: inline-block;">
-                            <div class="header">
+                        <div class="reply-content">
+                            <div class="about-content-text">
+                                well yes, but actually...no .-.
+                            </div>
+                            <div class="sender">
                                 Humpty
                             </div>
-                            well yes, but actually...no .-.
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="header" style="text-align: center; font-size: smaller; opacity: 0.6;">catalancabbage@zoho.com</div> 
         </div>
         <div id="main-panels" class="ui cards">
             <!--Added via JS-->

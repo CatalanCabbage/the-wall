@@ -1,3 +1,22 @@
+:root {
+    --background: #121212;
+    --general-font: rgb(219, 219, 219);
+    --wall-view: #303030;
+    --wall-graphic: #121212;
+    --brick-border: #121212;
+    --brick-unused: #121212;
+    --card: #222222;
+    --card-weightage: rgb(219, 219, 219);
+    --card-section: rgb(219, 219, 219);
+}
+
+body ::-webkit-scrollbar-track {
+    background: rgba(70, 69, 69, 0.15);
+}
+body ::-webkit-scrollbar-thumb {
+    background: rgba(74, 74, 74, 0.25);
+}
+
 /* CardsView */
 #main-panels {
     overflow-y: auto;
@@ -14,48 +33,85 @@
     margin-left: 10px;
     display: flex;
 }
-.panel.card{
-    color: black !important;
-    background-color: white !important;
+.main.panel.card {
+    background-color: var(--card);
+    box-shadow: 5px 5px 10px #070707, -5px -5px 10px #222222;
+}
+.panel.statistic {
+    margin-bottom: 0px;
+}
+.panel.value {
+    margin: 10px auto;
+    color: var(--card-weightage) !important;
+}
+.panel.content {
+    text-align: center;
+    color: var(--card-section);
+    font-size: 16px !important;
+    padding: 0px 1em 1em !important;
 }
 .panel.card.card--small {
     height: 135px;
 }
-.panel.content {
-    text-align: center;
-}
-.panel.value {
-    margin: 10px auto;
-}
 .panel.label {
     margin: 3px 1px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /* WallView */
 #wall-view {
     display: flex; 
-    justify-content: center; 
+    justify-content: flex-end; 
     width: 100%; 
     height: auto; 
-    background: white;
+    background: var(--wall-view);
+    padding: 10px 0px;
+    border-radius: 5px;
+    box-shadow: inset 10px 10px 60px #292929, inset -10px -10px 61px #373737;
 }
 #wall-view__graphic {
-    margin: 20px 20px 20px 60px; 
     display: grid; 
-    grid-template-columns: repeat(20, 25px); 
-    grid-template-rows: repeat(25, 15px);
+    grid-template-columns: repeat(20, 29px); 
+    grid-template-rows: repeat(25, 16px);
+    background: var(--wall-graphic);
+    border-radius: 5px;
+    box-shadow: 5px 5px 10px #202020, -5px -5px 10px #1d1d1d;
 }
-#wall-right-pane {
+#the-wall__right-pane {
+    color: var(--general-font);
+    width: 18%;
     display: flexbox;
     flex-direction: column;
+    margin-top: 50px;
+}
+.right-pane__container {
+    margin: 5px auto;
+}
+.right-pane__stat-title {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 3px;
+}
+.right-pane__stat {
+    text-align: center;
+}
+#right-pane__active-tag {
+    display: flex;
+    margin-top: 55%;
+    justify-content: center;
+}
+.ui.popup {
+    background-color: var(--wall-view) !important;
+    color: white !important;
 }
 .wall.brick {
-    border: 1px solid #FFF; 
-    border-radius: 0px;
+    border: 1px solid var(--brick-border);
+    border-radius: 5px;
 }
 .wall.brick.unused {
     border: 0px !important;
+    border-radius: 0px;
+    background: var(--brick-unused);
 }
 .wall.brick.active-tags {
     opacity: 80%;

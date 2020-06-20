@@ -15,6 +15,7 @@ $('.task-input.ui.dropdown')
 headerFooter.initEventListeners = function initEventListeners() {
     //Inputs 
     $('#task-submit-btn').on('click', () => {
+        setPreExistingInputs(); //Special case, check function
         addTask();
     });
     $('#task-input__points').on('focusout', () => {
@@ -37,7 +38,7 @@ async function addTask() {
     }
     let points = parseInt(pointsInp[0].value);
 
-    //Add Section. 
+    //Add Section
     let sectionId = sectionNameInp.dropdown('get value');
     //In dropdown, value == id and text == name. If text == value, it's mostly a new addition.
     if (sectionNameInp.dropdown('get text') == sectionNameInp.dropdown('get value')) {
@@ -66,13 +67,14 @@ async function addTask() {
     inputTags.forEach(tagId => { //Form object to be inserted
         taskTagRel.push({tag_id: tagId, task_id: taskId});
     });
-    dataAccess.addMultipleTaskTagRel(taskTagRel);
+    await dataAccess.addMultipleTaskTagRel(taskTagRel);
     //Clear inputs
     $('.task-input.ui.search.dropdown').dropdown('restore defaults');
-    pointsInp.value = '';
+    pointsInp[0].value = '';
 
     //Regenerate rendered data
     views.renderCardView(); //Update main panels
+    views.renderWallView();
     headerFooter.populateInputsDropdown(); //Update dropdown
     headerFooter.generateProgressBar();
 
@@ -157,12 +159,11 @@ headerFooter.handleAddNewTag =  function handleAddNewTag() {
     $('.tag.ui.modal')
         .modal({
             onApprove: function() {
-                console.log('cleared');
                 //Add Tag with Description
                 saveNewTag().then((res) => {
                     //The modal closes on input, before the value of this function is returned.
                     //Changing onApprove fn to async doesn't work either.
-                    //Hence, keep the modal open by default, and close it on success masage 
+                    //Hence, keep the modal open by default, and close it on success message 
                     if (res == true) {
                         $('.tag.ui.modal').modal('hide');
                     }
@@ -192,16 +193,34 @@ headerFooter.handleAddNewTag =  function handleAddNewTag() {
     var colorButtonsTemplate = '';
     var colorsEnum = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink'];
     colorsEnum.forEach((color) => {
-        colorButtonsTemplate = colorButtonsTemplate.concat('<button class="ui ' + color + ' tags color button" onclick="setPreviewTagColor(\'' + color + '\')"></button>');
+        colorButtonsTemplate += '<button class="ui ' + color + ' tags color button" color="' + color + '"></button>';
     });
     tagColorContainer.html(colorButtonsTemplate);
+    $('.ui.tags.color.button').on('click', (event) => {
+        setPreviewTagColor(event.currentTarget.attributes.color.value);
+    });
 };
+
+//There's a bug where on saving a Tag, previous 'values' in dropdowns like task, section etc 
+//are cleared internally, but are shown in the UI.
+//Hence, take that text if present and set it as current value and text.
+function setPreExistingInputs() {
+    var taskElem = $('#task-input__task');
+    var sectionElem = $('#task-input__section');
+
+    var initialTaskValue = $('.task-input.task .text').text();
+    var initialSectionValue = $('.task-input.section .text').text();
+    
+    taskElem.dropdown('set text', initialTaskValue);
+    taskElem.dropdown('set value', initialTaskValue);
+    sectionElem.dropdown('set text', initialSectionValue);
+    sectionElem.dropdown('set value', initialSectionValue);
+}
 
 var previewTagColor = '';
 
 function setPreviewTagColor(color) {
     //Remove previous color class if any, and add new color class
-    console.log('Previous color = ' + previewTagColor + ' new color = ' + color);
     var previewTagElem = $('#add-tag__preview');
     previewTagElem.removeClass(previewTagColor);
     previewTagColor = color;
@@ -213,7 +232,6 @@ async function saveNewTag() {
     //Save tag    
     let tagNameInp = $('#add-tag__name');
     let tagName = tagNameInp[0].value.trim();
-    console.log(tagName + ', color: ' + previewTagColor);
     //Validate Tags
     if (tagName == '') {
         general.showToast('Tag name cannot be empty', 'red');
@@ -239,13 +257,13 @@ async function saveNewTag() {
     return true;
 }
 
-
+var valueOfAddSkillDropdown = 'Add new Skill';
 
 //Populate dropdown entries for inputs, such as Section and Tasks
 headerFooter.populateInputsDropdown = async function populateInputsDropdown() {
     //Get Sections
     let sections = await dataAccess.getSections();
-    var sectionsTemplate = '<option value="">Section</option>';
+    var sectionsTemplate = '<option value="">Activity</option>';
     sections.forEach(section => {
         sectionsTemplate = sectionsTemplate.concat('<option value="' + section.id + '">' + section.name + '</option>');
     });
@@ -266,11 +284,11 @@ headerFooter.populateInputsDropdown = async function populateInputsDropdown() {
 
     //Get Tags
     let tags = await dataAccess.getTags();
-    var tagsTemplate = '<option value="">Task</option>';
+    var tagsTemplate = '<option value="">Skill</option>';
     for (var tagId in tags) {
         tagsTemplate = tagsTemplate.concat('<option value="' + tagId + '">' + tags[tagId].name + '</option>');
     }
-    tagsTemplate = tagsTemplate.concat('<option value="Add new Tag"><b>Add Tag</b></option>');
+    tagsTemplate = tagsTemplate.concat('<option value="' + valueOfAddSkillDropdown + '"><b>Add Skill</b></option>');
     //Populate Tags Dropdown
     let tagNameInp = $('#task-input__tag');
     tagNameInp.html(tagsTemplate);
@@ -353,11 +371,10 @@ $('.task-input.tags.ui.dropdown')
             noResults: 'No tags found'
         },
         onChange: async function(value) {
-            if (value == 'Add new Tag' || (Array.isArray(value) && value.includes('Add new Tag'))) {
+            if (value == valueOfAddSkillDropdown || (Array.isArray(value) && value.includes(valueOfAddSkillDropdown))) {
                 await headerFooter.handleAddNewTag();
                 $('.task-input.tags.ui.search.dropdown').dropdown('restore defaults');
             }
-            console.log('Tag value ' + value);
         }
     });
 

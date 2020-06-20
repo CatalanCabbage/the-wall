@@ -4,7 +4,6 @@ body {
     height: 100% !important; /*Added !important since about-modal sets a different value when activated*/
     left: 0px;
     top: 0px;
-    background: #29B6F6;
     overflow: hidden;
     margin:0;
     padding:0;
@@ -13,12 +12,15 @@ main {
     padding: 40px 40px;
     display: grid;
     grid-template-rows: 1fr 9fr;
-    background: #727070;
+    background: var(--background);
     height: 100%;
     width: 100%;
 }
 .force-hide {
     display: none !important;
+}
+.center-text {
+    text-align: center;
 }
 
 /* Title bar*/
@@ -81,6 +83,7 @@ main {
     position: absolute;
     padding: 5px;
     margin-top: 20px;
+    background-color: #2d2d2d;
 }
 #top-bar__input-bar {
     flex: 3;
@@ -109,7 +112,14 @@ main {
     max-height: 20%;
 }
 #task-input__points-container {
+    color: white;
     width: 15%;
+}
+#task-input__points {
+    background: #1b1c1d;
+    border-color: rgba(255, 255, 255, 0.15);
+    height: 38px;
+    color: white;
 }
 #add-tag__color {
     margin: 10px auto auto -5px;
@@ -147,14 +157,23 @@ main {
 #footer-progress {
     margin: 35px -25px auto -25px;
 }
+#footer-progress__label {
+    color: var(--general-font);
+}
 
 /* Settings */
-
+.settings.dropdown.button {
+    box-shadow: none;
+}
+.settings.dropdown.button:hover {
+    box-shadow: 0 0 0 2px #454545 inset;
+}
 #settings__content {
     display: grid;
     margin-left: 0px;
     grid-template-columns: auto auto auto 100px;
     grid-template-rows: auto auto;
+    background: #f3f3f3;
 }
 #settings__update-checkbox-text {
     grid-column: 1/4;
@@ -177,4 +196,49 @@ main {
     margin-left: 10px;
     margin-block-start: auto;
     margin-block-end: auto;
+}
+
+/* About */
+#about-modal {
+    width: 650px;
+}
+#about-modal_content {
+    background: #cecece;
+}
+#about-modal__content__body {
+    width: 550px; 
+    margin: 20px auto;
+}
+.ui.message.question {
+    background: #fff;
+    box-shadow: none; 
+    display: flex; 
+    flex-direction: row; 
+    margin-right: 100px;
+}
+.ui.message.reply {
+    background: #fff;
+    box-shadow: none; 
+    display: flex; 
+    flex-direction: row; 
+    margin-left: 100px;
+}
+.about-avatar-container {
+    display: inline-block;
+}
+.about-avatar {
+    width: 30px; 
+    height: 30px; 
+    margin-right: 10px;
+}
+.question-content, .reply-content {
+    display: inline-block;
+}
+.about.metadata {
+    font-size: smaller; 
+    color: gray;
+}
+.sender {
+    font-size: 11px;
+    opacity: 0.7;
 }

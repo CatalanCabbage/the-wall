@@ -3,6 +3,7 @@ const remote = require('electron').remote;
 const views = require('./../js/views.js');
 const headerFooter = require('./../js/headerFooter.js');
 const general = require('./../js/general.js');
+const about = require('./../js/about.js');
 if (general.isDevEnv) { 
     //Added so that it can be tested from the console
     // eslint-disable-next-line no-unused-vars
@@ -101,11 +102,7 @@ function handleSettingsMenu(value) {
             handleSettingsModal();
             break;
         case 'about':
-            $('.about.ui.modal').modal('show');
-            $('.about.popup').popup({
-                preserve: true,
-                hoverable: true
-            });
+            about.showAboutModal();
             break;
     }
 }
