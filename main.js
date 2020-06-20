@@ -34,6 +34,8 @@ function createWindow() {
     });
 }
 
+app.commandLine.appendSwitch('disable-http2');
+
 //Introduce splash-screen to reduce jarring page load delay of main window
 var splashScreen;
 
@@ -88,6 +90,7 @@ app.on('activate', () => {
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = false;
 var releaseBranch = process.env.RELEASE_BRANCH || 'release';
+autoUpdater.requestHeaders = {'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'};
 console.log(releaseBranch);
 var url = 'http://gitlab.com/api/v4/projects/16527632/jobs/artifacts/' + releaseBranch + '/raw/dist?job=build';
 console.log(url);
