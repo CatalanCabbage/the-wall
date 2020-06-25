@@ -9,7 +9,6 @@ var maxWeightage = 100000;
 var totalTagsCount; 
 var targetWeightage;
 
-
 general.isDevEnv = async function isDevEnv() {
     let isDev = false;
     if (process.env.NODE_ENV === 'dev') {
@@ -22,12 +21,12 @@ general.isDevEnv = async function isDevEnv() {
  * Return target weightage from DB; if not in DB,
  * take current weightage's closest multiple of 100 as target and set it in DB too 
  */
-general.getTargetWeightage = async function getTargetWeightage() {
+general.getTargetWeightage = async function getTargetWeightage(regenerate) {
     var targetWeightage = parseInt(await dataAccess.getParam('targetWeightage'));
-    if (targetWeightage == null || isNaN(targetWeightage)) { //if not in DB, init and add to DB
+    //If regen key is present or value not in DB, init and add to DB
+    if (regenerate || targetWeightage == null || isNaN(targetWeightage)) { 
         var totalWeightage = parseInt(await dataAccess.getTotalWeightage());
         targetWeightage = totalWeightage + (maxWeightage-totalWeightage)%100;
-        console.log('NaN/null, so targetWeightage is: ' + targetWeightage);
         dataAccess.addParam({key: 'targetWeightage', value: targetWeightage});
     }
     return targetWeightage;
@@ -36,13 +35,13 @@ general.getTargetWeightage().then((targetWeightage) => {
     this.targetWeightage = targetWeightage;
 });
 
-general.setTargetWeightage = async function setTargetWeightage(targetWeightage) {
+function setTargetWeightage(targetWeightage) {
     var isValidParam = targetWeightage != null && !isNaN(targetWeightage);
     if (isValidParam) {
         dataAccess.addParam({key: 'targetWeightage', value: targetWeightage});
     }
     return isValidParam;
-};
+}
 
 /* Number of unique Tags in the DB; cache it when called the first time.
  * If param invalidate isn't null, invalidates cache
@@ -121,11 +120,11 @@ async function alwaysUpdate(inputFlag) {
 //If no, do nothing
 var errorMessageCount = 0;
 
-function checkForUpdates() {
+general.checkForUpdates = function checkForUpdates() {
     ipcRenderer.send('updater-action', 'checkForUpdates');
     errorMessageCount = 0;
-}
-checkForUpdates();
+};
+
 //Ask if you want to update with release notes when a new update is downloaded
 ipcRenderer.on('updater-action-response', (event, arg) => {
     if (arg[0] == 'updateDownloaded') {
@@ -188,7 +187,7 @@ general.saveSettings = function saveSettings() {
     var newTargetWeightage = parseInt(targetText[0].innerText);
 
     if(targetWeightage != newTargetWeightage) {
-        general.setTargetWeightage(newTargetWeightage);
+        setTargetWeightage(newTargetWeightage);
         targetWeightage = newTargetWeightage;
         //Reinit progressBar and Wall
         changesMade = true;

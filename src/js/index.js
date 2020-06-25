@@ -4,7 +4,7 @@ const views = require('./../js/views.js');
 const headerFooter = require('./../js/headerFooter.js');
 const general = require('./../js/general.js');
 const about = require('./../js/about.js');
-if (general.isDevEnv) { 
+if (general.isDevEnv()) { 
     //Added so that it can be tested from the console
     // eslint-disable-next-line no-unused-vars
     var dataAccess = require('./../js/dataAccess.js');
@@ -24,6 +24,9 @@ document.onreadystatechange = () => {
     if (document.readyState == 'complete') {
         handleTitleBarEvents();
         initEvents();
+        if(!general.isDevEnv()) {
+            general.checkForUpdates();
+        }
     }
 };
 

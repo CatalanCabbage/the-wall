@@ -174,7 +174,6 @@ views.renderWallView = async function renderWallView() {
         if(idClass != null) {
             var tagName = elem.target.attributes.tagName.value;
             var tagColor = elem.target.attributes.tagColor.value;
-            console.log(tagColor);
             $('#right-pane__active-tag').html('<div class="ui tags horizontal label" style="background: ' + tagColor + '; color: white; opacity: 0.8">' + tagName + '</div>');
         }
         $('.popup.wall.brick.' + idClass).addClass('active-tags');
@@ -204,7 +203,7 @@ async function getWallRightPaneTemplate(normalizedTags) {
     var currentDate = new Date();
 
     var oneMonthElapsed = oldestTaskDate.getFullYear() < currentDate.getFullYear() || oldestTaskDate.getMonth() < currentDate.getMonth();
-    var oneWeekElapsed = oneMonthElapsed || oldestTaskDate.getDate() > (currentDate.getDate() - currentDate.getDay() + currentDate.getDay() === 0? -6 : 1);
+    var oneWeekElapsed = oneMonthElapsed || (oldestTaskDate.getDate() < ((currentDate.getDate()) - (currentDate.getDay() + currentDate.getDay() === 0? -6 : 1)));
 
     var weightageByTime = await getWeightageByTime();
     //Pane container with Weekly and Monthly points

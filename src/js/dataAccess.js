@@ -117,6 +117,10 @@ const TaskTagRel = sequelize.define('task_tag_rel', {
     await sequelize.sync();
 })();
 
+//Force deletion of ALL user data
+dataAccess.deleteAllData = async function deleteAllData() {
+    sequelize.sync({force: true});
+};
 
 //DataAccess for AppParams start---------------------------------------------------------------------------------------------
 dataAccess.addParam = async function addParam(param) {
@@ -571,6 +575,19 @@ dataAccess.getTask = async function getTask(taskId) {
 };
 
 /**
+ * Gets number of tasks
+ */
+dataAccess.getTasksCount = async function getTasksCount() {
+    var tasksCountResult = await sequelize.query('select * from tasks', 
+        {type: QueryTypes.SELECT}
+    );
+    var tasksCount = parseInt(tasksCountResult);
+    tasksCount = isNaN(tasksCount) ? 0 : tasksCount; 
+    console.log(tasksCount);
+    return tasksCount; 
+};
+
+/**
  * Gets all entries from Task table
  * @return Promise
  * @param taskId
@@ -778,8 +795,7 @@ dataAccess.addMultipleTaskTagRel = async function addMultipleTaskTagRel(taskTagR
         taskTagRelDetails,
         {fields: ['task_id', 'tag_id'], ignoreDuplicates: true}
     )
-        .then((res) => {
-            console.log(res);
+        .then(() => {
             return true;
         })
         .catch(err => {

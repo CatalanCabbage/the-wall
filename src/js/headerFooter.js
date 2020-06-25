@@ -72,6 +72,12 @@ async function addTask() {
     $('.task-input.ui.search.dropdown').dropdown('restore defaults');
     pointsInp[0].value = '';
 
+    //Check that points doesn't exceed target
+    var totalWeightage = await dataAccess.getTotalWeightage();
+    var targetWeightage = await general.getTargetWeightage();
+    if (totalWeightage > targetWeightage) {
+        targetWeightage = await general.getTargetWeightage(true);
+    }
     //Regenerate rendered data
     views.renderCardView(); //Update main panels
     views.renderWallView();
@@ -85,13 +91,15 @@ function isValidInput() {
     var valid = true;
     let taskNameInp = document.getElementById('task-input__task');
     let sectionNameInp = document.getElementById('task-input__section');
+    let tagsInp = document.getElementById('task-input__tag');
     let pointsInp = document.getElementById('task-input__points');
 
     let taskNameInpValue = taskNameInp.value.trim();
     let sectionNameInpValue = sectionNameInp.value.trim();
+    let tagsInpValue = tagsInp.value.trim();
     let pointsInpValue = pointsInp.value.trim();
     //Check empty
-    if (taskNameInpValue == '' || sectionNameInpValue == '' || pointsInpValue == '') {
+    if (taskNameInpValue == '' || sectionNameInpValue == '' || pointsInpValue == '' || tagsInpValue == '') {
         valid = false;
     }
     if (!valid) {
