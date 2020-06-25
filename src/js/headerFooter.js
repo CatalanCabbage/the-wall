@@ -4,7 +4,7 @@ module.exports = headerFooter;
 //Consists of functionality like header Input bar, footer Progress bar, etc. 
 const dataAccess = require('./../js/dataAccess.js'); 
 const general = require('./../js/general.js'); 
-const views = require('./../js/views.js'); 
+const views = require('./../js/views.js');
 
 //Input dropdown: Task and section
 $('.task-input.ui.dropdown')
@@ -85,7 +85,17 @@ async function addTask() {
     headerFooter.generateProgressBar();
 
     general.showToast('Task ' + taskName + ' added with ' + points + ' points!', 'green');
+    //Wall View prompt is shown after the first task is added, till Wall view is clicked for the first time
+    var wallPromptShown = await dataAccess.getParam('wallPromptShown');
+    if (!wallPromptShown) {
+        var totalTasksCount = await dataAccess.getTasksCount();
+        if (totalTasksCount > 0) {
+            general.showWallViewPrompt();
+        }
+    }
 }
+
+
 
 function isValidInput() {
     var valid = true;
@@ -262,6 +272,7 @@ async function saveNewTag() {
     //Regenerate tags dropdown options 
     headerFooter.populateInputsDropdown();
     general.showToast('Tag <b>' + tagName + '</b> added', 'green');
+    general.getTotalTagsCount(true);
     return true;
 }
 

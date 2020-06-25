@@ -42,17 +42,38 @@ window.onbeforeunload = () => {
 async function initEvents() {
     headerFooter.initEventListeners();
     
+    var wallPromptShown = false;
     //Rendering
     views.renderCardView();
+    views.renderWallView();
     headerFooter.populateInputsDropdown();
     headerFooter.generateProgressBar();
 
-    views.renderWallView();
     var theWallElem = $('#the-wall');
     var mainPanelsElem = $('#main-panels');
     theWallElem.addClass('force-hide');
 
-    document.getElementById('title-bar__title').addEventListener('click', () => {
+    //Wall View prompt is shown after the first task is added, till Wall view is clicked for the first time
+    wallPromptShown = await dataAccess.getParam('wallPromptShown');
+    if (!wallPromptShown) {
+        var totalTasksCount = await dataAccess.getTasksCount();
+        if (totalTasksCount > 0) {
+            general.showWallViewPrompt();
+        }
+    }
+
+    document.getElementById('title-bar__title').addEventListener('click', async () => {
+        //No need to show other views if no data is populated
+        var isTasksEmpty = (await dataAccess.getTasksCount()) == 0;
+        if(isTasksEmpty) {
+            return;
+        }
+        //Hide Wall prompt if not already hidden
+        if (!wallPromptShown) {
+            general.hideWallViewPrompt();
+            dataAccess.addParam({key: 'wallPromptShown', value: true});
+            wallPromptShown = true;
+        }
         switch (currentPanel) {
             case 'cards':
                 theWallElem.removeClass('force-hide');

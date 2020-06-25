@@ -71,6 +71,27 @@ general.showToast = function showToast(message, color) {
         });
 };
 
+//A new user won't know they have to click on the title to get The Wall view
+//So add a blinking text to draw attention;
+//shown after the user adds a task till the user clicks the title once
+var wallPromptIntervalControl;
+general.showWallViewPrompt = function showWallViewPrompt() {
+    $('#title-bar__title__blink').html('&nbsp;<i style="font-size: 12px; color: rgb(253, 189, 4)"> Click me!</i>');
+    var blink_speed = 500;
+    wallPromptIntervalControl = setInterval(function () {
+        var ele = document.getElementById('title-bar__title__blink');
+        ele.style.opacity = (ele.style.opacity == '0.6' ? '' : '0.6');
+    }, blink_speed);
+};
+
+general.hideWallViewPrompt = function hideWallViewPrompt() {
+    if(wallPromptIntervalControl == null) { //It isn't shown
+        return;
+    }
+    $('#title-bar__title__blink').html('');
+    clearInterval(wallPromptIntervalControl);
+    dataAccess.addParam({key: 'wallPromptShown', value: true}); //Prevent it from being shown again
+};
 
 //Handle updates
 //Update available popup

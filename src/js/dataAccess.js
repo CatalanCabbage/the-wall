@@ -578,12 +578,12 @@ dataAccess.getTask = async function getTask(taskId) {
  * Gets number of tasks
  */
 dataAccess.getTasksCount = async function getTasksCount() {
-    var tasksCountResult = await sequelize.query('select * from tasks', 
+    var countText = 'count(*)';
+    var tasksCountResult = await sequelize.query('select ' + countText + ' from tasks', 
         {type: QueryTypes.SELECT}
     );
-    var tasksCount = parseInt(tasksCountResult);
+    var tasksCount = parseInt(tasksCountResult[0][countText]);
     tasksCount = isNaN(tasksCount) ? 0 : tasksCount; 
-    console.log(tasksCount);
     return tasksCount; 
 };
 
