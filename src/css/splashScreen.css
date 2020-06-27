@@ -10,6 +10,7 @@ body {
     margin: 0px;
     width: 846px;
     height: 546px;
+    cursor: default;
 }
 #text-container {
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;

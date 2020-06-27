@@ -45,6 +45,7 @@ main {
     height: 100%;
     -webkit-app-region: no-drag;
     color: white;
+    cursor: pointer;
 }
 .title-bar__button {
     grid-row: 1 / span 1;
@@ -76,6 +77,7 @@ main {
     background: rgb(31, 31, 31);
     color: white;
     -webkit-app-region: no-drag;
+    cursor: pointer;
 }
 
 /* Header */
