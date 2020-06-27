@@ -761,7 +761,6 @@ dataAccess.addTaskTagRel = async function addTaskTagRel(taskTagRelDetails) {
         {fields: ['task_id', 'tag_id']} //Allows insertion of only these fields
     )
         .then(() => {
-            console.log(true);
             return true;
         })
         .catch(err => {

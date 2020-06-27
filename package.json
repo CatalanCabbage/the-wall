@@ -1,6 +1,6 @@
 {
   "name": "the-wall",
-  "version": "0.1.7",
+  "version": "1.0.0",
   "description": "We’re going to build a wall, folks. Don’t worry. That wall will go up so fast your head will spin.",
   "main": "main.js",
   "repository": {

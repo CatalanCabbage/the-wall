@@ -3,6 +3,7 @@ module.exports = general;
 const {ipcRenderer} = require('electron');
 //Without the ../ it looks inside node_modules
 const dataAccess = require('./../js/dataAccess.js');
+const headerFooter = require('./headerFooter.js');
 
 var maxWeightage = 100000;
 
@@ -103,10 +104,8 @@ general.updatePopup = function updatePopup(info) {
         .modal({
             onApprove: function() {
                 if ($('#update-checkbox')[0].checked) {
-                    console.log('checked');
                     alwaysUpdate('true');
                 }
-                console.log('approved');
                 updateAndQuit();
             }
         })
@@ -150,7 +149,6 @@ general.checkForUpdates = function checkForUpdates() {
 ipcRenderer.on('updater-action-response', (event, arg) => {
     if (arg[0] == 'updateDownloaded') {
         var info = arg[1];
-        console.log('received info in index.js');
         general.updatePopup(info);
         //Ask if you want to update, with release notes
     }
@@ -176,6 +174,14 @@ general.renderSettingsModal = async function renderSettingsModal() {
         $('#settings__update-checkbox')[0].checked = false;
     }
     
+    //Initialize autoUpdate checkbox
+    var showInputTooltips = await dataAccess.getParam('showInputTooltips');
+    if (showInputTooltips == null || showInputTooltips == 'true') {
+        $('#settings__input-tooltips-checkbox')[0].checked = true;
+    } else {
+        $('#settings__input-tooltips-checkbox')[0].checked = false;
+    }
+
     //Initialize Slider
     var totalWeightage = await dataAccess.getTotalWeightage();
     var minWeightageLimit = totalWeightage + (maxWeightage-totalWeightage)%100;
@@ -189,7 +195,6 @@ general.renderSettingsModal = async function renderSettingsModal() {
                 $('#settings__target-slider-text').html(targetPointsInput);
             }
         });
-    console.log(targetWeightage);
     $('.ui.target.slider').slider('set value', targetWeightage);
     $('#settings__target-slider-text').html(targetWeightage); //Init text box next to the slider
 };
@@ -203,6 +208,9 @@ general.saveSettings = function saveSettings() {
     } else {
         alwaysUpdate('false');
     }
+    //Decides if Input Tooltips should be shown
+    headerFooter.updateInputTooltipsSetting($('#settings__input-tooltips-checkbox')[0].checked);
+
     //Set targetWeightage
     var targetText = $('#settings__target-slider-text');
     var newTargetWeightage = parseInt(targetText[0].innerText);

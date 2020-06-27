@@ -130,14 +130,12 @@ function handleSettingsMenu(value) {
             break;
     }
 }
-
 function handleSettingsModal() {
     //Show modal
     $('.settings.ui.modal')
         .modal({
             onApprove: function() {
                 var changesMade = general.saveSettings();
-                console.log(changesMade);
                 if (changesMade) {
                     renderTargetDependantViews();
                 }

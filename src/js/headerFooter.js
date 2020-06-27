@@ -192,7 +192,7 @@ headerFooter.handleAddNewTag =  function handleAddNewTag() {
         .modal('show');
     //Clear previous inputs if any
     setPreviewTagColor('');
-    setPreviewTagText('Sample Tag');
+    setPreviewTagText('Sample Skill');
     var addTagNameElem = $('#add-tag__name');
     addTagNameElem[0].value = '';
 
@@ -252,26 +252,26 @@ async function saveNewTag() {
     let tagName = tagNameInp[0].value.trim();
     //Validate Tags
     if (tagName == '') {
-        general.showToast('Tag name cannot be empty', 'red');
+        general.showToast('Skill name cannot be empty', 'red');
         return false;
     }
     if (previewTagColor == '') {
-        general.showToast('Select a color for the Tag', 'red');
+        general.showToast('Select a color for the Skill', 'red');
         return false;
     }
     if (tagName.includes('<') || tagName.includes('>') || tagName.includes('"')) {
-        general.showToast('Tag name must not contain <u> <>" </u>', 'red');
+        general.showToast('Skill name must not contain <u> <>" </u>', 'red');
         return false;
     }
     //Save tags
     let tagObj = await dataAccess.addTag({name: tagName, color: previewTagColor});
     if (tagObj == 'SequelizeUniqueConstraintError') {
-        general.showToast('Tag <b>' + tagName + '</b> already exists', 'red');
+        general.showToast('Skill <b>' + tagName + '</b> already exists', 'red');
         return false;
     }
     //Regenerate tags dropdown options 
     headerFooter.populateInputsDropdown();
-    general.showToast('Tag <b>' + tagName + '</b> added', 'green');
+    general.showToast('Skill <b>' + tagName + '</b> added', 'green');
     general.getTotalTagsCount(true);
     return true;
 }
@@ -312,13 +312,27 @@ headerFooter.populateInputsDropdown = async function populateInputsDropdown() {
     let tagNameInp = $('#task-input__tag');
     tagNameInp.html(tagsTemplate);
 
-    addTooltips();
+    //Don't show toolTips only if explicitly turned off
+    var showInputTooltips = await dataAccess.getParam('showInputTooltips');
+    if (showInputTooltips == null || showInputTooltips == 'true') {
+        addTooltips();
+    }
+};
+
+headerFooter.updateInputTooltipsSetting = function updateInputTooltipsSetting(show) {
+    if(show) {
+        addTooltips();
+        show = 'true';
+    } else {
+        hideToolTips();
+        show = 'false';
+    }
+    dataAccess.addParam({key: 'showInputTooltips', value: show});
 };
 
 //Messages to show on input tooltip
 var messages = {};
 var messageId = 0;
-/* eslint-disable indent */
 messages[messageId++] = {
     task: {line1: 'Eg. Be really specific!', line2: 'Read a couple of pages...'},
     section: {line1: 'Which book?', line2: 'Pragmatic Programmer'},
@@ -361,7 +375,7 @@ messages[messageId++] = {
     tags: {line1: 'The broad field is also:', line2: 'JS'},
     points: {line1: 'How valuable do you think it is?', line2: '40'}
 };
-/* eslint-enable indent */
+
 //Add on-hover info tooltips to input buttons
 function addTooltips() {
     //Pick a random message
@@ -375,6 +389,9 @@ function addTooltips() {
         preserve: true,
         delay: {show: 350}
     });
+}
+function hideToolTips() {
+    $('.task-input').popup('destroy');
 }
 
 
