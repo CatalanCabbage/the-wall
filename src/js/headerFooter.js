@@ -402,9 +402,9 @@ $('.task-input.tags.ui.dropdown')
         useLabels: false,
         transition: 'scale',
         message: {
-            count: '{count} tags',
-            maxSelections: 'Max {maxCount} tags',
-            noResults: 'No tags found'
+            count: '{count} skills',
+            maxSelections: 'Max {maxCount} skills',
+            noResults: 'No skills found'
         },
         onChange: async function(value) {
             if (value == valueOfAddSkillDropdown || (Array.isArray(value) && value.includes(valueOfAddSkillDropdown))) {
