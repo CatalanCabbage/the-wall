@@ -76,6 +76,7 @@ async function addTask() {
     var totalWeightage = await dataAccess.getTotalWeightage();
     var targetWeightage = await general.getTargetWeightage();
     if (totalWeightage > targetWeightage) {
+        general.targetReached(targetWeightage);
         targetWeightage = await general.getTargetWeightage(true);
     }
     //Regenerate rendered data
@@ -94,7 +95,6 @@ async function addTask() {
         }
     }
 }
-
 
 
 function isValidInput() {

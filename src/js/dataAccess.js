@@ -659,15 +659,23 @@ dataAccess.deleteTask = async function deleteTask(taskId) {
         });
 };
 
+/*Note that it maps tags to tasks and calculates total, instead of just sum of tasks
+ *That is, if a task with 5 weightage is mapped to 2 tags, that would mean 5 per tag
+ *and so, 10 in total. Which is why just counting tasks total won't work
+ */
 dataAccess.getTotalWeightage = async function getTotalWeightage() {
-    var query = 'select coalesce(sum(tasks.weightage), 0) as weightage from tasks';
+    var query = 'select coalesce(sum(tasks.weightage), 0) as weightage' + 
+        ' from tags' +
+        ' left outer join task_tag_rels on tags.id=task_tag_rels.tag_id' + 
+        ' left outer join tasks on task_tag_rels.task_id=tasks.id';
     var result = await sequelize.query(query,
         {type: QueryTypes.SELECT}
     ).catch(err => new Error(err));
     if (result instanceof Error) {
         console.error(result);
-        return 0;
+        return null;
     }
+    console.log(result);
     var weightage = parseInt(result[0].weightage);
     if (weightage == null || isNaN(weightage)) {
         weightage = 0;
@@ -690,9 +698,13 @@ dataAccess.getWeightageByDays = async function getWeightageByDays(days) {
 
     startDate = startDateInp.getUTCFullYear() + '-' + ('0' + (startDateInp.getMonth() + 1)).slice(-2) + '-' + ('0' + startDateInp.getDate()).slice(-2);
     endDate = endDateInp.getUTCFullYear() + '-' + ('0' + (endDateInp.getMonth() + 1)).slice(-2) + '-' + ('0' + endDateInp.getDate()).slice(-2);
-    
-    // eslint-disable-next-line quotes
-    var query = "select coalesce(sum(tasks.weightage), 0) as weightage from tasks where created_at > '" + startDate + "' and created_at <= '" + endDate + "'";
+
+    var query = 'select coalesce(sum(tasks.weightage), 0) as weightage' + 
+        ' from tags' +
+        ' left outer join task_tag_rels on tags.id=task_tag_rels.tag_id' + 
+        ' left outer join tasks on task_tag_rels.task_id=tasks.id' +    
+        // eslint-disable-next-line quotes
+        " where tasks.created_at > '" + startDate + "' and tasks.created_at <= '" + endDate + "'";
     var result = await sequelize.query(query,{
         type: QueryTypes.SELECT
     }
@@ -724,8 +736,12 @@ dataAccess.getWeightageByMonths = async function getWeightageByMonths(months) {
     //Hard-code date, since we want to start counting from 1st of each month
     startMonth = startMonthInp.getUTCFullYear() + '-' + ('0' + (startMonthInp.getMonth() + 1)).slice(-2) + '-' + '01';
     endMonth = endMonthInp.getUTCFullYear() + '-' + ('0' + (endMonthInp.getMonth() + 1)).slice(-2) + '-' + '01';
-    // eslint-disable-next-line quotes
-    var query = "select coalesce(sum(tasks.weightage), 0) as weightage from tasks where created_at >= '" + startMonth + "' and created_at < '" + endMonth + "'";
+    var query = 'select coalesce(sum(tasks.weightage), 0) as weightage' + 
+        ' from tags' +
+        ' left outer join task_tag_rels on tags.id=task_tag_rels.tag_id' + 
+        ' left outer join tasks on task_tag_rels.task_id=tasks.id' +    
+        // eslint-disable-next-line quotes
+        " where tasks.created_at >= '" + startMonth + "' and tasks.created_at < '" + endMonth + "'";
     var result = await sequelize.query(query,{
         type: QueryTypes.SELECT
     }

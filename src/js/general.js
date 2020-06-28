@@ -72,6 +72,23 @@ general.showToast = function showToast(message, color) {
         });
 };
 
+//Show a toast when a task added results in target weightage being reached
+general.targetReached = function targetReached(targetWeightage) {
+    var message = 'You\'ve reached your target of <b><u>' + targetWeightage 
+        + '</u></b> points! :o <br> Your target has been increased, let\'s keep going!';
+    $('main')
+        .toast({
+            title: 'Congratulations!',
+            message: message,
+            position: 'bottom right',
+            displayTime: 10000,
+            class: 'teal',
+            showProgress: 'bottom',
+            classProgress: 'blue',
+            progressUp: true
+        });
+};
+
 //A new user won't know they have to click on the title to get The Wall view
 //So add a blinking text to draw attention;
 //shown after the user adds a task till the user clicks the title once
