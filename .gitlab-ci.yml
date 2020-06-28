@@ -15,7 +15,7 @@
 build:
   extends: .buildTemplate
   script:
-    - npm i -g eslint && eslint init && npm run lint
+    - npm i -g eslint && eslint -c .eslintrc.yml && npm run lint
     - npm run buildWin && npm cache --force clean && npm run buildMac
     - echo 'Built for Windows and Mac tar.gz; commit ' $CI_COMMIT_MESSAGE
   except:
@@ -31,6 +31,6 @@ releaseBuild:
   artifacts:
     expire_in: 3 years
   script:
-    - npm i -g eslint && eslint init && npm run lint
+    - npm i -g eslint && eslint -c .eslintrc.yml && npm run lint
     - npm run build
     - echo 'Built for all platforms; tag ' $CI_COMMIT_TAG
