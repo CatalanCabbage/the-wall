@@ -15,7 +15,8 @@
     "postinstall": "electron-builder install-app-deps",
     "buildWin": "electron-builder build --win",
     "buildMac": "electron-builder build --mac tar.gz",
-    "build": "electron-builder build -mwl"
+    "build": "electron-builder build -mwl",
+    "lint": "./node_modules/.bin/eslint .\\src\\js\\*"
   },
   "build": {
     "appId": "cataxcab.thewall",
@@ -48,7 +49,7 @@
     "electron": "^7.1.11",
     "electron-builder": "^22.6.0",
     "electron-rebuild": "^1.10.0",
-    "eslint": "^7.0.0"
+    "eslint": "^7.3.1"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
