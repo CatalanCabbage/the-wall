@@ -74,7 +74,7 @@ general.showToast = function showToast(message, color) {
 
 //Show a toast when a task added results in target weightage being reached
 general.targetReached = function targetReached(targetWeightage) {
-    message = 'You\'ve reached your target of <b><u>' + targetWeightage 
+    var message = 'You\'ve reached your target of <b><u>' + targetWeightage 
         + '</u></b> points! :o <br> Your target has been increased, let\'s keep going!';
     $('main')
         .toast({
@@ -82,7 +82,7 @@ general.targetReached = function targetReached(targetWeightage) {
             message: message,
             position: 'bottom right',
             displayTime: 10000,
-            class: "teal",
+            class: 'teal',
             showProgress: 'bottom',
             classProgress: 'blue',
             progressUp: true
