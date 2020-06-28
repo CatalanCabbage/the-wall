@@ -1,13 +1,15 @@
 # The Wall
 
-*Download:*  
-*(links to be updated)*
+> For bugs or suggestions, feel free to [create an issue](https://gitlab.com/cataxcab/the-wall/-/issues) or drop a mail at catalancabbage@zoho.com
 
-|Linux|Windows|Mac|
+*Download v1.0.0:*  
+
+|Linux|Windows|Mac[^2]|
 |:-----:|:----:|:-----:|
-|<a href="#"><img src="gitAssets/git-linux.png" alt="Linux" width="40"/></a>|<a href="#"><img src="gitAssets/git-windows.png" alt="Windows" width="40"/></a>|<a href="#"><img src="gitAssets/git-mac.png" alt="Mac" width="40"/></a>|
+|<a href="https://drive.google.com/uc?id=1NwB1c9ae_dbXBnpm3kJd3HX8WVyNEER0&export=download"><img src="gitAssets/git-linux.png" alt="Linux" width="40"/></a>|<a href="https://drive.google.com/uc?id=1jdrb_5zt1dIHqyTLy7XW7DbGht6x7qsC&export=download"><img src="gitAssets/git-windows.png" alt="Windows" width="40"/></a>|<a href="https://drive.google.com/uc?id=1A_qOWAwjZG5WLb1tITN3YNTmVYOiD8Nf&export=download"><img src="gitAssets/git-mac.png" alt="Mac" width="40"/></a>|
 
-*[~skip to screenshots~](#screenshots)*
+*[~skip to screenshots~](#screenshots)*  
+
 
 ## What is The Wall?
 An app to motivate long-term progress and graphically track them across various skills.  
@@ -70,3 +72,4 @@ So overall, 20 points is added to the total.
 -----
 
 [^1]: The idea that it requires 10,000 hours of concentrated practice in order to possess what is considered a world-class skill in something.
+[^2]: The Mac app does not support auto-update; new versions will have to be downloaded from this page
