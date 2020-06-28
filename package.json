@@ -16,7 +16,7 @@
     "buildWin": "electron-builder build --win",
     "buildMac": "electron-builder build --mac tar.gz",
     "build": "electron-builder build -mwl",
-    "lint": "./node_modules/.bin/eslint .\\src\\js\\*"
+    "lint": "cross-env ./node_modules/.bin/eslint ./src/js/*"
   },
   "build": {
     "appId": "cataxcab.thewall",
