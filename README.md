@@ -59,6 +59,11 @@ So overall, 20 points is added to the total.
 
 ## Screenshots:
 
+### A helpful 'about' section:
+*A moderately-fun read<sup>(the first couple of times)</sup>*
+
+<img src="gitAssets/git-about.JPG" alt="About The Wall" width="800"/>  
+
 ### Activity View:
 *Shows each activity as a card, along with total points and skills involved*
 
@@ -68,6 +73,16 @@ So overall, 20 points is added to the total.
 *Shows skills as bricks, with some stats; number of bricks is decided by points in that skill*
 
 <img src="gitAssets/git-wall-view.JPG" alt="The Wall, with points converted to bricks!" width="800"/>  
+
+### Target points selection:
+*Change your target points anytime*
+
+<img src="gitAssets/git-settings.JPG" alt="Aim high!" width="800"/>  
+
+### Scale-ing The Wall:
+*Example screenshot to scale: Optimal - not too big, not too small! (ref. resolution: 1920x1080)*
+
+<img src="gitAssets/git-scale.jpg" alt="Wall, to scale" width="800"/> 
 
 -----
 
