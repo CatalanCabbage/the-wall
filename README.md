@@ -2,7 +2,7 @@
 
 > For bugs or suggestions, feel free to [create an issue](https://gitlab.com/cataxcab/the-wall/-/issues) or drop a mail at catalancabbage@zoho.com
 
-*Download v1.0.0:*  
+*Click on your OS icon to Download v1.0.0:*  
 
 |Linux|Windows|Mac[^2]|
 |:-----:|:----:|:-----:|
