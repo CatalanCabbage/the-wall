@@ -118,18 +118,18 @@ function isValidInput() {
     }
 
     //Check for invalid characters: 
-    //Restricted Characters <>" and Characters not restricted: '/& 
-    if (taskNameInpValue.includes('<') || taskNameInpValue.includes('>') || taskNameInpValue.includes('"')) {
+    //Restricted Characters <>"' and Characters not restricted: /& 
+    if (taskNameInpValue.includes('<') || taskNameInpValue.includes('>') || taskNameInpValue.includes('"') || taskNameInpValue.includes('\'')) {
         valid = false;
     }
-    if (sectionNameInpValue.includes('<') || sectionNameInpValue.includes('>') || sectionNameInpValue.includes('"')) {
+    if (sectionNameInpValue.includes('<') || sectionNameInpValue.includes('>') || sectionNameInpValue.includes('"') || sectionNameInpValue.includes('\'')) {
         valid = false;
     }
-    if (pointsInpValue.includes('<') || pointsInpValue.includes('>') || pointsInpValue.includes('"')) {
+    if (pointsInpValue.includes('<') || pointsInpValue.includes('>') || pointsInpValue.includes('"') || pointsInpValue.includes('\'')) {
         valid = false;
     }
     if (!valid) {
-        general.showToast('Fields must not contain <u> <>" </u>', 'red');
+        general.showToast('Fields must not contain <u> <>\'" </u>', 'red');
         return false;
     }
 
@@ -259,8 +259,8 @@ async function saveNewTag() {
         general.showToast('Select a color for the Skill', 'red');
         return false;
     }
-    if (tagName.includes('<') || tagName.includes('>') || tagName.includes('"')) {
-        general.showToast('Skill name must not contain <u> <>" </u>', 'red');
+    if (tagName.includes('<') || tagName.includes('>') || tagName.includes('"') || tagName.includes('\'')) {
+        general.showToast('Skill name must not contain <u> <>\'" </u>', 'red');
         return false;
     }
     //Save tags
