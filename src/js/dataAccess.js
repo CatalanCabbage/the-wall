@@ -675,7 +675,6 @@ dataAccess.getTotalWeightage = async function getTotalWeightage() {
         console.error(result);
         return null;
     }
-    console.log(result);
     var weightage = parseInt(result[0].weightage);
     if (weightage == null || isNaN(weightage)) {
         weightage = 0;
