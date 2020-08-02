@@ -1,5 +1,5 @@
 const {app, BrowserWindow} = require('electron');
-require('electron-reload')('./src/js');
+require('electron-reload')('./');
 const {autoUpdater} = require('electron-updater');
 const {ipcMain} = require('electron');
 

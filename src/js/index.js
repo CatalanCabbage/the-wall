@@ -4,8 +4,7 @@ const views = require('./../js/views.js');
 const headerFooter = require('./../js/headerFooter.js');
 const general = require('./../js/general.js');
 const about = require('./../js/about.js');
-const vlog = require('./../js/vlog.js');
-if (general.isDevEnv()) { 
+if (general.isDevEnv()) {
     //Added so that it can be tested from the console
     // eslint-disable-next-line no-unused-vars
     var dataAccess = require('./../js/dataAccess.js');
@@ -38,20 +37,7 @@ window.onbeforeunload = () => {
     win.removeAllListeners();
 };
 
-/*
- * Add key bindings for screenshot
- */
-document.onkeyup = function(event) {
-    var key = event.key || event.keyCode;
-    //Ctrl + Shift + M for now
-    if((key == 'm' || key == 'M' || key == 77) && event.ctrlKey == true && event.shiftKey == true) {
-        vlog.captureScreen();
-    }
-};
-
-async function initEvents() {
-    vlog.captureScreen(); //to be removed
-    
+async function initEvents() {    
     headerFooter.initEventListeners();
     
     var wallPromptShown = false;
