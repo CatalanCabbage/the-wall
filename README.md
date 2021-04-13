@@ -4,11 +4,11 @@
 
 *Click on your OS icon to Download v1.0.0:*  
 
-|Linux|Windows|Mac[^2]|
+|Linux|Windows|Mac<sup>2</sup>|
 |:-----:|:----:|:-----:|
 |<a href="https://drive.google.com/uc?id=1NwB1c9ae_dbXBnpm3kJd3HX8WVyNEER0&export=download"><img src="gitAssets/git-linux.png" alt="Linux" width="40"/></a>|<a href="https://drive.google.com/uc?id=1jdrb_5zt1dIHqyTLy7XW7DbGht6x7qsC&export=download"><img src="gitAssets/git-windows.png" alt="Windows" width="40"/></a>|<a href="https://drive.google.com/uc?id=1A_qOWAwjZG5WLb1tITN3YNTmVYOiD8Nf&export=download"><img src="gitAssets/git-mac.png" alt="Mac" width="40"/></a>|
 
-*[~skip to screenshots~](#screenshots)*  
+*[skip to screenshots](#screenshots)*  
 
 
 ## What is The Wall?
@@ -25,7 +25,7 @@ You can choose your own target value(*points*) and watch The Wall grow as you pe
 * It also helps you keep going, hopefully giving you a nice hit of dopamine when you add another ~~brick~~ task! 
 
 ## The philosophy
-Takes inspiration from the 10,000 hour rule[^1], with a caveat: The time spent alone is a a skewed measure of value  
+Takes inspiration from the 10,000 hour rule<sup>1</sup>, with a caveat: The time spent alone is a a skewed measure of value  
 So for tasks completed, instead of just *time*, quantify it as *points* based on its effort and usefulness  
 Also, it's the journey to the number and not the number itself - this aims to help you keep going!
 
@@ -86,5 +86,5 @@ So overall, 20 points is added to the total.
 
 -----
 
-[^1]: The idea that it requires 10,000 hours of concentrated practice in order to possess what is considered a world-class skill in something.
-[^2]: The Mac app does not support auto-update; new versions will have to be downloaded from this page.
+<sup>1</sup>: The idea that it requires 10,000 hours of concentrated practice in order to possess what is considered a world-class skill in something.  
+<sup>2</sup>: The Mac app does not support auto-update; new versions will have to be downloaded from this page.
