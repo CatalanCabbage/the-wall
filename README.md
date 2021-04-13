@@ -1,6 +1,7 @@
 # The Wall
-
-> For bugs or suggestions, feel free to [create an issue](https://gitlab.com/cataxcab/the-wall/-/issues) or drop a mail at catalancabbage@zoho.com
+> *This is the archived version; the original can be found [in the GitLab repo](https://gitlab.com/cataxcab/the-wall)*.  
+---
+> For bugs or suggestions, feel free to [create an issue](https://gitlab.com/cataxcab/the-wall/-/issues) or drop a mail at catalancabbage@zoho.com  
 
 *Click on your OS icon to Download v1.0.0:*  
 
